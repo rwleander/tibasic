@@ -1,11 +1,13 @@
 # main repl loop
 
 import data
-import monitor
+import commands
 
 #main loop
 
 while (data.quitFlag == False):
   cmd = input('>')
-  print (monitor.executeCommand(cmd))
+  msg = commands.executeCommand(cmd)
+  if (msg != ''):
+    print (msg)
       

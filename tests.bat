@@ -1,2 +1,2 @@
-set pythonpath=src
-python tests\monitorTests.py 
+@set pythonpath=src
+python tests\commandTests.py 
