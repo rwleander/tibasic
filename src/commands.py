@@ -11,7 +11,10 @@ def executeCommand(cmd):
     return cmdNew()
   if (cmdWork == 'LIST'):
     return cmdList()  
-    
+
+  if (cmdWork[0] >= '0' and cmdWork[0] <= '9'):
+    return cmdAddLine(cmdWork)
+  
   if (cmdWork == 'QUIT'):
     data.quitFlag = True
     return ''
@@ -43,3 +46,19 @@ def cmdList():
       str = str + '\n'
   return str  
     
+    
+#  add or update a line of code
+
+def cmdAddLine(cmd):
+  parts = cmd.split()
+  lineNumber = int(parts[0])
+  if (len(parts) > 1):
+    data.codeList[lineNumber] = cmd
+  else:
+    if lineNumber in data.codeList:
+      data.codeList.pop(lineNumber)    
+    else:
+      return 'Not in list'
+  return 'OK'
+
+  
