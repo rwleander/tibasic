@@ -1,6 +1,6 @@
 # global variables
 
 codeList = {}
-varibals = {}
+variables = {}
 strings = {}
 quitFlag = False
