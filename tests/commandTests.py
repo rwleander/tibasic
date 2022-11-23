@@ -1,11 +1,11 @@
-#  test for monitor module
+#  test for commands module
 
 import unittest
 
 import data
 import commands
 
-class TestMonitor(unittest.TestCase):
+class TestCommands(unittest.TestCase):
 
 # test the quit function
 
@@ -90,7 +90,7 @@ class TestMonitor(unittest.TestCase):
 #------------------------
 #  file operations
 
-#save a file
+#save then reload a file
 
   def testSave (self):
     rslt = commands.executeCommand('New')
@@ -99,9 +99,20 @@ class TestMonitor(unittest.TestCase):
     rslt = commands.executeCommand('30 Let C = A+ B')
     self.assertEqual(rslt, 'OK')
     self.assertEqual(len(data.codeList), 3)
+    oldList  = commands.executeCommand('LIST TESTFILE1')
+    
     rslt = commands.executeCommand('Save TESTFILE1')
     self.assertEqual(rslt, 'OK')
     
+    rslt = commands.executeCommand('New')
+    self.assertEqual(rslt, 'OK')
+    self.assertEqual(len(data.codeList), 0)
+    
+    rslt = commands.executeCommand('Open TESTFILE1')
+    self.assertEqual(rslt, 'OK')
+    self.assertEqual(len(data.codeList), 3)
+    newList  = commands.executeCommand('LIST TESTFILE1')
+    self.assertEqual(newList, oldList)
 
  
   

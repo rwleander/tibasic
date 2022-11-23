@@ -1,6 +1,7 @@
 #  commands - parse and run repl commands
 
 import data
+import helpers
 
 # process a command
 
@@ -20,6 +21,9 @@ def executeCommand(cmd):
   if (command[0] >= '0' and cmdWork[0] <= '9'):
     return cmdAddLine(cmdWork)
   
+  if (command == 'OPEN'):
+    return cmdOpen(cmdWork)
+    
   if (command == 'SAVE'):
     return cmdSave(cmdWork)
     
@@ -62,7 +66,7 @@ def cmdList():
 
 def cmdAddLine(cmd):
   parts = cmd.split()
-  if (parts[0].isnumeric()):
+  if (helpers.isnumeric(parts[0])):
     lineNumber = int(parts[0])
   else:
     return 'Bad line number'
@@ -78,6 +82,25 @@ def cmdAddLine(cmd):
 
   #-----------------------
   #  file operations
+  
+  # load a file
+  
+def cmdOpen(cmdWork):
+  parts = cmdWork.split()
+  if (len(parts) < 2):
+    return 'Missing file name'
+    
+  if (len(parts) > 2):
+    return 'Too many arguments'
+
+  cmdNew()
+  fileName = parts[1] + '.ti'
+  with open (fileName, 'r') as fl:
+    while  (line := fl.readline().strip()):
+      cmdAddLine(line)  
+    fl.close()
+ 
+  return 'OK'
   
   #  save a file
   
@@ -96,7 +119,7 @@ def cmdSave(cmdWork):
   
   fileName =  parts[1] + '.ti'  
   with open (fileName, 'w') as fl:
-    for lineNumber in index:      
+    for lineNumber in index:
       fl.write (data.codeList[lineNumber] + '\n')
     fl.close()
   return 'OK'
