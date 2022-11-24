@@ -1,5 +1,6 @@
 #  commands - parse and run repl commands
 
+import os
 import data
 import helpers
 
@@ -27,6 +28,12 @@ def executeCommand(cmd):
   if (command == 'SAVE'):
     return cmdSave(cmdWork)
     
+  if (command == 'FILES'):
+    return cmdFiles()
+    
+  if (command == 'DELETE'):
+    return cmdDelete(cmdWork)
+      
   if (command == 'QUIT'):
     data.quitFlag = True
     return ''
@@ -115,6 +122,9 @@ def cmdOpen(cmdWork):
 
   cmdNew()
   fileName = parts[1] + '.ti'
+  if (os.path.exists(fileName) == False):
+    return 'File not found'
+    
   with open (fileName, 'r') as fl:
     while  (line := fl.readline().strip()):
       cmdAddLine(line)  
@@ -143,3 +153,37 @@ def cmdSave(cmdWork):
       fl.write (data.codeList[lineNumber] + '\n')
     fl.close()
   return 'OK'
+  
+  # list files
+  
+def cmdFiles():
+  str = ''
+  n = 0
+  files  = os.listdir()
+  for file in files:
+    i = file.find('.ti')
+    j = file.find('\\')
+    if (i > 0 and j < 0): 
+      str = str + file[0:i] + '\t'
+      n = n + 1
+  
+  if (n > 0):
+    return str[0:len(str)-1]
+  else:
+    return 'No files'
+    
+    # delete file
+    
+def cmdDelete(cmdWork):
+  parts = cmdWork.split()
+  if (len(parts) < 2):
+    return 'Missing file name'
+    
+  if (len(parts) > 2):
+    return 'Too many arguments'
+
+  fileName = parts[1] + '.ti'
+  os.remove(fileName)
+  return 'OK'
+  
+  

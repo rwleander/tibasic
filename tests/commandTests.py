@@ -150,6 +150,23 @@ class TestCommands(unittest.TestCase):
     rslt = commands.executeCommand('Open  test test2')
     self.assertEqual(rslt, 'Too many arguments')
 
+# list files
+    
+  def testFiles (self):  
+    rslt = commands.executeCommand('FILES')
+    self.assertNotEqual(rslt, '') 
+
+# delete a file
+    
+  def testDeleteFiles (self):  
+    rslt = commands.executeCommand('10 let a = 1')
+    rslt = commands.executeCommand('Save testDelete')
+    rslt = commands.executeCommand('NEW')
+    rslt = commands.executeCommand('Delete TestDelete')
+    self.assertEqual(rslt, 'OK')
+    rslt = commands.executeCommand('open TestDelete')
+    self.assertEqual(rslt, 'File not found')
+
 
 if __name__ == '__main__':  
     unittest.main()
