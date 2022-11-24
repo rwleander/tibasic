@@ -15,11 +15,11 @@ def executeCommand(cmd):
   if (command == 'NEW'):
     return cmdNew()
     
-  if (command == 'LIST'):
-    return cmdList()  
-
   if (command[0] >= '0' and cmdWork[0] <= '9'):
     return cmdAddLine(cmdWork)
+
+  if (command == 'RESEQUENCE'):
+    return cmdResequence()
   
   if (command == 'OPEN'):
     return cmdOpen(cmdWork)
@@ -30,6 +30,10 @@ def executeCommand(cmd):
   if (command == 'QUIT'):
     data.quitFlag = True
     return ''
+
+  if (command == 'LIST'):
+    return cmdList()  
+
     
   return 'unknown command'
     
@@ -80,6 +84,22 @@ def cmdAddLine(cmd):
       return 'Not in list'
   return 'OK'
 
+# resequence the list
+
+def cmdResequence():
+  newCodeList = {}
+  seq = 10
+  
+  for lineNumber in data.codeList:
+    line = data.codeList[lineNumber]
+    i = line.index(' ')    
+    newLine = str(seq) + line[i:len(line)]    
+    newCodeList[seq] = newLine
+    seq = seq + 10
+  data.codeList = newCodeList
+  return 'OK'
+  
+  
   #-----------------------
   #  file operations
   

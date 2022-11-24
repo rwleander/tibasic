@@ -86,6 +86,17 @@ class TestCommands(unittest.TestCase):
     rslt = commands.executeCommand('10x Let A = 1')
     self.assertEqual(rslt, 'Bad line number')
 
+# resequence list
+  
+  def testResequence (self):
+    rslt = commands.executeCommand('New')
+    rslt = commands.executeCommand('20 Let A = 1')
+    rslt = commands.executeCommand('50 Let B = 2')    
+    rslt = commands.executeCommand('72 Let C = A + B')
+    rslt = commands.executeCommand('Resequence')
+    self.assertEqual(rslt, 'OK')
+    rslt = commands.executeCommand('List')
+    self.assertEqual(rslt, '10 LET A = 1\n20 LET B = 2\n30 LET C = A + B') 
 
 #------------------------
 #  file operations
@@ -113,9 +124,33 @@ class TestCommands(unittest.TestCase):
     self.assertEqual(len(data.codeList), 3)
     newList  = commands.executeCommand('LIST TESTFILE1')
     self.assertEqual(newList, oldList)
+    
+# save without file name
 
- 
-  
+  def testSaveWithoutFile (self):
+    rslt = commands.executeCommand('SAVE')
+    self.assertEqual(rslt, 'Missing file name');
+
+#   save with too many args
+
+  def testSaveTooManyArgs (self):  
+    rslt = commands.executeCommand('SAVE test test2')
+    self.assertEqual(rslt, 'Too many arguments')
+
+
+# open file with missing name
+
+  def testOpenWithoutFile (self):
+    rslt = commands.executeCommand('Open')
+    self.assertEqual(rslt, 'Missing file name');
+
+# open with too many args
+    
+  def testOpenTooManyArgs (self):  
+    rslt = commands.executeCommand('Open  test test2')
+    self.assertEqual(rslt, 'Too many arguments')
+
+
 if __name__ == '__main__':  
     unittest.main()
     
