@@ -167,6 +167,12 @@ class TestCommands(unittest.TestCase):
     rslt = commands.executeCommand('open TestDelete')
     self.assertEqual(rslt, 'File not found')
 
+# test delete when file doesn't exist
+
+  def testDeleteMissingFiles (self):  
+    rslt = commands.executeCommand('Delete TestXYZ')
+    self.assertEqual(rslt, 'File not found')
+    
 
 if __name__ == '__main__':  
     unittest.main()

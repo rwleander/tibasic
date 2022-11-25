@@ -10,3 +10,16 @@ def isnumeric(str):
     i = i + 1
   return True
 
+# get file name from cammand line
+
+def parseFileName(cmdWork):
+  parts = cmdWork.split()
+  if (len(parts) < 2):
+    return ['', 'Missing file name']
+    
+  if (len(parts) > 2):
+    return ['', 'Too many arguments']
+
+  fileName = parts[1] + '.ti'
+  return [fileName, 'OK']
+

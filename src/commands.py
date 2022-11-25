@@ -113,15 +113,11 @@ def cmdResequence():
   # load a file
   
 def cmdOpen(cmdWork):
-  parts = cmdWork.split()
-  if (len(parts) < 2):
-    return 'Missing file name'
+  [fileName, msg] = helpers.parseFileName(cmdWork)
+  if (msg != 'OK'):
+    return msg
     
-  if (len(parts) > 2):
-    return 'Too many arguments'
-
   cmdNew()
-  fileName = parts[1] + '.ti'
   if (os.path.exists(fileName) == False):
     return 'File not found'
     
@@ -135,19 +131,15 @@ def cmdOpen(cmdWork):
   #  save a file
   
 def cmdSave(cmdWork):
-  parts = cmdWork.split()
-  if (len(parts) < 2):
-    return 'Missing file name'
-    
-  if (len(parts) > 2):
-    return 'Too many arguments'
-      
+  [fileName, msg] = helpers.parseFileName(cmdWork)
+  if (msg != 'OK'):
+    return msg
+        
   index = []
   for lineNumber in data.codeList:
     index.append(lineNumber)
   index.sort()  
   
-  fileName =  parts[1] + '.ti'  
   with open (fileName, 'w') as fl:
     for lineNumber in index:
       fl.write (data.codeList[lineNumber] + '\n')
@@ -175,14 +167,13 @@ def cmdFiles():
     # delete file
     
 def cmdDelete(cmdWork):
-  parts = cmdWork.split()
-  if (len(parts) < 2):
-    return 'Missing file name'
+  [fileName, msg] = helpers.parseFileName(cmdWork)
+  if (msg != 'OK'):
+    return msg
     
-  if (len(parts) > 2):
-    return 'Too many arguments'
-
-  fileName = parts[1] + '.ti'
+  if (os.path.exists(fileName) == False):
+    return 'File not found'
+    
   os.remove(fileName)
   return 'OK'
   
