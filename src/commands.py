@@ -2,6 +2,7 @@
 
 import os
 import data
+import statements
 import helpers
 
 # process a command
@@ -34,6 +35,9 @@ def executeCommand(cmd):
   if (command == 'DELETE'):
     return cmdDelete(cmdWork)
       
+  if (command == 'LET'):
+    return statements.stmtLet(cmdWork)
+        
   if (command == 'QUIT'):
     data.quitFlag = True
     return ''

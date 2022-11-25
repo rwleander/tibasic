@@ -1,5 +1,7 @@
 #  helper functions created to reproduce functions missing from Circuit Python
 
+import data
+
 #  is this string numeric
 
 def isnumeric(str):
@@ -23,3 +25,9 @@ def parseFileName(cmdWork):
   fileName = parts[1] + '.ti'
   return [fileName, 'OK']
 
+#  evaluate an expression
+
+def evaluate(expr):
+  value = eval(expr, data.variables)
+  return [value, 'OK']
+  
