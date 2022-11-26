@@ -24,6 +24,16 @@ class TestStatements(unittest.TestCase):
     rslt = commands.executeCommand('LET B = A')
     self.assertEqual(len(data.variables), 3)
     self.assertEqual(data.variables['B'], 1)
+
+# test print statement
+
+  def testPrint (self):
+    rslt = commands.executeCommand('New')
+    rslt = commands.executeCommand('LET A = 100')
+    self.assertEqual(rslt, 'OK')
+    rslt = commands.executeCommand('Print A')
+    self.assertEqual(rslt, '100')
+    
     
     
 

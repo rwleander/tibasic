@@ -37,7 +37,10 @@ def executeCommand(cmd):
       
   if (command == 'LET'):
     return statements.stmtLet(cmdWork)
-        
+    
+  if (command == 'PRINT'):
+    return statements.stmtPrint(cmdWork)
+  
   if (command == 'QUIT'):
     data.quitFlag = True
     return ''
@@ -122,7 +125,7 @@ def cmdOpen(cmdWork):
     return msg
     
   cmdNew()
-  if (os.path.exists(fileName) == False):
+  if (helpers.fileExists(fileName) == False):
     return 'File not found'
     
   with open (fileName, 'r') as fl:
@@ -175,7 +178,7 @@ def cmdDelete(cmdWork):
   if (msg != 'OK'):
     return msg
     
-  if (os.path.exists(fileName) == False):
+  if (helpers.fileExists(fileName) == False):
     return 'File not found'
     
   os.remove(fileName)

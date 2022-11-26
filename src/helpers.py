@@ -1,5 +1,6 @@
 #  helper functions created to reproduce functions missing from Circuit Python
 
+import os
 import data
 
 #  is this string numeric
@@ -12,7 +13,7 @@ def isnumeric(str):
     i = i + 1
   return True
 
-# get file name from cammand line
+# get file name from command line
 
 def parseFileName(cmdWork):
   parts = cmdWork.split()
@@ -25,9 +26,11 @@ def parseFileName(cmdWork):
   fileName = parts[1] + '.ti'
   return [fileName, 'OK']
 
-#  evaluate an expression
 
-def evaluate(expr):
-  value = eval(expr, data.variables)
-  return [value, 'OK']
+# does file exist
+
+def fileExists(fileName):
+  files = os.listdir()
+  return fileName in files
+  
   
