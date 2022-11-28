@@ -36,10 +36,10 @@ def executeCommand(cmd):
     return cmdDelete(cmdWork)
       
   if (command == 'LET'):
-    return statements.stmtLet(cmdWork)
+    return cmdLet(cmdWork)
     
   if (command == 'PRINT'):
-    return statements.stmtPrint(cmdWork)
+    return cmdPrint(cmdWork)
   
   if (command == 'QUIT'):
     data.quitFlag = True
@@ -183,5 +183,44 @@ def cmdDelete(cmdWork):
     
   os.remove(fileName)
   return 'OK'
+  
+  
+  #-----------------------
+  #  other commands
+  
+  # let statement
+
+def cmdLet(cmdWork):
+  parts = cmdWork.split()
+  if (len(parts) < 4):
+    return 'Syntax error'
+	
+  if (parts[2] != '='):
+    return 'Syntax error'
+      
+  vName = parts[1]
+  i = cmdWork.find('=')
+  expr = cmdWork[i+2: len(cmdWork)] 
+  try:
+    value = eval(expr, data.variables)
+  except:
+    return 'Syntax error'
+  data.variables[vName] = value  
+  return 'OK'
+  
+#print statement
+  
+def cmdPrint(cmdWork):
+  parts = cmdWork.split()
+  if (len(parts) < 2):
+    return 'Syntax error'
+  
+  i = cmdWork.find(' ')
+  expr = cmdWork[i+1: len(cmdWork)]
+  try:
+    value = eval(expr, data.variables)
+  except:
+    return  'Syntax error'
+  return str(value)
   
   

@@ -18,8 +18,10 @@ def stmtLet(cmdWork):
   vName = parts[1]
   i = cmdWork.find('=')
   expr = cmdWork[i+2: len(cmdWork)] 
-  value = eval(expr, data.variables)
-
+  try:
+    value = eval(expr, data.variables)
+  except:
+    return 'Syntax error'
   data.variables[vName] = value  
   return 'OK'
   
@@ -27,13 +29,14 @@ def stmtLet(cmdWork):
   
 def stmtPrint(cmdWork):
   parts = cmdWork.split()
-  if (len(parts) != 2):
+  if (len(parts) < 2):
     return 'Syntax error'
   
-  if (parts[1] in data.variables):
-    return str(data.variables[parts[1]])
-    
-  else:
-    return 'Unknown variable'
-  
+  i = cmdWork.find(' ')
+  expr = cmdWork[i+1: len(cmdWork)]
+  try:
+    value = eval(expr, data.variables)
+  except:
+    return  'Syntax error'
+  return str(value)
   
