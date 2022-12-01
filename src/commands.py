@@ -3,6 +3,7 @@
 import os
 
 import data
+import runtime
 import helpers
 
 # process a command
@@ -40,14 +41,17 @@ def executeCommand(cmd):
     
   if (command == 'PRINT'):
     return cmdPrint(cmdWork)
-  
-  if (command == 'QUIT'):
-    data.quitFlag = True
-    return ''
+
 
   if (command == 'LIST'):
     return cmdList()  
 
+  if(command == 'RUN'):
+    return runtime.run()
+  
+  if (command == 'QUIT'):
+    data.quitFlag = True
+    return ''
     
   return 'unknown command'
     

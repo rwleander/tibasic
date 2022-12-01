@@ -7,7 +7,6 @@ strings = {}
 index = []
 parserList = {}
 
-address = -1
 firstLine = -1
 quitFlag = False
 

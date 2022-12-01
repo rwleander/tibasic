@@ -88,15 +88,15 @@ def parseLet(item):
     
   # parse print cstatement
     
-def parseLet(item):
+def parsePrint(item):
   code = item['code']
   parts = code.split()
-  if (len(parts) < 4):
+  if (len(parts) < 3):
     item['error'] = 'Missing arguments'
     return item  
   
   i = code.find('PRINT') 
-  item['part1'] = code[ i + 7: len(code)]
+  item['part1'] = code[ i + 6: len(code)]
   return item
 
 

@@ -1,4 +1,4 @@
-#  test for parser functions
+#  test for parser methods
 
 import unittest
 
@@ -88,11 +88,11 @@ class TestParser(unittest.TestCase):
     rslt = parser.parse()    
     self.assertEqual(len(data.parseList), 3)
     item1 = data.parseList[10]
-    self.assertEqual(item1['error'], 'Missing arguments') 
+    self.assertEqual(item1['error'], 'Missing argument') 
     item2 = data.parseList[20]
-    self.assertEqual(item2['error'], 'Missing arguments') 
+    self.assertEqual(item2['error'], 'Missing argument') 
     item3 = data.parseList[30]
-    self.assertEqual(item3['error'], 'Missing =') 
+    self.assertEqual(item2['error'], 'Missing =') 
 
 # test parse print
 
@@ -101,11 +101,11 @@ class TestParser(unittest.TestCase):
     commands.executeCommand('10 PRINT A')
     commands.executeCommand('20 Print A * B / 2 * A + 2 * B') 
     rslt = parser.parse()    
-    self.assertEqual(len(data.parseList), 2)
+    self.assertEqual(len(data.parseList), 3)
     item1 = data.parseList[10]
     self.assertEqual(item1, {'code': '10 PRINT A', 'statement': 'PRINT', 'nextLine': 20, 'part1': 'A', 'error': 'OK'}) 
     item2 = data.parseList[20]
-    self.assertEqual(item2, {'code': '20 PRINT A * B / 2 * A + 2 * B', 'statement': 'PRINT', 'nextLine': -1, 'part1': 'A * B / 2 * A + 2 * B', 'error': 'OK'}) 
+    self.assertEqual(item2, {'code': '20 Print A * B / 2 * A + 2 * B', 'statement': 'PRINT', 'nextLine': -1, 'part1': 'A * B / 2 * A + 2 * B', 'error': 'OK'}) 
 
 #  test bad print statements
 
@@ -116,9 +116,9 @@ class TestParser(unittest.TestCase):
     rslt = parser.parse()    
     self.assertEqual(len(data.parseList), 1)
     item1 = data.parseList[10]
+    self.assertEqual(item1['error'], 'Missing argument')
     
- 
-  
-if __name__ == '__main__':  
+
+  if __name__ == '__main__':  
     unittest.main()
     
