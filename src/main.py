@@ -5,6 +5,7 @@ import commands
 
 #main loop
 
+print ('TI BASIC READY')
 while (data.quitFlag == False):
   cmd = input('>')
   msg = commands.executeCommand(cmd)

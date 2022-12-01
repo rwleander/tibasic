@@ -22,14 +22,17 @@ class TestCommands(unittest.TestCase):
   def testNew (self):
     data.codeList = ['10 Let A = 1']
     data.variables = {'I': 10}
-    data.strings = {'msg': 'This is a message'}
+    data.strings = {'msg': 'This is a message'}    
+    data.parseList = {10: 'not a structure'}
     self.assertEqual(len(data.codeList), 1)
     self.assertEqual(len(data.variables), 1)
     self.assertEqual(len(data.strings), 1)
+    self.assertEqual(len(data.parseList), 1)
     rslt = commands.executeCommand('NEW')
     self.assertEqual(len(data.codeList), 0)
     self.assertEqual(len(data.variables), 0)
     self.assertEqual(len(data.strings), 0)
+    self.assertEqual(len(data.parseList), 0)
     self.assertEqual(rslt, 'OK')
 
 #  list - lists code to screen

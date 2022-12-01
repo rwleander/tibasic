@@ -9,7 +9,7 @@ class TestHelper(unittest.TestCase):
 
 # test isnumeric  
 
-  def testIsNumeriQuit (self):
+  def testIsNumericQuit (self):
     rslt = helpers.isnumeric('12345')
     self.assertEqual(rslt, True)
     rslt = helpers.isnumeric('123xx')

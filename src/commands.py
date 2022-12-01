@@ -1,8 +1,8 @@
 #  commands - parse and run repl commands
 
 import os
+
 import data
-import statements
 import helpers
 
 # process a command
@@ -61,6 +61,7 @@ def cmdNew():
   data.codeList = {}
   data.variables = {}
   data.strings = {}
+  data.parseList = {}
   return 'OK'
 
 #  list code
