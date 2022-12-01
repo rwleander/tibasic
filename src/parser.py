@@ -8,7 +8,12 @@ def parse():
   rslt = createIndex()
   if (rslt != 'OK'):
     return rslt
+    
   rslt = buildParseList()
+  if (rslt != 'OK'):
+    return rslt
+  
+  rslt = parseStatements()
   return rslt
   
 
@@ -45,4 +50,56 @@ def buildParseList():
       data.parseList[lastLine]['nextLine'] = lineNumber  
     lastLine = lineNumber
   return 'OK'
+  
+#  parse individual statements based on statement keyword
+  
+def parseStatements():
+  for lineNumber in data.index:
+    item = data.parseList[lineNumber]
+    newItem = {}
+    if (item['statement'] == 'LET'):
+      newItem = parseLet(item)
+     
+    if (item['statement'] == 'PRINT'):
+      newItem = parsePrint(item)
+    if (len(newItem) == 0):
+      item['error'] = 'Unknown command'
+      newItem = item
+
+    data.parseList[lineNumber] = newItem
+  return 'OK'  
+
+# parse the let statement
+
+def parseLet(item):
+  code = item['code']
+  parts = code.split()
+  if (len(parts) < 5):
+    item['error'] = 'Missing arguments'
+    return item  
+    
+  item['part1'] =  parts[2]
+  i = code.find('=')
+  if (i >  1):
+    item['part2'] = code[i + 2: len(code)]
+  else:
+    item['error'] = 'Missing ='
+  return item
+    
+  # parse print cstatement
+    
+def parseLet(item):
+  code = item['code']
+  parts = code.split()
+  if (len(parts) < 4):
+    item['error'] = 'Missing arguments'
+    return item  
+  
+  i = code.find('PRINT') 
+  item['part1'] = code[ i + 7: len(code)]
+  return item
+
+
+    
+    
   

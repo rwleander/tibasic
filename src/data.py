@@ -20,6 +20,9 @@ quitFlag = False
 #  item can contain the following keys:
 #    code - full line of code
 #    statement: type  of statement (LET, PRINT, FOR...)
+#  part1 - first part of statement
+#  part2 - second part of statement
+#  part3 - third part of statement
 #    nextLine: next line number in sequence
 #  error - error message or 'OK'
 #

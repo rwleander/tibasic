@@ -62,7 +62,63 @@ class TestParser(unittest.TestCase):
     self.assertEqual(data.firstLine, 10)
 
 
-  
-if __name__ == '__main__':  
+# test parse let statement
+
+
+  def testParserLet (self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 Let A = 1')
+    commands.executeCommand('20 Let B = A + 1')
+    rslt = parser.parse()    
+    self.assertEqual(rslt, 'OK')
+    self.assertEqual(len(data.parseList), 2)
+    self.assertEqual(data.firstLine, 10)
+    item1 = data.parseList[10]
+    self.assertEqual(item1, {'code': '10 LET A = 1', 'statement': 'LET', 'nextLine': 20, 'part1': 'A', 'part2': '1', 'error': 'OK'}) 
+    item2 = data.parseList[20]
+    self.assertEqual(item2, {'code': '20 LET B = A + 1', 'statement': 'LET', 'nextLine': -1, 'part1': 'B', 'part2': 'A + 1', 'error': 'OK'}) 
+    
+#  test bad let statements
+
+  def testParserLetErrors (self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 Let') 
+    commands.executeCommand('20 Let B') 
+    commands.executeCommand('30 Let C A + B') 
+    rslt = parser.parse()    
+    self.assertEqual(len(data.parseList), 3)
+    item1 = data.parseList[10]
+    self.assertEqual(item1['error'], 'Missing argument') 
+    item2 = data.parseList[20]
+    self.assertEqual(item2['error'], 'Missing argument') 
+    item3 = data.parseList[30]
+    self.assertEqual(item2['error'], 'Missing =') 
+
+# test parse print
+
+  def testParserPrint (self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 PRINT A')
+    commands.executeCommand('20 Print A * B / 2 * A + 2 * B') 
+    rslt = parser.parse()    
+    self.assertEqual(len(data.parseList), 3)
+    item1 = data.parseList[10]
+    self.assertEqual(item1, {'code': '10 PRINT A', 'statement': 'PRINT', 'nextLine': 20, 'part1': 'A', 'error': 'OK'}) 
+    item2 = data.parseList[20]
+    self.assertEqual(item2, {'code': '20 Print A * B / 2 * A + 2 * B', 'statement': 'PRINT', 'nextLine': -1, 'part1': 'A * B / 2 * A + 2 * B', 'error': 'OK'}) 
+
+#  test bad print statements
+
+
+  def testParserPrintErrors (self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 PRINT ')
+    rslt = parser.parse()    
+    self.assertEqual(len(data.parseList), 1)
+    item1 = data.parseList[10]
+    self.assertEqual(item1['error'], 'Missing argument')
+    
+
+  if __name__ == '__main__':  
     unittest.main()
     
