@@ -206,9 +206,8 @@ def cmdLet(cmdWork):
   vName = parts[1]
   i = cmdWork.find('=')
   expr = cmdWork[i+2: len(cmdWork)] 
-  try:
-    value = eval(expr, data.variables)
-  except:
+  [value, msg] = helpers.evaluateExpression(expr)
+  if (msg != 'OK'):
     return 'Syntax error'
   data.variables[vName] = value  
   return 'OK'
@@ -222,10 +221,9 @@ def cmdPrint(cmdWork):
   
   i = cmdWork.find(' ')
   expr = cmdWork[i+1: len(cmdWork)]
-  try:
-    value = eval(expr, data.variables)
-  except:
-    return  'Syntax error'
+  [value, msg] = helpers.evaluateExpression(expr)
+  if (msg != 'OK'):
+    return  'Syntax error'    
   return str(value)
   
   

@@ -1,6 +1,7 @@
 #  parser - scan code for errors and build parseList data structure
 
 import data
+import helpers
 
 #  parse the code list and place in parseList
 
@@ -60,6 +61,9 @@ def parseStatements():
     if (item['statement'] == 'LET'):
       newItem = parseLet(item)
      
+    if (item['statement'] == 'IF'):
+      newItem = parseIf(item)
+       
     if (item['statement'] == 'PRINT'):
       newItem = parsePrint(item)
     if (len(newItem) == 0):
@@ -86,6 +90,42 @@ def parseLet(item):
     item['error'] = 'Missing ='
   return item
     
+    
+    # parse if statement
+    
+def parseIf(item):
+  code = item['code']
+  parts = code.split()
+  if (len(parts) < 4):
+    item['error'] = 'Missing arguments'
+    return item  
+  
+  i = code.find('IF')
+  j = code.find('THEN')
+  if (j < 1):
+    item['error'] = 'Missing THEN'
+    return item
+  k = code.find('ELSE')
+  item['part1'] = code [i + 3: j - 1]  
+  if (item['part1'] == ''):
+    item['error'] = 'Missing expression'  
+    return item
+  if (k > 1):
+    part2 = code[j + 5: k -1]
+    part3 = code[k + 5: len(code)]
+  else:
+    part2 = code[j + 5: len(code)]
+    part3 = str(item['nextLine'])
+  if ((helpers.isnumeric(part2) == False) or (helpers.isnumeric(part3) == False)):
+    item['error'] =  'Bad line number'
+    return item
+  if (int(part2) not in data.codeList) or (int(part3) not in data.codeList): 
+    item['error'] = 'Unknown line number'
+    return item    
+  item['part2'] = part2
+  item['part3'] = part3    
+  return item
+      
   # parse print cstatement
     
 def parsePrint(item):

@@ -2,6 +2,7 @@
 
 import data
 import parser
+import helpers
 
 #  run the program
 
@@ -34,6 +35,9 @@ def executeStatement(address):
   if (item['statement'] == 'LET'):
     return runLet(item)
   
+  if (item['statement'] == 'IF'):
+    return runIf(item)
+    
   if (item['statement'] == 'PRINT'):
     return runPrint(item)
   
@@ -46,26 +50,35 @@ def executeStatement(address):
 def runLet(item):
   variable = item['part1']
   expr = item['part2']
-  try:
-    value = eval(expr, data.variables)    
-  except:
+  [value, msg] = helpers.evaluateExpression(expr)
+  if (msg != 'OK'):
     msg = item['code'] + '\n' + 'Expression error' 
-    return [-1, msg]
-    
+    return [-1, msg]    
   data.variables[variable] = value
   return [item['nextLine'], 'OK']
   
-  #  run print statement
+  # run an if statement
   
+def runIf(item):
+  expr = item['part1']
+  [value, msg] = helpers.evaluateExpression(expr)
+  if (msg != 'OK'):
+    msg = item['code'] + '\n' + 'Expression error' 
+    return [-1, msg]    
+  if (value == True):
+    nextLine = int(item['part2'])
+  else:
+    nextLine = int(item['part3'])
+  return [nextLine, 'OK']
+  
+  #  run print statement
   
 def runPrint(item):
   expr = item['part1']
-  try:
-    value = eval(expr, data.variables)    
-  except:
+  [value, msg] = helpers.evaluateExpression(expr)
+  if (msg != 'OK'):
     msg = item['code'] + '\n' + 'Expression error' 
-    return [-1, msg]
-    
+    return [-1, msg]    
   print (value)
   return [item['nextLine'], 'OK']
   

@@ -32,5 +32,15 @@ def parseFileName(cmdWork):
 def fileExists(fileName):
   files = os.listdir()
   return fileName in files
-  
+
+# evaluate an expression
+
+def evaluateExpression(expr):
+  try:
+    value = eval(expr, data.variables)
+    return [value, 'OK']
+  except:
+    return [-1, 'Expression error']
+    
+    
   

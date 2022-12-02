@@ -4,6 +4,7 @@ import unittest
 
 import helpers
 import commands
+import data
 
 class TestHelper(unittest.TestCase):
 
@@ -40,17 +41,17 @@ class TestHelper(unittest.TestCase):
     rslt = commands.executeCommand('20 Let B = 2')
     rslt = commands.executeCommand('30 Let C = A+ B')
     rslt = commands.executeCommand('Save TESTFILE1')
-    self.assertEqual(rslt, 'OK')
-    
+    self.assertEqual(rslt, 'OK')    
     rslt = helpers.fileExists('TESTFILE1.ti')
     self.assertEqual(rslt, True)
 
-    rslt = helpers.fileExists('TESTFILEXYZ.ti')
-    self.assertEqual(rslt, False)
+# test evaluate expression
 
-
-
- 
+  def testEvaluate (self):
+    data.variables['A'] = 5
+    [value, msg]  = helpers.evaluateExpression('A * 15 / 3')
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(value, 25)
   
 if __name__ == '__main__':  
     unittest.main()
