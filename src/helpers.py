@@ -9,7 +9,8 @@ def isnumeric(str):
   i = 0
   while (i < len(str)):
     if (str[i] < '0' or str[i] > '9'):
-      return False
+      if (str[i] != '-'):
+        return False
     i = i + 1
   return True
 

@@ -117,11 +117,12 @@ def parseIf(item):
     part2 = code[j + 5: len(code)]
     part3 = str(item['nextLine'])
   if ((helpers.isnumeric(part2) == False) or (helpers.isnumeric(part3) == False)):
-    item['error'] =  'Bad line number'
+    item['error'] =  'Bad line number' 
     return item
   if (int(part2) not in data.codeList) or (int(part3) not in data.codeList): 
-    item['error'] = 'Unknown line number'
-    return item    
+    if (part3 != '-1'):
+      item['error'] = 'Unknown line number'
+      return item    
   item['part2'] = part2
   item['part3'] = part3    
   return item

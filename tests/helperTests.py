@@ -15,6 +15,8 @@ class TestHelper(unittest.TestCase):
     self.assertEqual(rslt, True)
     rslt = helpers.isnumeric('123xx')
     self.assertEqual(rslt, False)
+    rslt = helpers.isnumeric('-1')
+    self.assertEqual(rslt, True)
 
 # test parse file name function
 
