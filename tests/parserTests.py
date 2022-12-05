@@ -74,9 +74,9 @@ class TestParser(unittest.TestCase):
     self.assertEqual(len(data.parseList), 2)
     self.assertEqual(data.firstLine, 10)
     item1 = data.parseList[10]
-    self.assertEqual(item1, {'code': '10 LET A = 1', 'statement': 'LET', 'nextLine': 20, 'part1': 'A', 'part2': '1', 'error': 'OK'}) 
+    self.assertEqual(item1, {'code': '10 LET A = 1', 'statement': 'LET', 'nextLine': 20, 'variable': 'A', 'expr': '1', 'error': 'OK'}) 
     item2 = data.parseList[20]
-    self.assertEqual(item2, {'code': '20 LET B = A + 1', 'statement': 'LET', 'nextLine': -1, 'part1': 'B', 'part2': 'A + 1', 'error': 'OK'}) 
+    self.assertEqual(item2, {'code': '20 LET B = A + 1', 'statement': 'LET', 'nextLine': -1, 'variable': 'expr, 'expr': 'A + 1', 'error': 'OK'}) 
     
 #  test bad let statements
 
@@ -103,9 +103,9 @@ class TestParser(unittest.TestCase):
     rslt = parser.parse()    
     self.assertEqual(len(data.parseList), 2)
     item1 = data.parseList[10]
-    self.assertEqual(item1, {'code': '10 PRINT A', 'statement': 'PRINT', 'nextLine': 20, 'part1': 'A', 'error': 'OK'}) 
+    self.assertEqual(item1, {'code': '10 PRINT A', 'statement': 'PRINT', 'nextLine': 20, 'expr': 'A', 'error': 'OK'}) 
     item2 = data.parseList[20]
-    self.assertEqual(item2, {'code': '20 PRINT A * B / 2 * A + 2 * B', 'statement': 'PRINT', 'nextLine': -1, 'part1': 'A * B / 2 * A + 2 * B', 'error': 'OK'}) 
+    self.assertEqual(item2, {'code': '20 PRINT A * B / 2 * A + 2 * B', 'statement': 'PRINT', 'nextLine': -1, 'expr': 'A * B / 2 * A + 2 * B', 'error': 'OK'}) 
 
 #  test bad print statements
 
@@ -128,17 +128,17 @@ class TestParser(unittest.TestCase):
     rslt = parser.parse()    
     self.assertEqual(len(data.parseList), 4)
     item1 = data.parseList[10]
-    self.assertEqual(item1['part1'], 'TRUE')
-    self.assertEqual(item1['part2'], '40')
-    self.assertEqual(item1['part3'], '20')
+    self.assertEqual(item1['expr'], 'TRUE')
+    self.assertEqual(item1['line1'], '40')
+    self.assertEqual(item1['line2'], '20')
     item2 = data.parseList[20]
-    self.assertEqual(item2['part1'], 'A > B')
-    self.assertEqual(item2['part2'], '40')
-    self.assertEqual(item2['part3'], '30')
+    self.assertEqual(item2['expr'], 'A > B')
+    self.assertEqual(item2['line1'], '40')
+    self.assertEqual(item2['line2'], '30')
     item3 = data.parseList[30]
-    self.assertEqual(item3['part1'], 'B > A + 1')
-    self.assertEqual(item3['part2'], '40')
-    self.assertEqual(item3['part3'], '10')
+    self.assertEqual(item3['expr'], 'B > A + 1')
+    self.assertEqual(item3['line1'], '40')
+    self.assertEqual(item3['line2'], '10')
     
 # test if with errors
 

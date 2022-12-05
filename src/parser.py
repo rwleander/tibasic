@@ -3,6 +3,13 @@
 import data
 import helpers
 
+parseRules = {
+  'LET': 'LET expr',
+  'PRINT': 'PRINT expr',
+  'IF': 'IF expr THEN line [ ELSE line ]',
+  'GOSUB': 'GOSUB line'
+}
+
 #  parse the code list and place in parseList
 
 def parse():
@@ -18,7 +25,7 @@ def parse():
   return rslt
   
 
-# create an ordered list of line number
+# create an ordered list of line numbers
 
 def createIndex():
   data.index = []
@@ -55,92 +62,68 @@ def buildParseList():
 #  parse individual statements based on statement keyword
   
 def parseStatements():
-  for lineNumber in data.index:
+  i = 0
+  while (i < len(data.index)):
+    lineNumber = data.index[i]
     item = data.parseList[lineNumber]
-    newItem = {}
-    if (item['statement'] == 'LET'):
-      newItem = parseLet(item)
-     
-    if (item['statement'] == 'IF'):
-      newItem = parseIf(item)
-       
-    if (item['statement'] == 'PRINT'):
-      newItem = parsePrint(item)
-    if (len(newItem) == 0):
-      item['error'] = 'Unknown command'
-      newItem = item
-
-    data.parseList[lineNumber] = newItem
-  return 'OK'  
-
-# parse the let statement
-
-def parseLet(item):
-  code = item['code']
-  parts = code.split()
-  if (len(parts) < 5):
-    item['error'] = 'Missing arguments'
-    return item  
-    
-  item['part1'] =  parts[2]
-  i = code.find('=')
-  if (i >  1):
-    item['part2'] = code[i + 2: len(code)]
-  else:
-    item['error'] = 'Missing ='
-  return item
-    
-    
-    # parse if statement
-    
-def parseIf(item):
-  code = item['code']
-  parts = code.split()
-  if (len(parts) < 4):
-    item['error'] = 'Missing arguments'
-    return item  
-  
-  i = code.find('IF')
-  j = code.find('THEN')
-  if (j < 1):
-    item['error'] = 'Missing THEN'
-    return item
-  k = code.find('ELSE')
-  item['part1'] = code [i + 3: j - 1]  
-  if (item['part1'] == ''):
-    item['error'] = 'Missing expression'  
-    return item
-  if (k > 1):
-    part2 = code[j + 5: k -1]
-    part3 = code[k + 5: len(code)]
-  else:
-    part2 = code[j + 5: len(code)]
-    part3 = str(item['nextLine'])
-  if ((helpers.isnumeric(part2) == False) or (helpers.isnumeric(part3) == False)):
-    item['error'] =  'Bad line number' 
-    return item
-  if (int(part2) not in data.codeList) or (int(part3) not in data.codeList): 
-    if (part3 != '-1'):
-      item['error'] = 'Unknown line number'
-      return item    
-  item['part2'] = part2
-  item['part3'] = part3    
-  return item
+    statement = item['statement']
+    code = item['code']
+    if statement not in parseRules:
+      return code + '\n' + 'Unknown statement'
       
-  # parse print cstatement
-    
-def parsePrint(item):
-  code = item['code']
-  parts = code.split()
-  if (len(parts) < 3):
-    item['error'] = 'Missing arguments'
-    return item  
+    rule = parseRules[statement]
+    ruleParts = rule.split()
+    codeParts= splitCode(code, ruleParts)
+    newItem = addExpressions(item, ruleParts, codeParts)
+    data.parseList[lineNumber] = newItem
+    i = i + 1
+  return 'OK'
   
-  i = code.find('PRINT') 
-  item['part1'] = code[ i + 6: len(code)]
+#  split a line of code by the upper case keywords in the rule
+  
+def splitCode(code, ruleParts):
+  codeParts = []
+  lastKeyword = ''
+  lastIndex = -1
+  for word in ruleParts:
+  
+  # if word is upper case, truncate last expression then add to list
+  
+    if (word[0] < 'a' or word[0] > 'z'):
+      if (len(codeParts) > 0):
+        l = len(codeParts)
+        expr = codeParts[l - 1]
+        i = expr.find(word)
+        if (i > 1):
+          codeParts[l - 1] = expr[0: i - 1]
+          
+      j = code.find(word)
+      if (j > 1):
+        codeParts.append(word)
+        lastWord = word
+        lastIndex = j
+      else:
+        codeParts.append('')
+        lastWord = word
+        lastIndex = -1
+        
+    # if lower case, add new expression
+        
+    else:
+      i = lastIndex + len(lastWord) + 1
+      codeParts.append(code[i: len(code)])
+  return codeParts
+  
+#  add the expressions to the item list
+
+def addExpressions(item, ruleParts, codeParts):  
+  i = 0
+  while (i < len(ruleParts)):
+    word = ruleParts[i]
+    expr = codeParts[i]
+    if (word[0] >= 'a' and word[0] <= 'z'):      
+      item[word] = expr
+    i = i + 1
   return item
-
-
-    
     
   
