@@ -74,9 +74,9 @@ class TestParser(unittest.TestCase):
     self.assertEqual(len(data.parseList), 2)
     self.assertEqual(data.firstLine, 10)
     item1 = data.parseList[10]
-    self.assertEqual(item1, {'code': '10 LET A = 1', 'statement': 'LET', 'nextLine': 20, 'variable': 'A', 'expr': '1', 'error': 'OK'}) 
+    self.assertEqual(item1, {'code': '10 LET A = 1', 'statement': 'LET', 'nextLine': 20, 'var': 'A', 'expr': '1', 'error': 'OK'}) 
     item2 = data.parseList[20]
-    self.assertEqual(item2, {'code': '20 LET B = A + 1', 'statement': 'LET', 'nextLine': -1, 'variable': 'expr, 'expr': 'A + 1', 'error': 'OK'}) 
+    self.assertEqual(item2, {'code': '20 LET B = A + 1', 'statement': 'LET', 'nextLine': -1, 'var':'B', 'expr': 'A + 1', 'error': 'OK'}) 
     
 #  test bad let statements
 
@@ -88,9 +88,9 @@ class TestParser(unittest.TestCase):
     rslt = parser.parse()    
     self.assertEqual(len(data.parseList), 3)
     item1 = data.parseList[10]
-    self.assertEqual(item1['error'], 'Missing arguments') 
+    self.assertEqual(item1['error'], 'Missing expression') 
     item2 = data.parseList[20]
-    self.assertEqual(item2['error'], 'Missing arguments') 
+    self.assertEqual(item2['error'], 'Missing =') 
     item3 = data.parseList[30]
     self.assertEqual(item3['error'], 'Missing =') 
 
@@ -130,11 +130,9 @@ class TestParser(unittest.TestCase):
     item1 = data.parseList[10]
     self.assertEqual(item1['expr'], 'TRUE')
     self.assertEqual(item1['line1'], '40')
-    self.assertEqual(item1['line2'], '20')
     item2 = data.parseList[20]
     self.assertEqual(item2['expr'], 'A > B')
-    self.assertEqual(item2['line1'], '40')
-    self.assertEqual(item2['line2'], '30')
+    self.assertEqual(item2['line1'], '40')    
     item3 = data.parseList[30]
     self.assertEqual(item3['expr'], 'B > A + 1')
     self.assertEqual(item3['line1'], '40')
@@ -151,11 +149,12 @@ class TestParser(unittest.TestCase):
     rslt = parser.parse()    
     self.assertEqual(len(data.parseList), 4)
     item1 = data.parseList[10]
-    self.assertEqual(item1['error'], 'Missing arguments')
-    item2 = data.parseList[20]
-    self.assertEqual(item2['error'], 'Missing expression')
+    self.assertEqual(item1['error'], 'Missing expression')
+    item2 = data.parseList[20]    
+    #self.assertEqual(item2['error'], 'Missing expression')
+    self.assertEqual(item2['error'], 'OK')
     item3 = data.parseList[30]
-    self.assertEqual(item3['error'], 'Unknown line number')
+    self.assertEqual(item3['error'], 'OK')
     
     
  

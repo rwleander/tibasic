@@ -48,8 +48,8 @@ def executeStatement(address):
   #  run the LET command
   
 def runLet(item):
-  variable = item['part1']
-  expr = item['part2']
+  variable = item['var']
+  expr = item['expr']
   [value, msg] = helpers.evaluateExpression(expr)
   if (msg != 'OK'):
     msg = item['code'] + '\n' + 'Expression error' 
@@ -60,21 +60,28 @@ def runLet(item):
   # run an if statement
   
 def runIf(item):
-  expr = item['part1']
+  expr = item['expr']
   [value, msg] = helpers.evaluateExpression(expr)
   if (msg != 'OK'):
     msg = item['code'] + '\n' + 'Expression error' 
     return [-1, msg]    
+    
+  trueLine = int(item['line1'])
+  falseLine = item['nextLine']
+  if 'line2' in item:
+    if (helpers.isnumeric(item['line2']) and item['line2'] != ''):
+      falseLine = int(item['line2'])
+  
   if (value == True):
-    nextLine = int(item['part2'])
+    nextLine = trueLine
   else:
-    nextLine = int(item['part3'])
+    nextLine = falseLine
   return [nextLine, 'OK']
   
   #  run print statement
   
 def runPrint(item):
-  expr = item['part1']
+  expr = item['expr']
   [value, msg] = helpers.evaluateExpression(expr)
   if (msg != 'OK'):
     msg = item['code'] + '\n' + 'Expression error' 

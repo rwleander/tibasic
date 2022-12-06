@@ -4,9 +4,9 @@ import data
 import helpers
 
 parseRules = {
-  'LET': 'LET expr',
+  'LET': 'LET var = expr',
   'PRINT': 'PRINT expr',
-  'IF': 'IF expr THEN line [ ELSE line ]',
+  'IF': 'IF expr THEN line1 [ ELSE line2 ]',
   'GOSUB': 'GOSUB line'
 }
 
@@ -86,7 +86,7 @@ def splitCode(code, ruleParts):
   lastKeyword = ''
   lastIndex = -1
   for word in ruleParts:
-  
+    
   # if word is upper case, truncate last expression then add to list
   
     if (word[0] < 'a' or word[0] > 'z'):
@@ -94,36 +94,52 @@ def splitCode(code, ruleParts):
         l = len(codeParts)
         expr = codeParts[l - 1]
         i = expr.find(word)
-        if (i > 1):
+        if (i > 0):
           codeParts[l - 1] = expr[0: i - 1]
           
       j = code.find(word)
-      if (j > 1):
-        codeParts.append(word)
-        lastWord = word
-        lastIndex = j
-      else:
-        codeParts.append('')
-        lastWord = word
-        lastIndex = -1
+      if (word != '[' and word != ']'):
+        if (j > 1):
+          codeParts.append(word)
+          lastWord = word
+          lastIndex = j
+        else:
+          codeParts.append('')
+          lastWord = ''
+          lastIndex = -1
         
     # if lower case, add new expression
         
     else:
-      i = lastIndex + len(lastWord) + 1
-      codeParts.append(code[i: len(code)])
+      if (lastIndex > 0):
+        i = lastIndex + len(lastWord) + 1
+        codeParts.append(code[i: len(code)])
   return codeParts
   
 #  add the expressions to the item list
 
 def addExpressions(item, ruleParts, codeParts):  
+  optional = False
   i = 0
-  while (i < len(ruleParts)):
+  j = 0
+  while (i < len(ruleParts) and j < len(codeParts)):
     word = ruleParts[i]
-    expr = codeParts[i]
+    expr = codeParts[j].strip()
+    if (word == '['):
+      optional = True
+    
     if (word[0] >= 'a' and word[0] <= 'z'):      
-      item[word] = expr
-    i = i + 1
+      item[word] = expr    
+      if (expr == '' and optional == False):
+        item['error'] = 'Missing expression'
+        return item
+    else:      
+      if (expr == '' and optional == False):
+        item['error'] = 'Missing ' + word
+        return item
+    i = i + 1    
+    if (word != '[' and  word != ']'):
+      j = j + 1  
   return item
     
   
