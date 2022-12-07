@@ -8,6 +8,8 @@ parseRules = {
   'PRINT': 'PRINT expr',
   'IF': 'IF expr THEN line1 [ ELSE line2 ]',
   'GOTO': 'GOTO line',
+  'GOSUB': 'GOSUB line',
+  'RETURN': 'RETURN',
   'REM': 'REM expr',
   'STOP': 'STOP',
   'END': 'END'

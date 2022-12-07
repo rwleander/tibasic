@@ -6,6 +6,9 @@ variables = {}
 index = []
 parserList = {}
 
+gosubStack = []
+forNextStack = []
+
 firstLine = -1
 quitFlag = False
 

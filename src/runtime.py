@@ -44,6 +44,12 @@ def executeStatement(address):
   if (item['statement'] == 'GOTO'):
     return runGoto(item)
     
+  if (item['statement'] == 'GOSUB'):
+    return runGosub(item)
+    
+  if (item['statement'] == 'RETURN'):
+    return runReturn(item)
+    
   if (item['statement'] == 'PRINT'):
     return runPrint(item)
   
@@ -104,6 +110,27 @@ def runGoto(item):
     return [line, 'OK']
   else:
     return [-1, err]
+  
+  # run gosub 
+  
+def runGosub(item):
+  lineNum = item['line']
+  err = item['code'] + '\nBad line number'
+  if (helpers.isnumeric(lineNum) == False):
+    return [-1, err]
+  
+  line = int(lineNum)  
+  if line not in data.parseList:
+    return [-1, err]
+  
+  data.gosubStack.append(item['nextLine'])
+  return [line, 'OK']
+
+#  return from gosub
+
+def runReturn(item):
+  addr = data.gosubStack.pop()
+  return [addr, 'OK']
   
   #  run print statement
   
