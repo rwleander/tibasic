@@ -2,7 +2,6 @@
 
 codeList = {}
 variables = {}
-strings = {}
 
 index = []
 parserList = {}

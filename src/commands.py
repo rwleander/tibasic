@@ -24,8 +24,8 @@ def executeCommand(cmd):
   if (command == 'RESEQUENCE'):
     return cmdResequence()
   
-  if (command == 'OPEN'):
-    return cmdOpen(cmdWork)
+  if (command == 'OLD'):
+    return cmdOld(cmdWork)
     
   if (command == 'SAVE'):
     return cmdSave(cmdWork)
@@ -49,7 +49,7 @@ def executeCommand(cmd):
   if(command == 'RUN'):
     return runtime.run()
   
-  if (command == 'QUIT'):
+  if (command == 'QUIT' or command == 'BYE'):
     data.quitFlag = True
     return ''
     
@@ -63,8 +63,7 @@ def executeCommand(cmd):
     
 def cmdNew():
   data.codeList = {}
-  data.variables = {}
-  data.strings = {}
+  data.variables = {}  
   data.parseList = {}
   return 'OK'
 
@@ -124,7 +123,7 @@ def cmdResequence():
   
   # load a file
   
-def cmdOpen(cmdWork):
+def cmdOld(cmdWork):
   [fileName, msg] = helpers.parseFileName(cmdWork)
   if (msg != 'OK'):
     return msg

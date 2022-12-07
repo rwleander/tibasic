@@ -10,8 +10,15 @@ class TestCommands(unittest.TestCase):
 # test the quit function
 
   def testQuit (self):
-    self.assertEqual(data.quitFlag, False)
+    data.quitFlag = False
     commands.executeCommand('quit')
+    self.assertEqual(data.quitFlag, True)
+
+# test the bye function
+
+  def testBye (self):
+    data.quitFlag = False
+    commands.executeCommand('BYE')
     self.assertEqual(data.quitFlag, True)
 
 #---------------------------
@@ -21,17 +28,14 @@ class TestCommands(unittest.TestCase):
   
   def testNew (self):
     data.codeList = ['10 Let A = 1']
-    data.variables = {'I': 10}
-    data.strings = {'msg': 'This is a message'}    
+    data.variables = {'I': 10}    
     data.parseList = {10: 'not a structure'}
     self.assertEqual(len(data.codeList), 1)
-    self.assertEqual(len(data.variables), 1)
-    self.assertEqual(len(data.strings), 1)
+    self.assertEqual(len(data.variables), 1)    
     self.assertEqual(len(data.parseList), 1)
     rslt = commands.executeCommand('NEW')
     self.assertEqual(len(data.codeList), 0)
-    self.assertEqual(len(data.variables), 0)
-    self.assertEqual(len(data.strings), 0)
+    self.assertEqual(len(data.variables), 0)    
     self.assertEqual(len(data.parseList), 0)
     self.assertEqual(rslt, 'OK')
 
@@ -122,7 +126,7 @@ class TestCommands(unittest.TestCase):
     self.assertEqual(rslt, 'OK')
     self.assertEqual(len(data.codeList), 0)
     
-    rslt = commands.executeCommand('Open TESTFILE1')
+    rslt = commands.executeCommand('OLD TESTFILE1')
     self.assertEqual(rslt, 'OK')
     self.assertEqual(len(data.codeList), 3)
     newList  = commands.executeCommand('LIST TESTFILE1')
@@ -143,14 +147,14 @@ class TestCommands(unittest.TestCase):
 
 # open file with missing name
 
-  def testOpenWithoutFile (self):
-    rslt = commands.executeCommand('Open')
+  def testOldWithoutFile (self):
+    rslt = commands.executeCommand('OLD')
     self.assertEqual(rslt, 'Missing file name');
 
 # open with too many args
     
-  def testOpenTooManyArgs (self):  
-    rslt = commands.executeCommand('Open  test test2')
+  def testOldTooManyArgs (self):  
+    rslt = commands.executeCommand('OLD test test2')
     self.assertEqual(rslt, 'Too many arguments')
 
 # list files
@@ -167,7 +171,7 @@ class TestCommands(unittest.TestCase):
     rslt = commands.executeCommand('NEW')
     rslt = commands.executeCommand('Delete TestDelete')
     self.assertEqual(rslt, 'OK')
-    rslt = commands.executeCommand('open TestDelete')
+    rslt = commands.executeCommand('OLD TestDelete')
     self.assertEqual(rslt, 'File not found')
 
 # test delete when file doesn't exist
