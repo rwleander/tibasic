@@ -41,6 +41,13 @@ def executeStatement(address):
   if (item['statement'] == 'PRINT'):
     return runPrint(item)
   
+  if (item['statement'] == 'REM'):
+    return runRem(item)
+  
+  if (item['statement'] == 'STOP' or item['statement'] == 'END'):
+    return runStop(item)
+    
+    
   msg = item['code'] + '\n' + 'Unknown statement type'
   return [-1, msg]
   
@@ -88,4 +95,14 @@ def runPrint(item):
     return [-1, msg]    
   print (value)
   return [item['nextLine'], 'OK']
+  
+  # remark
+  
+def runRem(item):
+  return [item['nextLine'], 'OK']
+  
+  # stop and end
+  
+def runStop(item):
+  return [-1, 'OK'] 
   

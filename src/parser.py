@@ -7,7 +7,9 @@ parseRules = {
   'LET': 'LET var = expr',
   'PRINT': 'PRINT expr',
   'IF': 'IF expr THEN line1 [ ELSE line2 ]',
-  'GOSUB': 'GOSUB line'
+  'REM': 'REM expr',
+  'STOP': 'STOP',
+  'END': 'END'
 }
 
 #  parse the code list and place in parseList

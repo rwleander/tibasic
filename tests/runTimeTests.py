@@ -36,6 +36,42 @@ class TestRuntime(unittest.TestCase):
     self.assertEqual(rslt, 'Done')
     self.assertEqual(data.variables['B'], 11)
 
+#  test remark
+
+  def testRunDef (self):
+    rslt = commands.executeCommand('NEW')
+    rslt = commands.executeCommand('10 REM This is a comment')
+    rslt = runtime.run()
+    self.assertEqual(rslt, 'Done')
+    self.assertEqual(len(data.parseList), 1)
+    item1 = data.parseList[10]
+    self.assertEqual(item1['statement'], 'REM')
+
+# test stop statement
+
+  def testRunStop (self):
+    rslt = commands.executeCommand('NEW')
+    rslt = commands.executeCommand('10 STOP')
+    rslt = runtime.run()
+    self.assertEqual(rslt, 'Done')
+    self.assertEqual(len(data.parseList), 1)
+    item1 = data.parseList[10]
+    self.assertEqual(item1['statement'], 'STOP')
+
+# test end
+
+  def testRunEnd (self):
+    rslt = commands.executeCommand('NEW')
+    rslt = commands.executeCommand('10 END')
+    rslt = runtime.run()
+    self.assertEqual(rslt, 'Done')
+    self.assertEqual(len(data.parseList), 1)
+    item1 = data.parseList[10]
+    self.assertEqual(item1['statement'], 'END')
+
+
+
+
   
 if __name__ == '__main__':  
     unittest.main()

@@ -155,6 +155,16 @@ class TestParser(unittest.TestCase):
     self.assertEqual(item2['error'], 'OK')
     item3 = data.parseList[30]
     self.assertEqual(item3['error'], 'OK')
+
+# test stop
+
+  def testParserStop (self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 STOP')
+    rslt = parser.parse()    
+    self.assertEqual(len(data.parseList), 1)
+    item1 = data.parseList[10]
+    self.assertEqual(item1, {'code': '10 STOP', 'statement': 'STOP', 'nextLine': -1, 'error': 'OK'})
     
     #------------------
     #  lower level tests
@@ -225,19 +235,6 @@ class TestParser(unittest.TestCase):
     codeParts=  parser.splitCode(code, ruleParts)
     self.assertEqual(len(codeParts), 6)
     self.assertEqual(codeParts, ['IF', 'A > B', 'THEN', '40', 'ELSE', '10'])
-
-#  test add expression with if/then 
-
-  def testAddExpressions3 (self):
-    item = {'code': 'IF A > B THEN 40 ELSE 10'}
-    ruleParts = ['IF', 'expr', 'THEN', 'line1', '[', 'ELSE', 'line2', ']'] 
-    codeParts = ['IF', 'A > B', 'THEN', '40', 'ELSE', '10']
-    newItem = parser.addExpressions(item, ruleParts, codeParts)    
-    self.assertEqual(len(newItem), 4)
-    self.assertEqual(newItem['expr'], 'A > B')
-    self.assertEqual(newItem['line1'], '40')
-    self.assertEqual(newItem['line2'], '10')
-
 
   
 if __name__ == '__main__':  
