@@ -36,6 +36,42 @@ class TestRuntime(unittest.TestCase):
     self.assertEqual(rslt, 'Done')
     self.assertEqual(data.variables['B'], 11)
 
+# test goto
+
+  def testRunGoTo (self):
+    rslt = commands.executeCommand('NEW')
+    rslt = commands.executeCommand('10 LET A = 1')
+    rslt = commands.executeCommand('20 GOTO 40')
+    rslt = commands.executeCommand('30 LET A = 2')
+    rslt = commands.executeCommand('40 END')
+    rslt = runtime.run()
+    self.assertEqual(rslt, 'Done')
+    self.assertEqual(data.variables['A'], 1)
+
+# test goto with bad line number
+
+  def testRunGoToBad (self):
+    rslt = commands.executeCommand('NEW')
+    rslt = commands.executeCommand('10 LET A = 1')
+    rslt = commands.executeCommand('20 GOTO 100')
+    rslt = commands.executeCommand('30 LET A = 2')
+    rslt = commands.executeCommand('40 END')
+    rslt = runtime.run()
+    self.assertEqual(rslt, '20 GOTO 100\nBad line number')
+
+#  don't allow infinite loop
+
+  def testRunGoToBad2 (self):
+    rslt = commands.executeCommand('NEW')
+    rslt = commands.executeCommand('10 LET A = 1')
+    rslt = commands.executeCommand('20 GOTO 20')
+    rslt = commands.executeCommand('30 LET A = 2')
+    rslt = commands.executeCommand('40 END')
+    rslt = runtime.run()
+    self.assertEqual(rslt, 'Infinite loop at line 20')
+
+
+
 #  test remark
 
   def testRunDef (self):
@@ -68,9 +104,6 @@ class TestRuntime(unittest.TestCase):
     self.assertEqual(len(data.parseList), 1)
     item1 = data.parseList[10]
     self.assertEqual(item1['statement'], 'END')
-
-
-
 
   
 if __name__ == '__main__':  

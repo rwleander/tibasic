@@ -17,10 +17,13 @@ def run():
    
   address = data.firstLine
   while (address > 0):
-    [address, msg] = executeStatement(address)
+    [newAddress, msg] = executeStatement(address)
     if (msg  != 'OK'):
         return msg    
-        
+    if (address == newAddress):
+      return 'Infinite loop at line ' + str(newAddress)    
+    address = newAddress
+    
   return 'Done'
   
   
@@ -37,6 +40,9 @@ def executeStatement(address):
   
   if (item['statement'] == 'IF'):
     return runIf(item)
+    
+  if (item['statement'] == 'GOTO'):
+    return runGoto(item)
     
   if (item['statement'] == 'PRINT'):
     return runPrint(item)
@@ -84,6 +90,20 @@ def runIf(item):
   else:
     nextLine = falseLine
   return [nextLine, 'OK']
+  
+  # run goto 
+  
+def runGoto(item):
+  lineNum = item['line']
+  err = item['code'] + '\nBad line number'
+  if (helpers.isnumeric(lineNum) == False):
+    return [-1, err]
+  
+  line = int(lineNum)  
+  if line in data.parseList:
+    return [line, 'OK']
+  else:
+    return [-1, err]
   
   #  run print statement
   

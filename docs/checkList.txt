@@ -43,16 +43,17 @@ Statements:
 
 *LET
 *IF THEN ELSE
+*GOTO
+*REM
+*STOP
+*END
 
-REM
-STOP
-GOTO
-ON GOTO (switch/case)
+GOSUB
+RETURN
 FOR TO STEP
 NEXT
-GOSUB
+ON GOTO (switch/case)
 ON GOSUB
-RETURN
 
 INPUT
 READ
