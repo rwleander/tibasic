@@ -10,10 +10,11 @@ def run():
   if (len(data.codeList) == 0):
     return 'No code'
   
+  clearData()
+  
   rslt = parser.parse()
   if (rslt != 'OK'):
     return rslt
-    
    
   address = data.firstLine
   while (address > 0):
@@ -24,7 +25,20 @@ def run():
       return 'Infinite loop at line ' + str(newAddress)    
     address = newAddress
     
+  if (len(data.forNextStack) > 0):
+    return 'Missing NEXT'
+    
   return 'Done'
+  
+#  clear the variables
+  
+  
+def clearData():
+  data.variables = {}
+data.index = []
+data.parserList = {}
+data.gosubStack = []
+data.forNextStack = []
   
   
   # run a line of code
@@ -50,6 +64,12 @@ def executeStatement(address):
   if (item['statement'] == 'RETURN'):
     return runReturn(item)
     
+  if (item['statement'] == 'FOR'):
+    return runFor(item)
+    
+  if (item['statement'] == 'NEXT'):
+    return runNext(item)
+
   if (item['statement'] == 'PRINT'):
     return runPrint(item)
   
@@ -131,8 +151,60 @@ def runGosub(item):
 def runReturn(item):
   addr = data.gosubStack.pop()
   return [addr, 'OK']
+
+# for statement - push data to for stack then return next line
+
+def runFor(item):
+  var = item['var']
+  expr1 = item['expr1']
+  expr2 = item['expr2']  
+  step = 1
+  nextLine = item['nextLine']
   
-  #  run print statement
+  [min, msg] = helpers.evaluateExpression(expr1)
+  if (msg != 'OK'):
+    return [-1, msg]
+    
+  [max, msg] = helpers.evaluateExpression(expr2)
+  if (msg != 'OK'):
+    return [-1, msg]
+  
+  if 'expr3' in item:
+    [step, msg] = helpers.evaluateExpression(item['expr3'])
+    if (msg != 'OK'):
+      return [-1, msg]
+  
+  data.variables[var] = min
+  stackItem = {'var': var, 'min': min, 'max': max, 'step': step,  'nextLine': nextLine}
+  data.forNextStack.append(stackItem)   
+  return [nextLine, 'OK']
+  
+# next - get data from for/next stack and either increment variable or got o next line
+  
+def runNext(item):
+  if (len(data.forNextStack) < 1):
+    return [-1, 'Missing FOR']
+    
+  stackItem = data.forNextStack[len(data.forNextStack) - 1]
+  var = stackItem['var']
+  max = stackItem['max']
+  step = stackItem['step']
+  value = data.variables[var]
+  value = value + step
+
+  # at end of for - remove item from stack, go to next line
+# otherwise go to line after for
+
+  if ((step > 0 and value > max) or (step < 0 and value < max)):
+    data.forNextStack.pop()
+    nextLine = item['nextLine']  
+  else:
+    data.variables[var] = value
+    nextLine = stackItem['nextLine']
+  
+  return [nextLine, 'OK']
+  
+#  run print statement
   
 def runPrint(item):
   expr = item['expr']

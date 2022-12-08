@@ -65,6 +65,11 @@ def cmdNew():
   data.codeList = {}
   data.variables = {}  
   data.parseList = {}
+  data.index = []
+  data.gosubStack = []
+  data.forNextStack = []
+  
+  
   return 'OK'
 
 #  list code

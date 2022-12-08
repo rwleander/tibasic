@@ -99,6 +99,92 @@ class TestRuntime(unittest.TestCase):
     self.assertEqual(rslt, 'Done')
     self.assertEqual(data.variables['A'], 30)
 
+# test basic for/next
+
+  def testRunForNext (self):
+    rslt = commands.executeCommand('NEW')
+    rslt = commands.executeCommand('10 LET A = 0')
+    rslt = commands.executeCommand('20 FOR I = 1 TO 5')
+    rslt = commands.executeCommand('30 LET A = A * 10 + I')
+    rslt = commands.executeCommand('40 NEXT')
+    rslt = runtime.run()
+    self.assertEqual(rslt, 'Done')
+    self.assertEqual(data.variables['A'], 12345)
+
+# test for/next with step
+
+  def testRunForNext2 (self):
+    rslt = commands.executeCommand('NEW')
+    rslt = commands.executeCommand('10 LET A = 0')
+    rslt = commands.executeCommand('20 FOR I = 2 TO 8 STEP 2')
+    rslt = commands.executeCommand('30 LET A = A * 10 + I')
+    rslt = commands.executeCommand('40 NEXT')
+    rslt = runtime.run()
+    self.assertEqual(rslt, 'Done')
+    self.assertEqual(data.variables['A'], 2468)
+
+#  test for/next with negative step
+
+  def testRunForNext3 (self):
+    rslt = commands.executeCommand('NEW')
+    rslt = commands.executeCommand('10 LET A = 0')
+    rslt = commands.executeCommand('20 FOR I = 5 TO 1 STEP -1')
+    rslt = commands.executeCommand('30 LET A = A * 10 + I')
+    rslt = commands.executeCommand('40 NEXT')
+    rslt = runtime.run()
+    self.assertEqual(rslt, 'Done')
+    self.assertEqual(data.variables['A'], 54321)
+
+#  test nested for/next
+
+  def testRunForNext4 (self):
+    rslt = commands.executeCommand('NEW')
+    rslt = commands.executeCommand('10 LET N = 0')
+    rslt = commands.executeCommand('20 FOR I = 1 to 2')
+    rslt = commands.executeCommand('30 FOR J = 1 To 5')
+    rslt = commands.executeCommand('40 Let N = N + (I * j)')
+    rslt = commands.executeCommand('50 NEXT')
+    rslt = commands.executeCommand('60 NEXT')
+    rslt = runtime.run()
+    self.assertEqual(rslt, 'Done')
+    self.assertEqual(data.variables['N'], 45)
+
+# test missing for
+
+  def testRunForNextBad (self):
+    rslt = commands.executeCommand('NEW')
+    rslt = commands.executeCommand('10 LET N = 0')
+    #rslt = commands.executeCommand('20 FOR I = 1 To 5')
+    rslt = commands.executeCommand('30 Let N = N + 1')
+    rslt = commands.executeCommand('40 NEXT')
+    rslt = runtime.run()
+    self.assertEqual(rslt, 'Missing FOR')
+
+# test bad for expression
+
+  def testRunForNextBad2 (self):
+    rslt = commands.executeCommand('NEW')
+    rslt = commands.executeCommand('10 LET N = 0')
+    rslt = commands.executeCommand('20 FOR I = 1 To Z')
+    rslt = commands.executeCommand('30 Let N = N + 1')
+    rslt = commands.executeCommand('40 NEXT')
+    rslt = runtime.run()
+    self.assertEqual(rslt, 'Expression error')
+
+# missing next
+
+  def testRunForNextBad3 (self):
+    rslt = commands.executeCommand('NEW')
+    rslt = commands.executeCommand('10 LET N = 0')
+    rslt = commands.executeCommand('20 FOR I = 1 To 5')
+    rslt = commands.executeCommand('30 Let N = N + 1')
+    #rslt = commands.executeCommand('40 NEXT')
+    rslt = runtime.run()
+    self.assertEqual(len(data.forNextStack), 1)
+    self.assertEqual(rslt, 'Missing NEXT')
+
+
+
 
 
 

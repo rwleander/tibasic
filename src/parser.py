@@ -10,6 +10,8 @@ parseRules = {
   'GOTO': 'GOTO line',
   'GOSUB': 'GOSUB line',
   'RETURN': 'RETURN',
+  'FOR': 'FOR var = expr1 TO expr2 [ STEP expr3 ]',
+'NEXT': 'NEXT',  
   'REM': 'REM expr',
   'STOP': 'STOP',
   'END': 'END'
