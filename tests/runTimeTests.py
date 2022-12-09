@@ -222,6 +222,87 @@ class TestRuntime(unittest.TestCase):
     item1 = data.parseList[10]
     self.assertEqual(item1['statement'], 'END')
 
+
+#---------------------
+#  test helper functions
+
+# test getstring
+
+
+  def testRunGetString (self):
+    item = {'expr': 'A < B', 'error': 'OK'}
+    expr = runtime.getString(item, 'expr')    
+    self.assertEqual(expr, 'A < B')
+    self.assertEqual(item['error'], 'OK')
+
+#  test get string with missing item
+
+  def testRunGetStringWithError (self):
+    item = {'expr1': 'A < B', 'error': 'OK'}
+    expr = runtime.getString(item, 'expr')    
+    self.assertEqual(expr, 'error')
+    self.assertEqual(item['error'], 'Missing expr')
+
+#  test get line number
+
+  def testRunGetLine (self):
+    item = {'line': '10', 'error': 'OK'}
+    data.parseList = {10: '10 LET A = B'}
+    line = runtime.getLine(item, 'line')
+    self.assertEqual(line, 10)
+    self.assertEqual(item['error'], 'OK')
+
+# get line with missing item
+
+#  test get line number
+
+  def testRunGetLineMissing (self):
+    item = {'line1': '10', 'error': 'OK'}
+    data.parseList = {10: '10 LET A = B'}
+    line = runtime.getLine(item, 'line')
+    self.assertEqual(line, -1)
+    self.assertEqual(item['error'], 'Missing line')
+
+#  test with bad line number
+
+  def testRunGetLineBad (self):
+    item = {'line': '1X', 'error': 'OK'}
+    data.parseList = {10: '10 LET A = B'}
+    line = runtime.getLine(item, 'line')
+    self.assertEqual(line, -1)
+    self.assertEqual(item['error'], 'Bad line number')
+
+#  test get line with line not in program
+
+  def testRunGetLineMissing2 (self):
+    item = {'line': '20', 'error': 'OK'}
+    data.parseList = {10: '10 LET A = B'}
+    line = runtime.getLine(item, 'line')
+    self.assertEqual(line, 20)
+    self.assertEqual(item['error'], 'Bad line number')
+
+# test get line optional
+
+  def testRunGetLineOptional (self):
+    item = {'line': '10', 'error': 'OK'}
+    data.parseList = {10: '10 LET A = B'}
+    line = runtime.getLineOptional(item, 'line')
+    self.assertEqual(line, 10)
+    self.assertEqual(item['error'], 'OK')
+
+#  get optional line not in item
+
+  def testRunGetLineOptionalMissing (self):
+    item = {'line1': '10', 'error': 'OK'}
+    data.parseList = {10: '10 LET A = B'}
+    line = runtime.getLineOptional(item, 'line2')
+    self.assertEqual(line, -1)
+    self.assertEqual(item['error'], 'OK')
+
+
+
+
+
   
 if __name__ == '__main__':  
     unittest.main()

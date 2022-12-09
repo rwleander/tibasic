@@ -224,4 +224,46 @@ def runRem(item):
   
 def runStop(item):
   return [-1, 'OK'] 
+
+
+#--------------------
+#  validate and return items from parseList
+
+#  get a string by name
+
+def getString(item, name):
+  if name  in item:
+    return item[name]
+  else:
+    item['error'] = 'Missing ' + name
+    return 'error'
   
+#  get a line number from the item
+
+def getLine(item, name):
+  if name  not in item:
+    item['error'] = 'Missing ' + name
+    return -1
+    
+  str = item[name]
+  if (helpers.isnumeric(str) == False):
+    item['error'] = 'Bad line number'
+    return -1
+    
+  line =  int(str)
+  if line  in data.parseList:
+    return line
+  else:
+    item['error'] = 'Bad line number'
+    return line
+    
+
+#  get optional line number
+#  if not found, return -1
+
+def getLineOptional(item, name):
+  if name in item:
+    return getLine (item, name)
+  else:
+    return -1
+    
