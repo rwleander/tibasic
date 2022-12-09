@@ -19,7 +19,7 @@ def run():
   address = data.firstLine
   while (address > 0):
     [newAddress, msg] = executeStatement(address)
-    if (msg  != 'OK'):
+    if (msg  != 'OK'):    
         return msg    
     if (address == newAddress):
       return 'Infinite loop at line ' + str(newAddress)    
@@ -87,62 +87,57 @@ def executeStatement(address):
   #  run the LET command
   
 def runLet(item):
-  variable = item['var']
-  expr = item['expr']
+  expr = getString(item, 'expr')
+  variable = getString(item, 'var')
+  if (item['error'] != 'OK'):    
+    return [-1, createError(item)]
+  
   [value, msg] = helpers.evaluateExpression(expr)
-  if (msg != 'OK'):
-    msg = item['code'] + '\n' + 'Expression error' 
-    return [-1, msg]    
+  if (msg != 'OK'):    
+    return [-1, createMsg(item, msg)]
+    
   data.variables[variable] = value
   return [item['nextLine'], 'OK']
   
   # run an if statement
   
 def runIf(item):
-  expr = item['expr']
-  [value, msg] = helpers.evaluateExpression(expr)
-  if (msg != 'OK'):
-    msg = item['code'] + '\n' + 'Expression error' 
-    return [-1, msg]    
+  line2 = getLineOptional(item, 'line2', item['nextLine'])
+  line1 = getLine(item, 'line1')
+  expr = getString(item, 'expr')
+  if (item['error'] != 'OK'):    
+    return [-1, createError(item)]
     
-  trueLine = int(item['line1'])
-  falseLine = item['nextLine']
-  if 'line2' in item:
-    if (helpers.isnumeric(item['line2']) and item['line2'] != ''):
-      falseLine = int(item['line2'])
-  
+  [value, msg] = helpers.evaluateExpression(expr)
+  if (msg != 'OK'):    
+    return [-1, createMsg(item, msg)]
+    
   if (value == True):
-    nextLine = trueLine
+    newLine = line1
   else:
-    nextLine = falseLine
-  return [nextLine, 'OK']
+    newLine = line2
+  
+  if newLine in data.parseList:
+    return [newLine, 'OK']
+  else:
+    return [-1, createMsg(item, 'Bad line number')]
   
   # run goto 
   
 def runGoto(item):
-  lineNum = item['line']
-  err = item['code'] + '\nBad line number'
-  if (helpers.isnumeric(lineNum) == False):
-    return [-1, err]
-  
-  line = int(lineNum)  
-  if line in data.parseList:
+  line = getLine(item, 'line')
+  if (item['error'] == 'OK'):  
     return [line, 'OK']
   else:
-    return [-1, err]
+    return [-1, createError(item)]
   
   # run gosub 
   
 def runGosub(item):
-  lineNum = item['line']
-  err = item['code'] + '\nBad line number'
-  if (helpers.isnumeric(lineNum) == False):
-    return [-1, err]
-  
-  line = int(lineNum)  
-  if line not in data.parseList:
-    return [-1, err]
-  
+  line = getLine(item,'line')
+  if (item['error'] != 'OK'):
+    return [-1, createError(item)]
+    
   data.gosubStack.append(item['nextLine'])
   return [line, 'OK']
 
@@ -155,24 +150,27 @@ def runReturn(item):
 # for statement - push data to for stack then return next line
 
 def runFor(item):
-  var = item['var']
-  expr1 = item['expr1']
-  expr2 = item['expr2']  
+  expr2 = getString (item, 'expr2')
+  expr1 = getString(item, 'expr1')
+  var = getString(item, 'var')
+  if (item['error'] != 'OK'):
+    return [-1, createError(item)]
+  
   step = 1
   nextLine = item['nextLine']
   
   [min, msg] = helpers.evaluateExpression(expr1)
   if (msg != 'OK'):
-    return [-1, msg]
+    return [-1, createMsg(item, msg)]
     
   [max, msg] = helpers.evaluateExpression(expr2)
   if (msg != 'OK'):
-    return [-1, msg]
+    return [-1, createMsg(item, msg)]
   
   if 'expr3' in item:
     [step, msg] = helpers.evaluateExpression(item['expr3'])
     if (msg != 'OK'):
-      return [-1, msg]
+      return [-1, createMsg(item, msg)]
   
   data.variables[var] = min
   stackItem = {'var': var, 'min': min, 'max': max, 'step': step,  'nextLine': nextLine}
@@ -183,7 +181,7 @@ def runFor(item):
   
 def runNext(item):
   if (len(data.forNextStack) < 1):
-    return [-1, 'Missing FOR']
+    return [-1, createMsg(item, 'Missing FOR')]
     
   stackItem = data.forNextStack[len(data.forNextStack) - 1]
   var = stackItem['var']
@@ -207,11 +205,14 @@ def runNext(item):
 #  run print statement
   
 def runPrint(item):
-  expr = item['expr']
+  expr = getString(item, 'expr')
+  if (item['error'] != 'OK'):
+    return [-1, createError(item)]
+    
   [value, msg] = helpers.evaluateExpression(expr)
-  if (msg != 'OK'):
-    msg = item['code'] + '\n' + 'Expression error' 
-    return [-1, msg]    
+  if (msg != 'OK'):    
+    return [-1, createError(item, msg)]
+    
   print (value)
   return [item['nextLine'], 'OK']
   
@@ -261,9 +262,17 @@ def getLine(item, name):
 #  get optional line number
 #  if not found, return -1
 
-def getLineOptional(item, name):
+def getLineOptional(item, name, defaultLine):
   if name in item:
     return getLine (item, name)
   else:
-    return -1
-    
+    return defaultLine
+
+#  create an error message from an  ite or stringm    
+
+def createError(item):
+  return item['code'] + '\n' + item['error']
+
+def createMsg(item, msg):
+  return item['code'] + '\n' + msg
+

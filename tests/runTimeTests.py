@@ -158,7 +158,7 @@ class TestRuntime(unittest.TestCase):
     rslt = commands.executeCommand('30 Let N = N + 1')
     rslt = commands.executeCommand('40 NEXT')
     rslt = runtime.run()
-    self.assertEqual(rslt, 'Missing FOR')
+    self.assertEqual(rslt, '40 NEXT\nMissing FOR')
 
 # test bad for expression
 
@@ -169,7 +169,7 @@ class TestRuntime(unittest.TestCase):
     rslt = commands.executeCommand('30 Let N = N + 1')
     rslt = commands.executeCommand('40 NEXT')
     rslt = runtime.run()
-    self.assertEqual(rslt, 'Expression error')
+    self.assertEqual(rslt, '20 FOR I = 1 TO Z\nExpression error')
 
 # missing next
 
@@ -285,8 +285,8 @@ class TestRuntime(unittest.TestCase):
 
   def testRunGetLineOptional (self):
     item = {'line': '10', 'error': 'OK'}
-    data.parseList = {10: '10 LET A = B'}
-    line = runtime.getLineOptional(item, 'line')
+    data.parseList = {10: '10 LET A = B', 20: '20 LET B = 1'}
+    line = runtime.getLineOptional(item, 'line', 20)
     self.assertEqual(line, 10)
     self.assertEqual(item['error'], 'OK')
 
@@ -294,9 +294,9 @@ class TestRuntime(unittest.TestCase):
 
   def testRunGetLineOptionalMissing (self):
     item = {'line1': '10', 'error': 'OK'}
-    data.parseList = {10: '10 LET A = B'}
-    line = runtime.getLineOptional(item, 'line2')
-    self.assertEqual(line, -1)
+    data.parseList = {10: '10 LET A = B', 20: '20 LET B = 1'}
+    line = runtime.getLineOptional(item, 'line2', 20)
+    self.assertEqual(line, 20)
     self.assertEqual(item['error'], 'OK')
 
 
