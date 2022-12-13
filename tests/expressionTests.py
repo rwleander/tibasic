@@ -77,12 +77,61 @@ class TestExpressions(unittest.TestCase):
     [tree, msg] = expressions.buildTree(parts)
     self.assertEqual(msg, 'OK')
     self.assertEqual(len(tree), 4)
-    self.assertEqual(tree[0], {'parts': ['2', '+', '~1'], 'value': 0, 'id': 0,  'parent': -1})
+    self.assertEqual(tree[0], {'parts': ['2', '*', '~1'], 'value': 0, 'id': 0,  'parent': -1})
     self.assertEqual(tree[1], {'parts': ['3', '/', '~2'], 'value': 0, 'id': 1, 'parent': 0})
     self.assertEqual(tree[2], {'parts': ['4', '+', '5'], 'value': 0, 'id': 2, 'parent': 1})
+   
+  def testCreateTreeFail (self):
+    [parts, msg] = expressions.splitLine('2 * (3 / (4 + 5)')
+    self.assertEqual(msg, 'OK')
+    [tree, msg] = expressions.buildTree(parts)
+    self.assertEqual(msg, 'Missing )')
 
+#  test set variables
+
+  def testSetVariables (self):
+    parts = ['2', '+', '3']
+    parts = expressions.setVariables(parts, {})
+    self.assertEqual(parts, [2, '+', 3])
+
+#  test addParts
+
+  def testAddParts (self):
+    parts = [2, '+', 3]
+    parts = expressions.addParts(parts)
+    self.assertEqual(parts, [5])
+
+
+#  test entire function
+
+  def testEvaluate (self):
+    [value, msg] = expressions.evaluate('2 + 3')
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(value, 5)
+
+  def testEvaluate2 (self):
+    [value, msg] = expressions.evaluate('2 + 3 * 4')
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(value, 14)
+
+  def testEvaluate3 (self):
+    [value, msg] = expressions.evaluate('2 + 3 / 4')
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(value, 2.75)
+
+  def testEvaluate4 (self):
+    [value, msg] = expressions.evaluate('2 * (1 + 2) ^ 2') 
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(value, 18)
+
+  def testEvaluate5 (self):
+    [value, msg] = expressions.evaluate('(1 + 2) ^ 2 - (2 * 3)') 
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(value, 3)
     
- 
+    
+    
+    
   
 if __name__ == '__main__':  
     unittest.main()

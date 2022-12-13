@@ -6,13 +6,20 @@ import helpers
 #  evaluate an expression
 
 def evaluate (expr):
-  value = -1
-  try:
-    value = float(expr)    
-  except:
-    value = expr
-  return [value, 'OK']
+  [parts, msg] = splitLine(expr)
+  if (msg != 'OK'):
+    return [0, msg]
   
+  [tree, msg] = buildTree(parts)
+  if (msg != 'OK'):
+    return [0, msg]
+  
+  [value, msg] = calculate(tree)
+  if (msg != 'OK'):
+    return [0, msg]
+  
+  return [value, 'OK']
+
   
 # split the expression into its parts
   
@@ -106,7 +113,133 @@ def buildTree(parts):
       
     else:
       branch['parts'].append (item)
-    
+  
+  if (branch['id'] > 0):
+    return [tree, 'Missing )']
+  
   return [tree, 'OK']
+  
+  
+#  calculae the value of the expression
+  
+def calculate(tree):  
+  i = tree['end']
+  while (i >= 0):
+    branch = tree[i]
+    parts = branch['parts']
+    parts = setVariables(parts, tree)    
+    
+    parts = raiseParts(parts)
+    parts = divideParts(parts)
+    parts = multiplyParts(parts)    
+    parts = addParts(parts)
+    parts = subtractParts(parts)
+    
+    branch['value'] = parts[0]    
+    tree[i] = branch
+    i = i - 1
+  
+  rootBranch = tree[0]  
+  value = rootBranch['value']
+  return [value, 'OK']
+    
+#  substitute variables and convert numbers to floats
+
+def setVariables(parts, tree):
+  newParts = []
+  for item in parts:
+    if (item[0] == '~'):
+      text = item[1: len(item)]
+      index = int(text)
+      branch = tree[index]
+      newParts.append(branch['value'])
+    
+    elif item in data.variables:
+      newParts.append(data.variables[item])
+    
+    elif (helpers.isnumeric(item) and item != '-'):
+      newParts.append (float(item))
+    
+    else:
+      newParts.append(item)
+      
+  return newParts
+
+# raise parts to power
+
+def raiseParts(parts):    
+  i = 1
+  while (i > 0):
+    i = findOperator(parts, '^')    
+    if i > 0:
+      parts[i] = parts[i - 1] ** parts[ i + 1]
+      del parts[i + 1]
+      del parts[i - 1]
+            
+  return parts
+            
+# do division
+
+def divideParts(parts):    
+  i = 1
+  while (i > 0):
+    i = findOperator(parts, '/')    
+    if i > 0:
+      parts[i] = parts[i - 1] / parts[ i + 1]
+      del parts[i + 1]
+      del parts[i - 1]
+            
+  return parts
+ 
+  
+# do multiplication
+
+def multiplyParts(parts):    
+  i = 1
+  while (i > 0):
+    i = findOperator(parts, '*')    
+    if i > 0:
+      parts[i] = parts[i - 1] * parts[ i + 1]
+      del parts[i + 1]
+      del parts[i - 1]
+            
+  return parts
+  
+#  do additions
+  
+def addParts(parts):
+  i = 1
+  while (i > 0):
+    i = findOperator(parts, '+')    
+    if i > 0:
+      parts[i] = parts[i - 1] + parts[ i + 1]
+      del parts[i + 1]
+      del parts[i - 1]
+            
+  return parts
+
+#  do subtraction
+  
+def subtractParts(parts):
+  i = 1
+  while (i > 0):
+    i = findOperator(parts, '-')    
+    if i > 0:
+      parts[i] = parts[i - 1] - parts[ i + 1]
+      del parts[i + 1]
+      del parts[i - 1]
+            
+  return parts
+  
+  
+  #  helper to find operators
+  
+def findOperator(parts, op):
+  try:
+    i = parts.index(op)
+  except:
+    i = -1
+  return i
+    
   
   
