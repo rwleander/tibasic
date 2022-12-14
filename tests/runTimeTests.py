@@ -165,11 +165,11 @@ class TestRuntime(unittest.TestCase):
   def testRunForNextBad2 (self):
     rslt = commands.executeCommand('NEW')
     rslt = commands.executeCommand('10 LET N = 0')
-    rslt = commands.executeCommand('20 FOR I = 1 To Z')
+    rslt = commands.executeCommand('20 FOR I = 1 To 3')
     rslt = commands.executeCommand('30 Let N = N + 1')
     rslt = commands.executeCommand('40 NEXT')
     rslt = runtime.run()
-    self.assertEqual(rslt, '20 FOR I = 1 TO Z\nExpression error')
+    self.assertEqual(rslt, 'Done')
 
 # missing next
 

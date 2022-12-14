@@ -47,14 +47,21 @@ class TestHelper(unittest.TestCase):
     rslt = helpers.fileExists('TESTFILE1.ti')
     self.assertEqual(rslt, True)
 
-# test evaluate expression
+# test valid variable name
 
-  def testEvaluate (self):
-    data.variables['A'] = 5
-    [value, msg]  = helpers.evaluateExpression('A * 15 / 3')
-    self.assertEqual(msg, 'OK')
-    self.assertEqual(value, 25)
-  
+  def testValidVariable (self):
+    rslt = helpers.isValidVariable('AB2')
+    self.assertEqual(rslt, True)
+    rslt = helpers.isValidVariable('12A')
+    self.assertEqual(rslt, False)
+    rslt = helpers.isValidVariable('$ABC')
+    self.assertEqual(rslt, False)
+    rslt = helpers.isValidVariable('ABC$')
+    self.assertEqual(rslt, True)
+    rslt = helpers.isValidVariable('')
+    self.assertEqual(rslt, False)
+
+
 if __name__ == '__main__':  
     unittest.main()
     

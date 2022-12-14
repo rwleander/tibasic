@@ -3,6 +3,7 @@
 import os
 
 import data
+import expressions
 import runtime
 import helpers
 
@@ -210,7 +211,7 @@ def cmdLet(cmdWork):
   vName = parts[1]
   i = cmdWork.find('=')
   expr = cmdWork[i+2: len(cmdWork)] 
-  [value, msg] = helpers.evaluateExpression(expr)
+  [value, msg] = expressions.evaluate(expr)
   if (msg != 'OK'):
     return 'Syntax error'
   data.variables[vName] = value  
@@ -225,7 +226,7 @@ def cmdPrint(cmdWork):
   
   i = cmdWork.find(' ')
   expr = cmdWork[i+1: len(cmdWork)]
-  [value, msg] = helpers.evaluateExpression(expr)
+  [value, msg] = expressions.evaluate(expr)
   if (msg != 'OK'):
     return  'Syntax error'    
   return str(value)

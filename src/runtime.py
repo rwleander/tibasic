@@ -3,6 +3,7 @@
 import data
 import parser
 import helpers
+import expressions
 
 #  run the program
 
@@ -92,7 +93,7 @@ def runLet(item):
   if (item['error'] != 'OK'):    
     return [-1, createError(item)]
   
-  [value, msg] = helpers.evaluateExpression(expr)
+  [value, msg] = expressions.evaluate(expr)
   if (msg != 'OK'):    
     return [-1, createMsg(item, msg)]
     
@@ -108,7 +109,7 @@ def runIf(item):
   if (item['error'] != 'OK'):    
     return [-1, createError(item)]
     
-  [value, msg] = helpers.evaluateExpression(expr)
+  [value, msg] = expressions.evaluate(expr)
   if (msg != 'OK'):    
     return [-1, createMsg(item, msg)]
     
@@ -117,7 +118,7 @@ def runIf(item):
   else:
     newLine = line2
   
-  if newLine in data.parseList:
+  if (newLine in data.parseList) or (newLine == -1):
     return [newLine, 'OK']
   else:
     return [-1, createMsg(item, 'Bad line number')]
@@ -159,21 +160,26 @@ def runFor(item):
   step = 1
   nextLine = item['nextLine']
   
-  [min, msg] = helpers.evaluateExpression(expr1)
+  [min, msg] = expressions.evaluate(expr1)
   if (msg != 'OK'):
     return [-1, createMsg(item, msg)]
     
-  [max, msg] = helpers.evaluateExpression(expr2)
+  [max, msg] = expressions.evaluate(expr2)
   if (msg != 'OK'):
     return [-1, createMsg(item, msg)]
   
   if 'expr3' in item:
-    [step, msg] = helpers.evaluateExpression(item['expr3'])
+    [step, msg] = expressions.evaluate(item['expr3'])
     if (msg != 'OK'):
       return [-1, createMsg(item, msg)]
   
   data.variables[var] = min
-  stackItem = {'var': var, 'min': min, 'max': max, 'step': step,  'nextLine': nextLine}
+  stackItem = {}
+  stackItem['var'] = var 
+  stackItem['min'] = min 
+  stackItem['max'] = max
+  stackItem['step'] = step
+  stackItem['nextLine'] = nextLine
   data.forNextStack.append(stackItem)   
   return [nextLine, 'OK']
   
@@ -186,8 +192,9 @@ def runNext(item):
   stackItem = data.forNextStack[len(data.forNextStack) - 1]
   var = stackItem['var']
   max = stackItem['max']
-  step = stackItem['step']
+  step   = stackItem['step']
   value = data.variables[var]
+  
   value = value + step
 
   # at end of for - remove item from stack, go to next line
@@ -209,7 +216,7 @@ def runPrint(item):
   if (item['error'] != 'OK'):
     return [-1, createError(item)]
     
-  [value, msg] = helpers.evaluateExpression(expr)
+  [value, msg] = expressions.evaluate(expr)
   if (msg != 'OK'):    
     return [-1, createError(item, msg)]
     
@@ -248,14 +255,14 @@ def getLine(item, name):
     
   str = item[name]
   if (helpers.isnumeric(str) == False):
-    item['error'] = 'Bad line number'
+    item['error'] = 'Bad line number'    
     return -1
     
   line =  int(str)
   if line  in data.parseList:
     return line
   else:
-    item['error'] = 'Bad line number'
+    item['error'] = 'Bad line number'    
     return line
     
 

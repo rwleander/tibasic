@@ -135,6 +135,7 @@ def calculate(tree):
     parts = multiplyParts(parts)    
     parts = addParts(parts)
     parts = subtractParts(parts)
+    parts = compareParts(parts)
     
     branch['value'] = parts[0]    
     tree[i] = branch
@@ -161,6 +162,10 @@ def setVariables(parts, tree):
     elif (helpers.isnumeric(item) and item != '-'):
       newParts.append (float(item))
     
+    elif helpers.isValidVariable(item):
+      data.variables[item] = 0
+      newParts.append (0) 
+      
     else:
       newParts.append(item)
       
@@ -169,12 +174,20 @@ def setVariables(parts, tree):
 # switch numbers negative if preceded by -
 
 def minusParts(parts):      
-  i = len (parts) - 2
-  while i > 0:    
-    if parts[i] == '-':
-      if (isinstance(parts[i - 1], float) == False) and (isinstance(parts[i + 1], float) == True):
-        parts[i + 1] = 0 - parts[i + 1]
-        del(parts[i])
+  if len(parts) < 2:    
+    return parts
+  
+  i = len (parts) - 2  
+  while i >= 0:    
+    item = parts[i]
+    nextItem = parts[i + 1]
+    lastItem = 'xxx'
+    if (i > 0):
+      lastItem = parts[i - 1]
+    
+    if  (isinstance(lastItem, float) == False) and (isinstance(nextItem, float) == True):        
+      parts[i] = 0 -nextItem 
+      del(parts[i + 1])
     i = i - 1    
     
   return parts
@@ -241,6 +254,30 @@ def subtractParts(parts):
     i = findOperator(parts, '-')    
     if i > 0:
       parts[i] = parts[i - 1] - parts[ i + 1]
+      del parts[i + 1]
+      del parts[i - 1]
+            
+  return parts
+  
+  # comparisons
+  
+def compareParts(parts):
+  i = 1
+  while i < len(parts) - 1:
+    item = parts[i]
+    if item in ['=', '<', '>', '<=', '>=']:
+      prevItem = parts[i - 1]
+      if isinstance(prevItem, float):
+        prevItem = str(prevItem)
+        
+        if item == '=':
+          item = '=='
+          
+      nextItem = parts[i + 1]
+      if isinstance(nextItem, float):
+        nextItem = str(nextItem)
+      
+      parts[i] = eval (prevItem + ' ' + item + ' ' + nextItem)
       del parts[i + 1]
       del parts[i - 1]
             
