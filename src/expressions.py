@@ -129,14 +129,20 @@ def calculate(tree):
     parts = branch['parts']
     parts = setVariables(parts, tree)    
     
-    parts = minusParts(parts)
-    parts = raiseParts(parts)
-    parts = divideParts(parts)
-    parts = multiplyParts(parts)    
-    parts = addParts(parts)
-    parts = subtractParts(parts)
-    parts = compareParts(parts)
-    
+    try:
+      parts = minusParts(parts)
+      parts = calcParts(parts, '^')
+      parts = calcParts(parts, '/')
+      parts = calcParts(parts, '*')    
+      parts = calcParts(parts, '+')
+      parts = calcParts(parts, '-')
+      parts = compareParts(parts)
+    except:
+      return [0, 'Bad expression']
+      
+    if len(parts) > 1:
+      return [0, 'Bad expression']
+        
     branch['value'] = parts[0]    
     tree[i] = branch
     i = i - 1
@@ -179,83 +185,58 @@ def minusParts(parts):
   
   i = len (parts) - 2  
   while i >= 0:    
-    item = parts[i]
-    nextItem = parts[i + 1]
-    lastItem = 'xxx'
-    if (i > 0):
-      lastItem = parts[i - 1]
+    if parts[i] == '-':
+      item = parts[i]
+      nextItem = parts[i + 1]
+      lastItem = 'xxx'
+      if (i > 0):
+        lastItem = parts[i - 1]
     
-    if  (isinstance(lastItem, float) == False) and (isinstance(nextItem, float) == True):        
-      parts[i] = 0 -nextItem 
-      del(parts[i + 1])
+      if  (isinstance(lastItem, float) == False) and (isinstance(nextItem, float) == True):        
+        parts[i] = 0 -nextItem 
+        del(parts[i + 1])
     i = i - 1    
     
   return parts
-           
 
-# raise parts to power
+# calculate parts
 
-def raiseParts(parts):    
+def calcParts(parts, op):            
   i = 1
   while (i > 0):
-    i = findOperator(parts, '^')    
+    i = findOperator(parts, op)    
+    if (i == 0) or (i == len(parts) - 1):
+      raise Exception
+      
     if i > 0:
-      parts[i] = parts[i - 1] ** parts[ i + 1]
-      del parts[i + 1]
-      del parts[i - 1]
-            
-  return parts
-            
-# do division
-
-def divideParts(parts):    
-  i = 1
-  while (i > 0):
-    i = findOperator(parts, '/')    
-    if i > 0:
-      parts[i] = parts[i - 1] / parts[ i + 1]
-      del parts[i + 1]
-      del parts[i - 1]
-            
-  return parts
- 
+      lastItem = parts[i - 1]
+      item = parts[i]
+      nextItem = parts[i + 1]
+      
+      if (isinstance(lastItem, float) == False) or (isinstance(nextItem, float) == False):
+        raise Exception
+        
+      newItem = 0
+      if op == '^':
+        newItem = lastItem ** nextItem
+        
+      if op == '/':
+        if nextItem == 0.0:
+          raise Exception
+        newItem = lastItem / nextItem        
+        
+      if op == '*':
+        newItem = lastItem * nextItem
   
-# do multiplication
-
-def multiplyParts(parts):    
-  i = 1
-  while (i > 0):
-    i = findOperator(parts, '*')    
-    if i > 0:
-      parts[i] = parts[i - 1] * parts[ i + 1]
-      del parts[i + 1]
-      del parts[i - 1]
-            
-  return parts
+      if op == '+':
+        newItem = lastItem + nextItem
   
-#  do additions
-  
-def addParts(parts):
-  i = 1
-  while (i > 0):
-    i = findOperator(parts, '+')    
-    if i > 0:
-      parts[i] = parts[i - 1] + parts[ i + 1]
+      if op == '-':
+        newItem = lastItem - nextItem
+    
+      parts[i - 1] = newItem
       del parts[i + 1]
-      del parts[i - 1]
-            
-  return parts
-
-#  do subtraction
-  
-def subtractParts(parts):
-  i = 1
-  while (i > 0):
-    i = findOperator(parts, '-')    
-    if i > 0:
-      parts[i] = parts[i - 1] - parts[ i + 1]
-      del parts[i + 1]
-      del parts[i - 1]
+      del parts[i]
             
   return parts
   

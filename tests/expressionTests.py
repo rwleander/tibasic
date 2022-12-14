@@ -94,14 +94,6 @@ class TestExpressions(unittest.TestCase):
     parts = expressions.setVariables(parts, {})
     self.assertEqual(parts, [2, '+', 3])
 
-#  test addParts
-
-  def testAddParts (self):
-    parts = [2, '+', 3]
-    parts = expressions.addParts(parts)
-    self.assertEqual(parts, [5])
-
-
 #  test entire function
 
   def testEvaluate (self):
@@ -145,6 +137,19 @@ class TestExpressions(unittest.TestCase):
     self.assertEqual(msg, 'OK')
     self.assertEqual(value, 0)
     
+
+  def testEvaluate9 (self):
+    [value, msg] = expressions.evaluate('3 * -5 + 1')
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(value, -14)
+    
+    #   test badi expressions
+    
+  def testEvaluateBad (self):
+    [value, msg] = expressions.evaluate('5 + * 4')
+    self.assertEqual(msg, 'Bad expression')
+    
+
     
     
     
