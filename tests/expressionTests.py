@@ -128,7 +128,11 @@ class TestExpressions(unittest.TestCase):
     [value, msg] = expressions.evaluate('(1 + 2) ^ 2 - (2 * 3)') 
     self.assertEqual(msg, 'OK')
     self.assertEqual(value, 3)
-    
+
+  def testEvaluate6 (self):
+    [value, msg] = expressions.evaluate('2 * -3')
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(value, -6)
     
     
     

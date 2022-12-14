@@ -129,6 +129,7 @@ def calculate(tree):
     parts = branch['parts']
     parts = setVariables(parts, tree)    
     
+    parts = minusParts(parts)
     parts = raiseParts(parts)
     parts = divideParts(parts)
     parts = multiplyParts(parts)    
@@ -164,6 +165,20 @@ def setVariables(parts, tree):
       newParts.append(item)
       
   return newParts
+
+# switch numbers negative if preceded by -
+
+def minusParts(parts):      
+  i = len (parts) - 2
+  while i > 0:    
+    if parts[i] == '-':
+      if (isinstance(parts[i - 1], float) == False) and (isinstance(parts[i + 1], float) == True):
+        parts[i + 1] = 0 - parts[i + 1]
+        del(parts[i])
+    i = i - 1    
+    
+  return parts
+           
 
 # raise parts to power
 
