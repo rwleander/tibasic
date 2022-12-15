@@ -1,0 +1,4 @@
+10 LET A = 1
+20 PRINT A
+30 LET A = A + 1
+40 IF A < 11 THEN 20

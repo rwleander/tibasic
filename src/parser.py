@@ -70,7 +70,7 @@ def buildParseList():
   
 def parseStatements():
   i = 0
-  while (i < len(data.index)):
+  while i < len(data.index):
     lineNumber = data.index[i]
     item = data.parseList[lineNumber]
     statement = item['statement']
@@ -129,7 +129,7 @@ def addExpressions(item, ruleParts, codeParts):
   optional = False
   i = 0
   j = 0
-  while (i < len(ruleParts) and j < len(codeParts)):
+  while (i < len(ruleParts)) and (j < len(codeParts)):
     word = ruleParts[i]
     expr = codeParts[j].strip()
     if word == '[':

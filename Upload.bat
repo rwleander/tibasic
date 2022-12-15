@@ -1,8 +1,9 @@
-ampy -p com4 put src/helpers.py
-ampy -p com4 put src/data.py
-ampy -p com4 put src/commands.py
-ampy -p com4 put src/parser.py
-ampy -p com4 put src/runtime.py
-ampy -p com4 put src/expressions.py
-ampy -p com4 put src/main.py
-ampy -p com4 ls
+set com=com4 
+ampy -p %com% put src/helpers.py
+ampy -p %com% put src/data.py
+ampy -p %com% put src/commands.py
+ampy -p %com% put src/parser.py
+ampy -p %com% put src/runtime.py
+ampy -p %com% put src/expressions.py
+ampy -p %com% put src/main.py
+ampy -p %com% ls

@@ -18,7 +18,7 @@ def run():
     return rslt
    
   address = data.firstLine
-  while (address > 0):
+  while address > 0:
     [newAddress, msg] = executeStatement(address)
     if msg  != 'OK':    
         return msg    
