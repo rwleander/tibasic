@@ -6,12 +6,10 @@ import data
 #  is this string numeric
 
 def isnumeric(str):
-  i = 0
-  while (i < len(str)):
-    if str[i] < '0' or str[i] > '9':
-      if str[i] != '-':
-        return False
-    i = i + 1
+  for  ch in str:
+    if ch not in "0123456789-.":      
+      return False
+      
   return True
 
 # is this a valid variable name
@@ -50,10 +48,10 @@ def isValidVariable(txt):
 
 def parseFileName(cmdWork):
   parts = cmdWork.split()
-  if (len(parts) < 2):
+  if len(parts) < 2:
     return ['', 'Missing file name']
     
-  if (len(parts) > 2):
+  if len(parts) > 2:
     return ['', 'Too many arguments']
 
   fileName = parts[1] + '.ti'

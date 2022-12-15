@@ -7,15 +7,15 @@ import helpers
 
 def evaluate (expr):
   [parts, msg] = splitLine(expr)
-  if (msg != 'OK'):
+  if msg != 'OK':
     return [0, msg]
   
   [tree, msg] = buildTree(parts)
-  if (msg != 'OK'):
+  if msg != 'OK':
     return [0, msg]
   
   [value, msg] = calculate(tree)
-  if (msg != 'OK'):
+  if msg != 'OK':
     return [0, msg]
   
   return [value, 'OK']
@@ -30,8 +30,8 @@ def splitLine(expr):
   inString = False
   
   for char in expr:
-    if (inString):
-      if (char == '"'):
+    if inString:
+      if char == '"':
         inString = False
         item = item + char
         parts.append(item)
@@ -39,32 +39,32 @@ def splitLine(expr):
       else:
         item = item + char
   
-    elif (char == '"'):
-      if (item != ''):
+    elif char == '"':
+      if item != '':
         parts.append (item)
       item = char
       inString = True
     
     elif char in symbols:
-      if (item == ''):
+      if item == '':
         parts.append (char)
       else:
         parts.append(item)
         parts.append(char)
       item = ''
     
-    elif (char == ' '):
-      if (item != ''):
+    elif char == ' ':
+      if item != '':
         parts.append(item)
         item = ''
       
     else:
       item = item + char  
   
-  if (item != ''):
+  if item != '':
     parts.append(item)
     
-  if (inString == True):
+  if inString == True:
       return [parts, 'Missing quote']
 
   return [parts, 'OK']
@@ -91,7 +91,7 @@ def buildTree(parts):
  #  copy parts to branch 
  
   for item in parts:    
-    if (item == '('):
+    if item == '(':
       id = tree['end'] + 1
       tree['end'] = id 
       branch['parts'].append('~' + str(id))
@@ -105,7 +105,7 @@ def buildTree(parts):
       
       branch = newBranch
       
-    elif (item == ')'):
+    elif item == ')':
       oldBranch = branch
       oldId = oldBranch['id']
       tree[oldId] = oldBranch
@@ -114,7 +114,7 @@ def buildTree(parts):
     else:
       branch['parts'].append (item)
   
-  if (branch['id'] > 0):
+  if branch['id'] > 0:
     return [tree, 'Missing )']
   
   return [tree, 'OK']
@@ -124,7 +124,7 @@ def buildTree(parts):
   
 def calculate(tree):  
   i = tree['end']
-  while (i >= 0):
+  while i >= 0:
     branch = tree[i]
     parts = branch['parts']
     parts = setVariables(parts, tree)    
@@ -156,7 +156,7 @@ def calculate(tree):
 def setVariables(parts, tree):
   newParts = []
   for item in parts:
-    if (item[0] == '~'):
+    if item[0] == '~':
       text = item[1: len(item)]
       index = int(text)
       branch = tree[index]
@@ -165,7 +165,7 @@ def setVariables(parts, tree):
     elif item in data.variables:
       newParts.append(data.variables[item])
     
-    elif (helpers.isnumeric(item) and item != '-'):
+    elif helpers.isnumeric(item) and item != '-':
       newParts.append (float(item))
     
     elif helpers.isValidVariable(item):
@@ -189,7 +189,7 @@ def minusParts(parts):
       item = parts[i]
       nextItem = parts[i + 1]
       lastItem = 'xxx'
-      if (i > 0):
+      if i > 0:
         lastItem = parts[i - 1]
     
       if  (isinstance(lastItem, float) == False) and (isinstance(nextItem, float) == True):        
@@ -203,7 +203,7 @@ def minusParts(parts):
 
 def calcParts(parts, op):            
   i = 1
-  while (i > 0):
+  while i > 0:
     i = findOperator(parts, op)    
     if (i == 0) or (i == len(parts) - 1):
       raise Exception

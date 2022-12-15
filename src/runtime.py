@@ -8,25 +8,26 @@ import expressions
 #  run the program
 
 def run():
-  if (len(data.codeList) == 0):
+  if len(data.codeList) == 0:
     return 'No code'
   
   clearData()
   
   rslt = parser.parse()
-  if (rslt != 'OK'):
+  if rslt != 'OK':
     return rslt
    
   address = data.firstLine
   while (address > 0):
     [newAddress, msg] = executeStatement(address)
-    if (msg  != 'OK'):    
+    if msg  != 'OK':    
         return msg    
-    if (address == newAddress):
+        
+    if address == newAddress:
       return 'Infinite loop at line ' + str(newAddress)    
     address = newAddress
     
-  if (len(data.forNextStack) > 0):
+  if len(data.forNextStack) > 0:
     return 'Missing NEXT'
     
   return 'Done'
@@ -46,40 +47,39 @@ data.forNextStack = []
   
 def executeStatement(address):
   item = data.parseList[address]
-  if (item['error'] != 'OK'):
+  if item['error'] != 'OK':
     msg =   item['code'] + '\n' + item['error']
     return [-1, msg]  
   
-  if (item['statement'] == 'LET'):
+  if item['statement'] == 'LET':
     return runLet(item)
   
-  if (item['statement'] == 'IF'):
+  if item['statement'] == 'IF':
     return runIf(item)
     
-  if (item['statement'] == 'GOTO'):
+  if item['statement'] == 'GOTO':
     return runGoto(item)
     
-  if (item['statement'] == 'GOSUB'):
+  if item['statement'] == 'GOSUB':
     return runGosub(item)
     
-  if (item['statement'] == 'RETURN'):
+  if item['statement'] == 'RETURN':
     return runReturn(item)
     
-  if (item['statement'] == 'FOR'):
+  if item['statement'] == 'FOR':
     return runFor(item)
     
-  if (item['statement'] == 'NEXT'):
+  if item['statement'] == 'NEXT':
     return runNext(item)
 
-  if (item['statement'] == 'PRINT'):
+  if item['statement'] == 'PRINT':
     return runPrint(item)
   
-  if (item['statement'] == 'REM'):
+  if item['statement'] == 'REM':
     return runRem(item)
   
-  if (item['statement'] == 'STOP' or item['statement'] == 'END'):
+  if item['statement'] == 'STOP' or item['statement'] == 'END':
     return runStop(item)
-    
     
   msg = item['code'] + '\n' + 'Unknown statement type'
   return [-1, msg]
@@ -90,11 +90,11 @@ def executeStatement(address):
 def runLet(item):
   expr = getString(item, 'expr')
   variable = getString(item, 'var')
-  if (item['error'] != 'OK'):    
+  if item['error'] != 'OK':    
     return [-1, createError(item)]
   
   [value, msg] = expressions.evaluate(expr)
-  if (msg != 'OK'):    
+  if msg != 'OK':    
     return [-1, createMsg(item, msg)]
     
   data.variables[variable] = value
@@ -106,14 +106,14 @@ def runIf(item):
   line2 = getLineOptional(item, 'line2', item['nextLine'])
   line1 = getLine(item, 'line1')
   expr = getString(item, 'expr')
-  if (item['error'] != 'OK'):    
+  if item['error'] != 'OK':    
     return [-1, createError(item)]
     
   [value, msg] = expressions.evaluate(expr)
-  if (msg != 'OK'):    
+  if msg != 'OK':    
     return [-1, createMsg(item, msg)]
     
-  if (value == True):
+  if value == True:
     newLine = line1
   else:
     newLine = line2
@@ -127,7 +127,7 @@ def runIf(item):
   
 def runGoto(item):
   line = getLine(item, 'line')
-  if (item['error'] == 'OK'):  
+  if item['error'] == 'OK':  
     return [line, 'OK']
   else:
     return [-1, createError(item)]
@@ -136,7 +136,7 @@ def runGoto(item):
   
 def runGosub(item):
   line = getLine(item,'line')
-  if (item['error'] != 'OK'):
+  if item['error'] != 'OK':
     return [-1, createError(item)]
     
   data.gosubStack.append(item['nextLine'])
@@ -154,23 +154,23 @@ def runFor(item):
   expr2 = getString (item, 'expr2')
   expr1 = getString(item, 'expr1')
   var = getString(item, 'var')
-  if (item['error'] != 'OK'):
+  if item['error'] != 'OK':
     return [-1, createError(item)]
   
   step = 1
   nextLine = item['nextLine']
   
   [min, msg] = expressions.evaluate(expr1)
-  if (msg != 'OK'):
+  if msg != 'OK':
     return [-1, createMsg(item, msg)]
     
   [max, msg] = expressions.evaluate(expr2)
-  if (msg != 'OK'):
+  if msg != 'OK':
     return [-1, createMsg(item, msg)]
   
   if 'expr3' in item:
     [step, msg] = expressions.evaluate(item['expr3'])
-    if (msg != 'OK'):
+    if msg != 'OK':
       return [-1, createMsg(item, msg)]
   
   data.variables[var] = min
@@ -186,7 +186,7 @@ def runFor(item):
 # next - get data from for/next stack and either increment variable or got o next line
   
 def runNext(item):
-  if (len(data.forNextStack) < 1):
+  if len(data.forNextStack) < 1:
     return [-1, createMsg(item, 'Missing FOR')]
     
   stackItem = data.forNextStack[len(data.forNextStack) - 1]
@@ -200,7 +200,7 @@ def runNext(item):
   # at end of for - remove item from stack, go to next line
 # otherwise go to line after for
 
-  if ((step > 0 and value > max) or (step < 0 and value < max)):
+  if (step > 0 and value > max) or (step < 0 and value < max):
     data.forNextStack.pop()
     nextLine = item['nextLine']  
   else:
@@ -213,11 +213,11 @@ def runNext(item):
   
 def runPrint(item):
   expr = getString(item, 'expr')
-  if (item['error'] != 'OK'):
+  if item['error'] != 'OK':
     return [-1, createError(item)]
     
   [value, msg] = expressions.evaluate(expr)
-  if (msg != 'OK'):    
+  if msg != 'OK':    
     return [-1, createError(item, msg)]
     
   print (value)
@@ -254,7 +254,7 @@ def getLine(item, name):
     return -1
     
   str = item[name]
-  if (helpers.isnumeric(str) == False):
+  if helpers.isnumeric(str) == False:
     item['error'] = 'Bad line number'    
     return -1
     

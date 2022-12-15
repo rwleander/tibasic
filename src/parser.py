@@ -25,7 +25,7 @@ def parse():
     return rslt
     
   rslt = buildParseList()
-  if (rslt != 'OK'):
+  if rslt != 'OK':
     return rslt
   
   rslt = parseStatements()
@@ -37,7 +37,7 @@ def parse():
 def createIndex():
   data.index = []
   data.firstLine = -1  
-  if (len(data.codeList) == 0):
+  if len(data.codeList) == 0:
     return 'No code'
     
   for lineNumber in data.codeList:
@@ -61,7 +61,7 @@ def buildParseList():
     item['error'] = 'OK'
     data.parseList[lineNumber] = item
     
-    if (lastLine > 0):
+    if lastLine > 0:
       data.parseList[lastLine]['nextLine'] = lineNumber  
     lastLine = lineNumber
   return 'OK'
@@ -97,16 +97,16 @@ def splitCode(code, ruleParts):
   # if word is upper case, truncate last expression then add to list
   
     if (word[0] < 'a' or word[0] > 'z'):
-      if (len(codeParts) > 0):
+      if len(codeParts) > 0:
         l = len(codeParts)
         expr = codeParts[l - 1]
         i = expr.find(word)
-        if (i > 0):
+        if i > 0:
           codeParts[l - 1] = expr[0: i - 1]
           
       j = code.find(word)
-      if (word != '[' and word != ']'):
-        if (j > 1):
+      if word != '[' and word != ']':
+        if j > 1:
           codeParts.append(word)
           lastWord = word
           lastIndex = j
@@ -118,7 +118,7 @@ def splitCode(code, ruleParts):
     # if lower case, add new expression
         
     else:
-      if (lastIndex > 0):
+      if lastIndex > 0:
         i = lastIndex + len(lastWord) + 1
         codeParts.append(code[i: len(code)])
   return codeParts
@@ -132,20 +132,20 @@ def addExpressions(item, ruleParts, codeParts):
   while (i < len(ruleParts) and j < len(codeParts)):
     word = ruleParts[i]
     expr = codeParts[j].strip()
-    if (word == '['):
+    if word == '[':
       optional = True
     
-    if (word[0] >= 'a' and word[0] <= 'z'):      
+    if word[0] >= 'a' and word[0] <= 'z':      
       item[word] = expr    
-      if (expr == '' and optional == False):
+      if expr == '' and optional == False:
         item['error'] = 'Missing expression'
         return item
     else:      
-      if (expr == '' and optional == False):
+      if expr == '' and optional == False:
         item['error'] = 'Missing ' + word
         return item
     i = i + 1    
-    if (word != '[' and  word != ']'):
+    if word != '[' and  word != ']':
       j = j + 1  
   return item
     

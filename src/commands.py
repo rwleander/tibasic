@@ -12,45 +12,44 @@ import helpers
 def executeCommand(cmd):
   cmdWork = cmd.upper()
   parts = cmdWork.split()
-  if (len(parts) == 0):
+  if len(parts) == 0:
     return ''
 
   command = parts[0]      
-  if (command == 'NEW'):
+  if command == 'NEW':
     return cmdNew()
     
-  if (command[0] >= '0' and cmdWork[0] <= '9'):
+  if command[0] >= '0' and cmdWork[0] <= '9':
     return cmdAddLine(cmdWork)
 
-  if (command == 'RESEQUENCE'):
+  if command == 'RESEQUENCE':
     return cmdResequence()
   
-  if (command == 'OLD'):
+  if command == 'OLD':
     return cmdOld(cmdWork)
     
-  if (command == 'SAVE'):
+  if command == 'SAVE':
     return cmdSave(cmdWork)
     
-  if (command == 'FILES'):
+  if command == 'FILES':
     return cmdFiles()
     
-  if (command == 'DELETE'):
+  if command == 'DELETE':
     return cmdDelete(cmdWork)
       
-  if (command == 'LET'):
+  if command == 'LET':
     return cmdLet(cmdWork)
     
-  if (command == 'PRINT'):
+  if command == 'PRINT':
     return cmdPrint(cmdWork)
 
-
-  if (command == 'LIST'):
+  if command == 'LIST':
     return cmdList()  
 
-  if(command == 'RUN'):
+  if command == 'RUN':
     return runtime.run()
   
-  if (command == 'QUIT' or command == 'BYE'):
+  if command == 'QUIT' or command == 'BYE':
     data.quitFlag = True
     return ''
     
@@ -85,7 +84,7 @@ def cmdList():
   for j in index:
     str = str + data.codeList[j] 
     n = n + 1
-    if (n < len(data.codeList)):
+    if n < len(data.codeList):
       str = str + '\n'
   return str  
     
@@ -94,12 +93,12 @@ def cmdList():
 
 def cmdAddLine(cmd):
   parts = cmd.split()
-  if (helpers.isnumeric(parts[0])):
+  if helpers.isnumeric(parts[0]):
     lineNumber = int(parts[0])
   else:
     return 'Bad line number'
     
-  if (len(parts) > 1):
+  if len(parts) > 1:
     data.codeList[lineNumber] = cmd
   else:
     if lineNumber in data.codeList:
@@ -131,11 +130,11 @@ def cmdResequence():
   
 def cmdOld(cmdWork):
   [fileName, msg] = helpers.parseFileName(cmdWork)
-  if (msg != 'OK'):
+  if msg != 'OK':
     return msg
     
   cmdNew()
-  if (helpers.fileExists(fileName) == False):
+  if helpers.fileExists(fileName) == False:
     return 'File not found'
     
   with open (fileName, 'r') as fl:
@@ -149,7 +148,7 @@ def cmdOld(cmdWork):
   
 def cmdSave(cmdWork):
   [fileName, msg] = helpers.parseFileName(cmdWork)
-  if (msg != 'OK'):
+  if msg != 'OK':
     return msg
         
   index = []
@@ -172,11 +171,11 @@ def cmdFiles():
   for file in files:
     i = file.find('.ti')
     j = file.find('\\')
-    if (i > 0 and j < 0): 
+    if (i > 0) and (j < 0): 
       str = str + file[0:i] + '\t'
       n = n + 1
   
-  if (n > 0):
+  if n > 0:
     return str[0:len(str)-1]
   else:
     return 'No files'
@@ -185,10 +184,10 @@ def cmdFiles():
     
 def cmdDelete(cmdWork):
   [fileName, msg] = helpers.parseFileName(cmdWork)
-  if (msg != 'OK'):
+  if msg != 'OK':
     return msg
     
-  if (helpers.fileExists(fileName) == False):
+  if helpers.fileExists(fileName) == False:
     return 'File not found'
     
   os.remove(fileName)
@@ -202,17 +201,17 @@ def cmdDelete(cmdWork):
 
 def cmdLet(cmdWork):
   parts = cmdWork.split()
-  if (len(parts) < 4):
+  if len(parts) < 4:
     return 'Syntax error'
 	
-  if (parts[2] != '='):
+  if parts[2] != '=':
     return 'Syntax error'
       
   vName = parts[1]
   i = cmdWork.find('=')
   expr = cmdWork[i+2: len(cmdWork)] 
   [value, msg] = expressions.evaluate(expr)
-  if (msg != 'OK'):
+  if msg != 'OK':
     return 'Syntax error'
   data.variables[vName] = value  
   return 'OK'
@@ -221,13 +220,13 @@ def cmdLet(cmdWork):
   
 def cmdPrint(cmdWork):
   parts = cmdWork.split()
-  if (len(parts) < 2):
+  if len(parts) < 2:
     return 'Syntax error'
   
   i = cmdWork.find(' ')
   expr = cmdWork[i+1: len(cmdWork)]
   [value, msg] = expressions.evaluate(expr)
-  if (msg != 'OK'):
+  if msg != 'OK':
     return  'Syntax error'    
   return str(value)
   
