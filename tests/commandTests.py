@@ -95,7 +95,7 @@ class TestCommands(unittest.TestCase):
 
 # resequence list
   
-  def testResequence (self):
+  def testResequence1 (self):
     rslt = commands.executeCommand('New')
     rslt = commands.executeCommand('20 Let A = 1')
     rslt = commands.executeCommand('50 Let B = 2')    
@@ -104,6 +104,22 @@ class TestCommands(unittest.TestCase):
     self.assertEqual(rslt, 'OK')
     rslt = commands.executeCommand('List')
     self.assertEqual(rslt, '10 LET A = 1\n20 LET B = 2\n30 LET C = A + B') 
+  
+  def testResequence2 (self):
+    rslt = commands.executeCommand('New')
+    rslt = commands.executeCommand('20 Let A = 1')
+    rslt = commands.executeCommand('50 IF A > 1 THEN 80')
+    rslt = commands.executeCommand('70 GOSUB 100')
+    rslt = commands.executeCommand('80 GOTO 10')
+    rslt = commands.executeCommand('100 RETURN')
+    rslt = commands.executeCommand('80 GOTO 20')
+    rslt = commands.executeCommand('Resequence')
+    self.assertEqual(rslt, 'OK')
+    self.assertEqual(data.codeList[10], '10 LET A = 1')
+    self.assertEqual(data.codeList[20], '20 IF A > 1 THEN 40')
+    self.assertEqual(data.codeList[30], '30 GOSUB 50')
+    self.assertEqual(data.codeList[40], '40 GOTO 10')
+    self.assertEqual(data.codeList[50], '50 RETURN')
 
 #------------------------
 #  file operations
@@ -225,9 +241,6 @@ class TestCommands(unittest.TestCase):
     rslt = commands.executeCommand('Print A + 1')
     self.assertEqual(rslt, '101.0')
     
-  
-if __name__ == '__main__':  
-    unittest.main()
     
 
 

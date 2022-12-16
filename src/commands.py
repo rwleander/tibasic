@@ -111,14 +111,46 @@ def cmdAddLine(cmd):
 
 def cmdResequence():
   newCodeList = {}
+  lineList = {}
   seq = 10
   
   for lineNumber in data.codeList:
     line = data.codeList[lineNumber]
     i = line.index(' ')    
+    oldLine = line[0: i]
     newLine = str(seq) + line[i:len(line)]    
     newCodeList[seq] = newLine
+    lineList[oldLine] = str(seq)
     seq = seq + 10
+    
+    # replace line numbers within statements
+    
+  for lineNumber in newCodeList:
+    line = newCodeList[lineNumber]
+    parts = line.split()
+      
+    if parts[1] == 'GOTO' or parts[1] == 'GOSUB':
+      i = len(line) - len(parts[2])
+      line = line[0: i] + lineList[parts[2]]
+      newCodeList[lineNumber] = line
+        
+    elif parts[1] == 'IF':
+      i1 = line.find('THEN')
+      i2 = line.find('ELSE')
+      firstPart = line[0: i1 + 5]
+      if i2 > 0:
+        oldnum1 = parts[len(parts) - 3]
+        oldNum2 = parts[len(parts) - 1]
+        newNum1 = lineList[oldNum1]
+        newNum2 = lineList[oldNum2]
+        line = firstPart + newNum1 + ' ELSE ' + newNum2
+      else:
+        oldNum1 = parts[len(parts) - 1]
+        newNum1 = lineList[oldNum1]
+        i  = len(line) - len(oldNum1)
+        line = firstPart + newNum1
+      newCodeList[lineNumber] = line
+        
   data.codeList = newCodeList
   return 'OK'
   
