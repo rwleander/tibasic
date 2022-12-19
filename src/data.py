@@ -12,6 +12,18 @@ forNextStack = []
 firstLine = -1
 quitFlag = False
 
+reservedWords = ['ABS', 'APPEND', 'ASC', 'ATN', 'BASE', 'BREAK', 'BYE', 
+                 'CALL', 'CHR$', 'CLOSE', 'CON', 'CONTINUE', 'COS',
+                 'DATA', 'DEF', 'DIM', 'DELETE', 'DISPLAY',
+'EDIT', 'ELSE', 'END', 'EOF', 'EXP', 'FIXED', 'FOR',
+'GO', 'GOSUB', 'GOTO', 'IF', 'INPUT', 'INT', 'INTERNAL',
+'LEN', 'LET', 'LIST', 'LOG', 'NEW', 'NEXT', 'NUM', 'NUMBER',
+'OLD', 'ON', 'OPEN', 'OPTION', 'OUTPUT', 'PERMANENT', 'POS', 'PRINT',
+'RANDOMIZE', 'READ', 'REC', 'RELATIVE', 'REM', 'RES', 'RESEQUENCE', 'RESTORE', 'RETURN', 'RND', 'RUN',
+'SAVE', 'SEG$', 'SEQUENTIAL', 'SGN', 'SIN', 'SQR', 'STEP', 'STOP', 'STR$', 'SUB',  
+'TAB', 'TAN', 'THEN', 'TO', 'TRACE', 'UNBREAK', 'UNTRACE', 'UPDATE', 'VAL', 'VARIABLE']
+     
+
 
 #  codeList contains each line of code in the form codeList[lineNumber] = full line of code
 

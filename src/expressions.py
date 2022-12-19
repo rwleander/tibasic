@@ -168,11 +168,16 @@ def setVariables(parts, tree):
     elif helpers.isnumeric(item) and item != '-':
       newParts.append (float(item))
     
-    elif helpers.isValidVariable(item):
-      data.variables[item] = 0
-      newParts.append (0) 
+    elif helpers.isValidVariable(item):      
+      if item[len(item) - 1] == '$':
+        data.variables[item] = ""        
+        newParts.append("")
+      else:
+        data.variables[item] = 0
+        newParts.append (0) 
       
     else:
+    
       newParts.append(item)
       
   return newParts

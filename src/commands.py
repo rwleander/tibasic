@@ -240,13 +240,18 @@ def cmdLet(cmdWork):
     return 'Syntax error'
       
   vName = parts[1]
+    
   i = cmdWork.find('=')
   expr = cmdWork[i+2: len(cmdWork)] 
   [value, msg] = expressions.evaluate(expr)
   if msg != 'OK':
     return 'Syntax error'
-  data.variables[vName] = value  
-  return 'OK'
+    
+  msg = helpers.setVariable(vName,  value)
+  if msg == '':
+    return 'OK'
+  else:
+    return msg
   
 #print statement
   

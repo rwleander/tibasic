@@ -17,12 +17,23 @@ def isnumeric(str):
 def isValidVariable(txt):
   letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
   numbers = "0123456789"
+  characters = ['@', '_']
   
   # if blank, quit
   
   if txt == '':
     return False
-    
+
+# if already in variables list, we're ok
+
+  if txt in data.variables:
+    return True  
+
+# cannot be more than 15 characters
+
+  if len(txt) > 15:
+    return False
+  
   # first character must be a number
   
   if txt[0] not in letters:
@@ -31,19 +42,45 @@ def isValidVariable(txt):
   # scan remaining characters  up to last
 
   for ch in txt[1: len(txt) - 1]:
-    if ch not in letters and ch not in numbers:
+    if ch not in letters and ch not in numbers and ch not in characters:
       return false  
     
   # last character
+  
   ch = txt[len(txt) - 1]
-  if ch in letters or ch in numbers:
-    return True
-      
-  if ch == '$':
-    return True
-  else:
+  if ch not in letters and ch not in numbers and ch not in characters and  ch != '$':
     return False
+    
+  # not a reserved word
+    
+  if txt  in data.reservedWords:
+    return False
+    
+  return True
       
+#  set variable value
+
+def setVariable(name, value):
+
+#  make sure variable name is valid
+
+  if isValidVariable(name) == False:
+    return 'Bad name'
+    
+# match type
+
+  lastChar = name[len(name) - 1]
+  if type(value) == int or type(value) == float:
+    if lastChar == '$':
+      return 'Bad type'  
+  else:
+    if lastChar != '$':
+      return 'Bad type'
+    
+  data.variables[name] = value
+  return 'OK'
+  
+
 # get file name from command line
 
 def parseFileName(cmdWork):

@@ -97,8 +97,11 @@ def runLet(item):
   if msg != 'OK':    
     return [-1, createMsg(item, msg)]
     
-  data.variables[variable] = value
-  return [item['nextLine'], 'OK']
+  msg = helpers.setVariable(variable, value)  
+  if msg == 'OK':
+    return [item['nextLine'], 'OK']
+  else:
+    return [-1, createMsg(item, msg)]
   
   # run an if statement
   
@@ -173,7 +176,10 @@ def runFor(item):
     if msg != 'OK':
       return [-1, createMsg(item, msg)]
   
-  data.variables[var] = min
+  msg = helpers.setVariable(var, min) 
+  if msg != 'OK':
+    return [-1, createMsg(item, msg)]
+  
   stackItem = {}
   stackItem['var'] = var 
   stackItem['min'] = min 
