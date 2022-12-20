@@ -44,7 +44,7 @@ def executeCommand(cmd):
     return cmdPrint(cmdWork)
 
   if command == 'LIST':
-    return cmdList()  
+    return cmdList(cmdWork)  
 
   if command == 'RUN':
     return runtime.run()
@@ -74,18 +74,23 @@ def cmdNew():
 
 #  list code
 
-def cmdList():
-  str = ''
-  index = []
-  n = 0
+def cmdList(cmdWork):
+  str = ''  
+  index = []  
   for i in data.codeList:
     index.append(i)
   index.sort()  
-  for j in index:
-    str = str + data.codeList[j] 
-    n = n + 1
-    if n < len(data.codeList):
-      str = str + '\n'
+  
+  [first, last, msg] = splitLinesForList(cmdWork, index[0], index[len(index) - 1])
+  if msg != 'OK':
+    return msg
+    
+  for lineNumber in index:
+    if lineNumber >= first and lineNumber <= last:
+      str = str + data.codeList[lineNumber] 
+      if lineNumber < last:
+        str = str + '\n'
+      
   return str  
     
     
@@ -267,4 +272,46 @@ def cmdPrint(cmdWork):
     return  'Syntax error'    
   return str(value)
   
+#-------------------
+#  helper functions
   
+# get first and last line number for list statement
+  
+def splitLinesForList(txt, min, max):
+  numbers = "1234567890"
+  line1 = ''
+  line2 = ''
+  num1 = min
+  num2 = max
+  msg = 'OK'
+  beforeDash = True
+ 
+  if txt == 'LIST':
+    return [min, max, 'OK']
+   
+  for ch in txt:
+    if ch in numbers:
+      if beforeDash:
+        line1 = line1 + ch
+      else:
+        line2 = line2 + ch
+        
+    if ch == '-':
+      if beforeDash == False:
+        return [-1, -1, 'Bad line numbers']
+      else:
+        beforeDash = False      
+
+  if line1 != '':
+    min = int(line1)
+  
+  if line2 != '':
+    max = int(line2)
+  
+  if beforeDash:
+    max = min
+  
+  return [min, max, 'OK']
+    
+  
+ 

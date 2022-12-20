@@ -44,12 +44,27 @@ class TestCommands(unittest.TestCase):
   def testList (self):
     data.codeList = {10: '10 Let A = 1', 20: '20 Let B = 30', 30: '30 Let C = A + B'}
     result = commands.executeCommand('LIST')
-    self.assertEqual(result, '10 Let A = 1\n20 Let B = 30\n30 Let C = A + B')
+    self.assertEqual(result, '10 Let A = 1\n20 Let B = 30\n30 Let C = A + B')    
     
-  def testListNotOrdered (self):
+  def testListUnordered (self):
     data.codeList = {20: '20 Let A = 1', 10: '10 Let B = 30', 30: '30 Let C = A + B'}
     result = commands.executeCommand('LIST')
     self.assertEqual(result, '10 Let B = 30\n20 Let A = 1\n30 Let C = A + B')
+
+#  partial lists
+  
+  def testListPartial (self):
+    data.codeList = {10: '10 Let A = 1', 20: '20 Let B = 30', 30: '30 Let C = A + B', 40: '40 PRINT C' }
+    result = commands.executeCommand('LIST')
+    self.assertEqual(result, '10 Let A = 1\n20 Let B = 30\n30 Let C = A + B\n40 PRINT C')
+    result = commands.executeCommand('LIST 20')
+    self.assertEqual(result, '20 Let B = 30')
+    result = commands.executeCommand('LIST -20')
+    self.assertEqual(result, '10 Let A = 1\n20 Let B = 30')
+    result = commands.executeCommand('LIST 30-')
+    self.assertEqual(result, '30 Let C = A + B\n40 PRINT C')
+    result = commands.executeCommand('LIST 20 - 30')
+    self.assertEqual(result, '20 Let B = 30\n30 Let C = A + B')
 
 #  code lines add, replace or delete
 
