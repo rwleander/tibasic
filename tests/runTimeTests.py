@@ -80,6 +80,18 @@ class TestRuntime(unittest.TestCase):
     rslt = runtime.run()
     self.assertEqual(rslt, 'Infinite loop at line 20')
 
+# test GO TO (separate words)
+
+  def testRunGoTo2 (self):
+    rslt = commands.executeCommand('NEW')
+    rslt = commands.executeCommand('10 LET A = 1')
+    rslt = commands.executeCommand('20 GO TO 40')
+    rslt = commands.executeCommand('30 LET A = 2')
+    rslt = commands.executeCommand('40 END')
+    rslt = runtime.run()    
+    self.assertEqual(rslt, 'Done')
+    self.assertEqual(data.variables['A'], 1)
+
 #  test gosub, return
 
   def testRunGosub (self):
@@ -108,6 +120,20 @@ class TestRuntime(unittest.TestCase):
     rslt = runtime.run()
     self.assertEqual(rslt, 'Done')
     self.assertEqual(data.variables['A'], 30)
+
+#  test go sub (two words)
+
+  def testRunGosub2 (self):
+    rslt = commands.executeCommand('NEW')
+    rslt = commands.executeCommand('10 LET A = 1')
+    rslt = commands.executeCommand('20 GO SUB 50')
+    rslt = commands.executeCommand('30 STOP')
+    rslt = commands.executeCommand('50 LET A = 10')
+    rslt = commands.executeCommand('60 RETURN')        
+    rslt = runtime.run()    
+    self.assertEqual(rslt, 'Done')
+    self.assertEqual(data.variables['A'], 10)
+
 
 # test basic for/next
 

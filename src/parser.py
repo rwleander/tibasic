@@ -8,6 +8,7 @@ parseRules = {
   'PRINT': 'PRINT expr',
   'IF': 'IF expr THEN line1 [ ELSE line2 ]',
   'GOTO': 'GOTO line',
+  'GO': 'GO type line',
   'GOSUB': 'GOSUB line',
   'RETURN': 'RETURN',
   'FOR': 'FOR var = expr1 TO expr2 [ STEP expr3 ]',
@@ -141,6 +142,15 @@ def splitCode(code, ruleParts):
 
 def addExpressions(item, ruleParts, codeParts):  
   optional = False
+  
+  # for GO TO / GO SUB, fix up type and line
+
+  if 'statement' in item:  
+    if item['statement'] == 'GO':
+      tmpParts = codeParts[1].split()
+      codeParts[1] = tmpParts[0]
+      codeParts[2] = tmpParts[1]    
+
   i = 0
   j = 0
   while (i < len(ruleParts)) and (j < len(codeParts)):

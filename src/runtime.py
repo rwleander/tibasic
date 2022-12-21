@@ -63,6 +63,9 @@ def executeStatement(address):
   if item['statement'] == 'GOSUB':
     return runGosub(item)
     
+  if item['statement'] == 'GO':
+    return runGo(item)
+    
   if item['statement'] == 'RETURN':
     return runReturn(item)
     
@@ -125,6 +128,24 @@ def runIf(item):
     return [newLine, 'OK']
   else:
     return [-1, createMsg(item, 'Bad line number')]
+  
+  #  if goto or gosub were coded as two words, route to correct function
+  
+def runGo(item):
+  cmdType = getString(item, 'type')
+  line = getLine(item, 'line')
+  
+  if item['error'] != 'OK':
+    return [-1, createError(item)]
+
+  if cmdType == 'TO':
+    return [line, 'OK']
+    
+  if cmdType == 'SUB':
+    data.gosubStack.append(item['nextLine'])
+    return [line, 'OK']
+  
+  return [-1, createMsg(item, 'Bad command')]
   
   # run goto 
   
