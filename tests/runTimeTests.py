@@ -24,6 +24,16 @@ class TestRuntime(unittest.TestCase):
     self.assertEqual(rslt, 'Done')
     self.assertEqual(data.variables['A'], 1)
 
+# test let without keyword
+
+
+  def testRunImpliedLet (self):
+    rslt = commands.executeCommand('NEW')
+    rslt = commands.executeCommand('10 A = 1')
+    rslt = runtime.run()
+    self.assertEqual(rslt, 'Done')
+    self.assertEqual(data.variables['A'], 1)
+
 # test if statement
 
   def testRunIf (self):

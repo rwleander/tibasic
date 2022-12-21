@@ -103,5 +103,5 @@ Arrays
 
 Additional notes:
 1. for/next skips code if out of range on first pass
-2. Variables are limited to 15 characters and contain letters, numbers or @ or _ 
-  use 'Bad name' if variable doesn't follow the rules
+2. strings cannot exceed 256 characters
+3. GOTO and GO TO act the same

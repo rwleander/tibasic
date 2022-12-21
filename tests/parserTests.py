@@ -12,8 +12,8 @@ class TestParser(unittest.TestCase):
 
   def testParserNoCode (self):
     commands.executeCommand('NEW')
-    rslt = parser.parse()    
-    self.assertEqual(rslt, 'No code')
+    result = parser.parse()    
+    self.assertEqual(result, 'No code')
 
 #  test create index
 
@@ -22,8 +22,8 @@ class TestParser(unittest.TestCase):
     data.codeList[10] = '10 LET A = 1'
     data.codeList[20] = '20 LET B = 2'
     data.codeList[30] = '30 LET C = A + B'
-    rslt = parser.createIndex()
-    self.assertEqual(rslt, 'OK')
+    result = parser.createIndex()
+    self.assertEqual(result, 'OK')
     self.assertEqual(data.index, [10, 20, 30]) 
     self.assertEqual(data.firstLine, 10)
     
@@ -34,11 +34,11 @@ class TestParser(unittest.TestCase):
     data.codeList[10] = '10 LET A = 1'
     data.codeList[20] = '20 LET B = 2'
     data.codeList[30] = '30 LET C = A + B'
-    rslt = parser.createIndex()
-    self.assertEqual(rslt, 'OK')
+    result = parser.createIndex()
+    self.assertEqual(result, 'OK')
     self.assertEqual(len(data.index), 3)
-    rslt = parser.buildParseList()
-    self.assertEqual(rslt, 'OK')
+    result = parser.buildParseList()
+    self.assertEqual(result, 'OK')
     self.assertEqual(len(data.parseList), 3)
     item1 = data.parseList[10]
     self.assertEqual(item1, {'code': '10 LET A = 1', 'statement': 'LET', 'nextLine': 20, 'error': 'OK'})
@@ -54,8 +54,8 @@ class TestParser(unittest.TestCase):
     data.codeList[10] = '10 LET A = 1'
     data.codeList[20] = '20 LET B = 2'
     data.codeList[30] = '30 LET C = A + B'
-    rslt = parser.parse()    
-    self.assertEqual(rslt, 'OK')
+    result = parser.parse()    
+    self.assertEqual(result, 'OK')
     self.assertEqual(len(data.codeList), 3)
     self.assertEqual(len(data.index), 3)
     self.assertEqual(len(data.parseList), 3)
@@ -69,8 +69,8 @@ class TestParser(unittest.TestCase):
     commands.executeCommand('NEW')
     commands.executeCommand('10 Let A = 1')
     commands.executeCommand('20 Let B = A + 1')
-    rslt = parser.parse()    
-    self.assertEqual(rslt, 'OK')
+    result = parser.parse()    
+    self.assertEqual(result, 'OK')
     self.assertEqual(len(data.parseList), 2)
     self.assertEqual(data.firstLine, 10)
     item1 = data.parseList[10]
@@ -85,7 +85,7 @@ class TestParser(unittest.TestCase):
     commands.executeCommand('10 Let') 
     commands.executeCommand('20 Let B') 
     commands.executeCommand('30 Let C A + B') 
-    rslt = parser.parse()    
+    result = parser.parse()    
     self.assertEqual(len(data.parseList), 3)
     item1 = data.parseList[10]
     self.assertEqual(item1['error'], 'Missing expression') 
@@ -94,13 +94,30 @@ class TestParser(unittest.TestCase):
     item3 = data.parseList[30]
     self.assertEqual(item3['error'], 'Missing =') 
 
+#  test implied let
+
+  def testParserImpliedLet (self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 A = 1')
+    commands.executeCommand('20 B = A + 1')
+    result = parser.parse()    
+    self.assertEqual(result, 'OK')
+    self.assertEqual(len(data.parseList), 2)
+    self.assertEqual(data.firstLine, 10)
+    item1 = data.parseList[10]
+    self.assertEqual({'code': '10 A = 1', 'statement': 'LET', 'nextLine': 20, 'var': 'A', 'expr': '1', 'error': 'OK'}, item1) 
+    item2 = data.parseList[20]
+    self.assertEqual(len(item2), 6)
+    self.assertEqual({'code': '20 B = A + 1', 'statement': 'LET', 'nextLine': -1, 'var':'B', 'expr': 'A + 1', 'error': 'OK'}, item2) 
+    
+
 # test parse print
 
   def testParserPrint (self):
     commands.executeCommand('NEW')
     commands.executeCommand('10 PRINT A')
     commands.executeCommand('20 Print A * B / 2 * A + 2 * B') 
-    rslt = parser.parse()    
+    result = parser.parse()    
     self.assertEqual(len(data.parseList), 2)
     item1 = data.parseList[10]
     self.assertEqual(item1, {'code': '10 PRINT A', 'statement': 'PRINT', 'nextLine': 20, 'expr': 'A', 'error': 'OK'}) 
@@ -112,7 +129,7 @@ class TestParser(unittest.TestCase):
   def testParserPrintErrors (self):
     commands.executeCommand('NEW')
     commands.executeCommand('10 PRINT ')
-    rslt = parser.parse()    
+    result = parser.parse()    
     self.assertEqual(len(data.parseList), 1)
     item1 = data.parseList[10]
 
@@ -125,7 +142,7 @@ class TestParser(unittest.TestCase):
     commands.executeCommand('20 IF A > B THEN 40')
     commands.executeCommand('30 IF B > A + 1 THEN 40 ELSE 10')
     commands.executeCommand('40 PRINT A')
-    rslt = parser.parse()    
+    result = parser.parse()    
     self.assertEqual(len(data.parseList), 4)
     item1 = data.parseList[10]
     self.assertEqual(item1['expr'], 'TRUE')
@@ -146,7 +163,7 @@ class TestParser(unittest.TestCase):
     commands.executeCommand('20 IF THEN 40')
     commands.executeCommand('30 IF B > A + 1 THEN 25')
     commands.executeCommand('40 PRINT A')
-    rslt = parser.parse()    
+    result = parser.parse()    
     self.assertEqual(len(data.parseList), 4)
     item1 = data.parseList[10]
     self.assertEqual(item1['error'], 'Missing expression')
@@ -161,7 +178,7 @@ class TestParser(unittest.TestCase):
   def testParserStop (self):
     commands.executeCommand('NEW')
     commands.executeCommand('10 STOP')
-    rslt = parser.parse()    
+    result = parser.parse()    
     self.assertEqual(len(data.parseList), 1)
     item1 = data.parseList[10]
     self.assertEqual(item1, {'code': '10 STOP', 'statement': 'STOP', 'nextLine': -1, 'error': 'OK'})

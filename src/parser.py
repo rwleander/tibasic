@@ -59,6 +59,13 @@ def buildParseList():
     item['statement'] = parts[1]
     item['nextLine'] = -1
     item['error'] = 'OK'
+    
+    # if implied let, set statement type to let
+    
+    if len(parts) > 2:
+      if parts[2] == '=':
+        item['statement'] = 'LET'
+      
     data.parseList[lineNumber] = item
     
     if lastLine > 0:
@@ -75,9 +82,16 @@ def parseStatements():
     item = data.parseList[lineNumber]
     statement = item['statement']
     code = item['code']
-    if statement not in parseRules:
+    
+    if statement not in parseRules:      
       return code + '\n' + 'Unknown statement'
-      
+    
+    # if implied let, add keyword
+    
+    if statement == 'LET' and code.find('LET') < 0:
+      j = code.find(' ')
+      code = code[0: j] + ' LET' + code[j:len(code)]
+    
     rule = parseRules[statement]
     ruleParts = rule.split()
     codeParts= splitCode(code, ruleParts)
