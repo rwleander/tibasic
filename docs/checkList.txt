@@ -78,7 +78,7 @@ Functions
 SOUND
 KEY
 
-ABS
+*ABS
 ATN
 COS
 EXP
@@ -87,7 +87,7 @@ LOG
 RND
 SGN
 SIN
-SQR
+*SQR
 TAN
 
 ASC
