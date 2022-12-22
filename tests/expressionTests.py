@@ -49,7 +49,7 @@ class TestExpressions(unittest.TestCase):
     [tree, msg] = expressions.buildTree(parts)
     self.assertEqual(msg, 'OK')
     self.assertEqual(len(tree), 2)
-    self.assertEqual(tree[0], {'parts': ['3.1416', '*', 'R', '^', '2'], 'value': 0,'id': 0,  'parent': -1})
+    self.assertEqual(tree[0], {'type': 'expr', 'parts': ['3.1416', '*', 'R', '^', '2'], 'value': 0,'id': 0,  'parent': -1})
    
   def testCreateTree2 (self):
     [parts, msg] = expressions.splitLine('3 * ( 2 + 3)')
@@ -57,8 +57,8 @@ class TestExpressions(unittest.TestCase):
     [tree, msg] = expressions.buildTree(parts)
     self.assertEqual(msg, 'OK')
     self.assertEqual(len(tree), 3)
-    self.assertEqual(tree[0], {'parts': ['3', '*', '~1'], 'value': 0, 'id': 0,  'parent': -1})
-    self.assertEqual(tree[1], {'parts': ['2', '+', '3'], 'value': 0, 'id': 1, 'parent': 0})
+    self.assertEqual(tree[0], {'type': 'expr', 'parts': ['3', '*', '~1'], 'value': 0, 'id': 0,  'parent': -1})
+    self.assertEqual(tree[1], {'type': 'expr', 'parts': ['2', '+', '3'], 'value': 0, 'id': 1, 'parent': 0})
    
   def testCreateTree3 (self):
     [parts, msg] = expressions.splitLine('(1 + 2) / (3 * 4)')
@@ -66,9 +66,9 @@ class TestExpressions(unittest.TestCase):
     [tree, msg] = expressions.buildTree(parts)
     self.assertEqual(msg, 'OK')
     self.assertEqual(len(tree), 4)
-    self.assertEqual(tree[0], {'parts': ['~1', '/', '~2'], 'value': 0, 'id': 0,  'parent': -1})
-    self.assertEqual(tree[1], {'parts': ['1', '+', '2'], 'value': 0, 'id': 1, 'parent': 0})
-    self.assertEqual(tree[2], {'parts': ['3', '*', '4'], 'value': 0, 'id': 2, 'parent': 0})
+    self.assertEqual(tree[0], {'type': 'expr', 'parts': ['~1', '/', '~2'], 'value': 0, 'id': 0,  'parent': -1})
+    self.assertEqual(tree[1], {'type': 'expr', 'parts': ['1', '+', '2'], 'value': 0, 'id': 1, 'parent': 0})
+    self.assertEqual(tree[2], {'type': 'expr', 'parts': ['3', '*', '4'], 'value': 0, 'id': 2, 'parent': 0})
 
    
   def testCreateTree4 (self):
@@ -77,15 +77,29 @@ class TestExpressions(unittest.TestCase):
     [tree, msg] = expressions.buildTree(parts)
     self.assertEqual(msg, 'OK')
     self.assertEqual(len(tree), 4)
-    self.assertEqual(tree[0], {'parts': ['2', '*', '~1'], 'value': 0, 'id': 0,  'parent': -1})
-    self.assertEqual(tree[1], {'parts': ['3', '/', '~2'], 'value': 0, 'id': 1, 'parent': 0})
-    self.assertEqual(tree[2], {'parts': ['4', '+', '5'], 'value': 0, 'id': 2, 'parent': 1})
+    self.assertEqual(tree[0], {'type': 'expr', 'parts': ['2', '*', '~1'], 'value': 0, 'id': 0,  'parent': -1})
+    self.assertEqual(tree[1], {'type': 'expr', 'parts': ['3', '/', '~2'], 'value': 0, 'id': 1, 'parent': 0})
+    self.assertEqual(tree[2], {'type': 'expr', 'parts': ['4', '+', '5'], 'value': 0, 'id': 2, 'parent': 1})
    
   def testCreateTreeFail (self):
     [parts, msg] = expressions.splitLine('2 * (3 / (4 + 5)')
     self.assertEqual(msg, 'OK')
     [tree, msg] = expressions.buildTree(parts)
     self.assertEqual(msg, 'Missing )')
+
+#  test tree with function
+
+  def testCreateTreeWithFunction (self):
+    [parts, msg] = expressions.splitLine('SQR(4)')
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(len(parts), 4)
+    self.assertEqual(parts, ['SQR', '(', '4', ')'])
+    [tree, msg] = expressions.buildTree(parts)
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(len(tree), 4)
+    self.assertEqual(tree[0], {'type': 'expr', 'parts': ['~1'], 'value': 0, 'id': 0,  'parent': -1})
+    self.assertEqual(tree[1], {'type': 'func', 'parts': ['SQR', '~2'], 'value': 0, 'id': 1, 'parent': 0})
+    self.assertEqual(tree[2], {'type': 'expr', 'parts': ['4'], 'value': 0, 'id': 2, 'parent': 1})
 
 #  test set variables
 
@@ -149,10 +163,8 @@ class TestExpressions(unittest.TestCase):
     [value, msg] = expressions.evaluate('5 + * 4')
     self.assertEqual(msg, 'Bad expression')
     
+# test function call
 
-    
-    
-    
   
 if __name__ == '__main__':  
     unittest.main()

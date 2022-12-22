@@ -37,9 +37,12 @@ RESTORE
 Statements:
 
 *LET
+* implied LET
 *IF THEN ELSE
 *GOTO
+* GO TO
 *GOSUB
+*GO SUB
 *RETURN
 *FOR TO STEP
 *NEXT
@@ -104,4 +107,3 @@ Arrays
 Additional notes:
 1. for/next skips code if out of range on first pass
 2. strings cannot exceed 256 characters
-3. GOTO and GO TO act the same

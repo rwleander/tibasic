@@ -2,6 +2,7 @@
 
 import data
 import helpers
+import functions
 
 #  evaluate an expression
 
@@ -79,6 +80,7 @@ def buildTree(parts):
   #  create furst branch
   
   branch = {}
+  branch['type'] = 'expr'
   branch['parts'] = []
   branch['value'] = 0
   branch['id'] = 0
@@ -91,12 +93,27 @@ def buildTree(parts):
  #  copy parts to branch 
  
   for item in parts:    
-    if item == '(':
+    if item in data.functionNames:
       id = tree['end'] + 1
       tree['end'] = id 
       branch['parts'].append('~' + str(id))
       
       newBranch = {}
+      newBranch['type'] = 'func'
+      newBranch['parts'] = [item]
+      newBranch['value'] = 0
+      newBranch['id'] = id
+      newBranch['parent'] = branch['id']
+      tree[id] = newBranch
+      branch = newBranch
+                
+    elif item == '(':
+      id = tree['end'] + 1
+      tree['end'] = id 
+      branch['parts'].append('~' + str(id))
+      
+      newBranch = {}
+      newBranch['type'] = 'expr'
       newBranch['parts'] = []
       newBranch['value'] = 0
       newBranch['id'] = id
@@ -105,11 +122,19 @@ def buildTree(parts):
       
       branch = newBranch
       
-    elif item == ')':
+    elif item == ')':      
       oldBranch = branch
       oldId = oldBranch['id']
       tree[oldId] = oldBranch
       branch = tree[oldBranch['parent']]
+      
+      #  note: if this is a function call, pop the stach twice
+      
+      if branch['type'] == 'func':
+        oldBranch = branch
+        oldId = oldBranch['id']
+        tree[oldId] = oldBranch
+        branch = tree[oldBranch['parent']]
       
     else:
       branch['parts'].append (item)
@@ -127,28 +152,35 @@ def calculate(tree):
   while i >= 0:
     branch = tree[i]
     parts = branch['parts']
-    parts = setVariables(parts, tree)    
+    parts = setVariables(parts, tree)           
+   
+    if  branch['type'] == 'expr':
+      try:
+        parts = minusParts(parts)
+        parts = calcParts(parts, '^')
+        parts = calcParts(parts, '/')
+        parts = calcParts(parts, '*')    
+        parts = calcParts(parts, '+')
+        parts = calcParts(parts, '-')
+        parts = compareParts(parts)
+      except:
+        return [0, 'Bad expression']
+       
+      if len(parts) > 1:
+        return [0, 'Bad expression']
+      branch['value'] = parts[0]        
     
-    try:
-      parts = minusParts(parts)
-      parts = calcParts(parts, '^')
-      parts = calcParts(parts, '/')
-      parts = calcParts(parts, '*')    
-      parts = calcParts(parts, '+')
-      parts = calcParts(parts, '-')
-      parts = compareParts(parts)
-    except:
-      return [0, 'Bad expression']
-      
-    if len(parts) > 1:
-      return [0, 'Bad expression']
-        
-    branch['value'] = parts[0]    
+    else:
+      [value, msg] = functions.evaluate(parts)
+      if (msg != 'OK'):
+        return [0, msg]           
+      branch['value'] = value    
+  
     tree[i] = branch
     i = i - 1
-  
+
   rootBranch = tree[0]  
-  value = rootBranch['value']
+  value =rootBranch['value']
   return [value, 'OK']
     
 #  substitute variables and convert numbers to floats

@@ -22,7 +22,8 @@ reservedWords = ['ABS', 'APPEND', 'ASC', 'ATN', 'BASE', 'BREAK', 'BYE',
 'RANDOMIZE', 'READ', 'REC', 'RELATIVE', 'REM', 'RES', 'RESEQUENCE', 'RESTORE', 'RETURN', 'RND', 'RUN',
 'SAVE', 'SEG$', 'SEQUENTIAL', 'SGN', 'SIN', 'SQR', 'STEP', 'STOP', 'STR$', 'SUB',  
 'TAB', 'TAN', 'THEN', 'TO', 'TRACE', 'UNBREAK', 'UNTRACE', 'UPDATE', 'VAL', 'VARIABLE']
-     
+
+functionNames = ['SQR']
 
 
 #  codeList contains each line of code in the form codeList[lineNumber] = full line of code
