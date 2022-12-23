@@ -1,6 +1,7 @@
 #  test for functions
 
 import unittest
+import math
 
 import expressions
 import functions
@@ -50,6 +51,45 @@ class TestFunctions(unittest.TestCase):
     self.assertEqual(value , -0)
     [value, msg] = expressions.evaluate('SGN(-3)')
     self.assertEqual(value , -1)
+
+# test arc tangent function
+
+  def testAtn (self):
+    [value, msg] = expressions.evaluate('ATN(1.0)')
+    self.assertEqual(msg, 'OK')    
+    self.assertEqual(value , math.pi / 4)
+    [value, msg] = expressions.evaluate('ATN(0.0)')
+    self.assertEqual(value , 0)
+
+#  test cosin
+
+  def testCOS (self):
+    n = math.pi / 4
+    [value, msg] = expressions.evaluate('COS(' + str(n) + ')')
+    self.assertEqual(msg, 'OK')    
+    self.assertEqual(value , (2 ** 0.5) / 2)
+    [value, msg] = expressions.evaluate('COS(0.0)')
+    self.assertEqual(value , 1.0)
+
+# test sine
+
+  def testSin (self):
+    n = math.pi / 4
+    [value, msg] = expressions.evaluate('SIN(' + str(n) + ')')
+    self.assertEqual(msg, 'OK')    
+    self.assertEqual(value , (2 ** 0.5) / 2)
+    [value, msg] = expressions.evaluate('SIN(0.0)')
+    self.assertEqual(value , 0.0)
+
+#  test tangent
+
+  def testTAN (self):
+    n = math.pi / 4
+    [value, msg] = expressions.evaluate('TAN(' + str(n) + ')')
+    self.assertEqual(msg, 'OK')    
+    self.assertEqual(value , 0.9999999999999999)
+    [value, msg] = expressions.evaluate('TAN(0.0)')
+    self.assertEqual(value , 0.0)
 
 
 if __name__ == '__main__':  
