@@ -14,6 +14,7 @@ parseRules = {
   'FOR': 'FOR var = expr1 TO expr2 [ STEP expr3 ]',
 'NEXT': 'NEXT',  
   'REM': 'REM expr',
+  'RANDOMIZE': 'RANDOMIZE',
   'STOP': 'STOP',
   'END': 'END'
 }

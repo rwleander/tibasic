@@ -109,6 +109,14 @@ class TestFunctions(unittest.TestCase):
     [value, msg] = expressions.evaluate('EXP(0)')
     self.assertEqual(value, 1)
 
+# test random function
+
+  def testRnd (self):
+    [value, msg] = expressions.evaluate('RND()')
+    self.assertEqual(msg, 'OK')    
+    self.assertEqual(value >= 0, True)
+    self.assertEqual(value < 1, True)
+    
 
 
 if __name__ == '__main__':  

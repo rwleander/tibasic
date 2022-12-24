@@ -335,6 +335,17 @@ class TestRuntime(unittest.TestCase):
     self.assertEqual(line, 20)
     self.assertEqual(item['error'], 'OK')
 
+#  test randomize
+
+  def testRunRandomize (self):
+    rslt = commands.executeCommand('NEW')
+    rslt = commands.executeCommand('10 RANDOMIZE')
+    rslt = commands.executeCommand('20 R = RND()')
+    rslt = runtime.run()
+    self.assertEqual(rslt, 'Done')
+    self.assertEqual(data.variables['R'] > 0, True)
+
+
 
 
 

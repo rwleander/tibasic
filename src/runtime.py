@@ -1,5 +1,7 @@
 #  run time interprets  the code
 
+import random
+
 import data
 import parser
 import helpers
@@ -41,6 +43,7 @@ data.index = []
 data.parserList = {}
 data.gosubStack = []
 data.forNextStack = []
+random.seed(0)
   
   
   # run a line of code
@@ -75,6 +78,9 @@ def executeStatement(address):
   if item['statement'] == 'NEXT':
     return runNext(item)
 
+  if item['statement'] == 'RANDOMIZE':
+    return runRandomize(item)
+    
   if item['statement'] == 'PRINT':
     return runPrint(item)
   
@@ -235,6 +241,12 @@ def runNext(item):
     nextLine = stackItem['nextLine']
   
   return [nextLine, 'OK']
+  
+  #  randomize - set random sequence
+  
+def runRandomize(item):
+  random.seed()
+  return [item['nextLine'], 'OK']
   
 #  run print statement
   

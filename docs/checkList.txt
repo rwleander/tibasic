@@ -81,9 +81,9 @@ KEY
 *ABS
 *ATN
 *COS
-EXP
+*EXP
 *INT
-LOG
+*LOG
 RND
 *SGN
 *SIN

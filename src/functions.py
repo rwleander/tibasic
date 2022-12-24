@@ -1,6 +1,7 @@
 #  evaluate functions
 
 import math
+import random
 
 #  get function results
 
@@ -27,6 +28,9 @@ def evaluate(parts):
   if func == 'LOG':
     return doLog(parts)
       
+  if func == 'RND':
+    return doRnd(parts)
+        
   if func == 'SGN':
     return doSgn(parts)
 
@@ -106,8 +110,13 @@ def doLog(parts):
     return [l, 'OK']
   else:
     return [0, 'Bad value']
-    
-    
+
+#  random number
+
+def doRnd(parts):
+  r = random.random()
+  return [r, 'OK']
+
 # sgn - return sign
 
 def doSgn(parts):

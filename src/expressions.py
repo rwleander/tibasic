@@ -168,7 +168,11 @@ def calculate(tree):
        
       if len(parts) > 1:
         return [0, 'Bad expression']
-      branch['value'] = parts[0]        
+        
+      if len(parts) == 0:
+        branch['value'] = 0
+      else:
+        branch['value'] = parts[0]        
     
     else:
       [value, msg] = functions.evaluate(parts)
@@ -239,6 +243,9 @@ def minusParts(parts):
 # calculate parts
 
 def calcParts(parts, op):            
+  if len(parts) < 3:
+    return parts
+    
   i = 1
   while i > 0:
     i = findOperator(parts, op)    
@@ -280,6 +287,9 @@ def calcParts(parts, op):
   # comparisons
   
 def compareParts(parts):
+  if len(parts) < 3:
+    return parts
+    
   i = 1
   while i < len(parts) - 1:
     item = parts[i]
