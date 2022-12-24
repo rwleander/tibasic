@@ -18,9 +18,15 @@ def evaluate(parts):
   if func == 'COS':
     return doCos(parts)
     
+  if func == 'EXP':
+    return doExp(parts)
+    
   if func == 'INT':
     return doInt(parts)
     
+  if func == 'LOG':
+    return doLog(parts)
+      
   if func == 'SGN':
     return doSgn(parts)
 
@@ -39,12 +45,9 @@ def evaluate(parts):
 # ABS - absolute value
 
 def doAbs(parts):
-  if len(parts) < 2:
-    return [0, 'Bad argument']
-      
-  n = parts[1]
-  if type(n) != float:
-    return [0, 'Bad argument']
+  [n, msg] = getNumber(parts)
+  if msg != 'OK':
+    return [0, msg]
   
   if n < 0:
     return [0 - n, 'OK']
@@ -54,52 +57,64 @@ def doAbs(parts):
 #  atn - return arc tangent
 
 def doAtn(parts):
-  if len(parts) < 2:
-    return [0, 'Bad argument']
-      
-  n = parts[1]
-  if type(n) != float:
-    return [0, 'Bad argument']
-  
-  a = math.atan(n)
-  return [a, 'OK']
+  [n, msg] = getNumber(parts)
+  if msg == 'OK':
+    a = math.atan(n)
+    return [a, 'OK']
+  else:
+    return [0, msg]
 
 #  cosine
 
 def doCos(parts):
-  if len(parts) < 2:
-    return [0, 'Bad argument']
-      
-  n = parts[1]
-  if type(n) != float:
-    return [0, 'Bad argument']
-  
-  c = math.cos(n)
-  return [c, 'OK']
-
+  [n, msg] = getNumber(parts)
+  if msg == 'OK':
+    c = math.cos(n)
+    return [c, 'OK']
+  else:
+    return [0, msg]
+    
+    #  exponent function
+    
+def doExp(parts):
+  [n, msg] = getNumber(parts)
+  if msg == 'OK':
+    x = math.exp(n)
+    return [x, 'OK']
+  else:
+    return [0, msg]
+    
 # int return integer value
 
 def doInt(parts):
-  if len(parts) < 2:
-    return [0, 'Bad argument']
-      
-  n = parts[1]
-  if type(n) != float:
-    return [0, 'Bad argument']
-  
-  i = math.floor(n)
-  return [i, 'OK']
+  [n, msg] = getNumber(parts)
+  if msg == 'OK':
+    i = math.floor(n)
+    return [i, 'OK']
+  else:
+    return [0, 'msg']
 
+# log function
+
+def doLog(parts):
+  [n, msg] = getNumber(parts)
+  if msg != 'OK':  
+    return [0, msg]
+    
+  if n > 0:
+    l = math.log(n)
+    return [l, 'OK']
+  else:
+    return [0, 'Bad value']
+    
+    
 # sgn - return sign
 
 def doSgn(parts):
-  if len(parts) < 2:
-    return [0, 'Bad argument']
-      
-  n = parts[1]
-  if type(n) != float:
-    return [0, 'Bad argument']
-  
+  [n, msg] = getNumber(parts)
+  if msg != 'OK':
+    return [0, msg]
+    
   if n == 0:
     return [0, 'OK']
   elif n < 0:
@@ -110,42 +125,49 @@ def doSgn(parts):
 #  sine function
 
 def doSin(parts):
-  if len(parts) < 2:
-    return [0, 'Bad argument']
-      
-  n = parts[1]
-  if type(n) != float:
-    return [0, 'Bad argument']
-  
-  s = math.sin(n)
-  return [s, 'OK']
-  
+  [n, msg] = getNumber(parts)
+  if msg == 'OK':
+    s = math.sin(n)
+    return [s, 'OK']
+  else:
+    return [0, msg]
     
 #  SQR - square root
 
 def doSqr (parts):
-  if len(parts) < 2:
+  [n, msg] = getNumber(parts)
+  if msg != 'OK':
+    return [0, msg]
+    
+  if n >= 0:
+    sqr = n ** 0.5
+    return [sqr, 'OK']
+  else:
     return [0, 'Bad argument']
-      
-  n = parts[1]
-  if type(n) != float or n < 0:
-    return [0, 'Bad argument']
-  
-  sqr = n ** 0.5
-  return [sqr, 'OK']
   
 # tangent
 
 def doTan (parts):
+  [n, msg] = getNumber(parts)
+  if msg == 'OK':
+    t = math.tan(n)
+    return [t, 'OK']
+    
+  else:
+    return [0, msg]
+    
+  
+  #------------------
+  #  helpers
+  
+def getNumber(parts):
   if len(parts) < 2:
     return [0, 'Bad argument']
       
   n = parts[1]
-  if type(n) != float or n < 0:
+  if type(n) == float or n < 0:
+    return [n, 'OK']
+  else:
     return [0, 'Bad argument']
   
-  t = math.tan(n)
-  return [t, 'OK']
-    
-    
   

@@ -91,6 +91,25 @@ class TestFunctions(unittest.TestCase):
     [value, msg] = expressions.evaluate('TAN(0.0)')
     self.assertEqual(value , 0.0)
 
+#  test log function
+
+  def testLog (self):
+    [value, msg] = expressions.evaluate('LOG(' + str(math.e) + ')')
+    self.assertEqual(msg, 'OK')    
+    self.assertEqual(value , 1)
+    [value, msg] = expressions.evaluate('LOG(0)')
+    self.assertEqual(msg, 'Bad value')
+
+#  test exponent function
+
+  def testExp (self):
+    [value, msg] = expressions.evaluate('EXP(1)')
+    self.assertEqual(msg, 'OK')    
+    self.assertEqual(value , math.e)
+    [value, msg] = expressions.evaluate('EXP(0)')
+    self.assertEqual(value, 1)
+
+
 
 if __name__ == '__main__':  
     unittest.main()

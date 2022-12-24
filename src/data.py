@@ -23,7 +23,7 @@ reservedWords = ['ABS', 'APPEND', 'ASC', 'ATN', 'BASE', 'BREAK', 'BYE',
 'SAVE', 'SEG$', 'SEQUENTIAL', 'SGN', 'SIN', 'SQR', 'STEP', 'STOP', 'STR$', 'SUB',  
 'TAB', 'TAN', 'THEN', 'TO', 'TRACE', 'UNBREAK', 'UNTRACE', 'UPDATE', 'VAL', 'VARIABLE']
 
-functionNames = ['ABS', 'ATN', 'COS', 'INT', 'SGN', 'SIN', 'SQR', 'TAN']
+functionNames = ['ABS', 'ATN', 'COS', 'EXP', 'INT', 'LOG', 'SGN', 'SIN', 'SQR', 'TAN']
 
 
 #  codeList contains each line of code in the form codeList[lineNumber] = full line of code
