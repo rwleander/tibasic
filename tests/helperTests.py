@@ -101,6 +101,16 @@ class TestHelper(unittest.TestCase):
     result = helpers.setVariable('M', 'Hello')
     self.assertEqual(result, 'Bad type')
 
+#  test upshift function
+
+
+  def testUpshift (self):
+    result = helpers.upshift ('10 let a = 100')    
+    self.assertEqual(result, '10 LET A = 100')
+    result = helpers.upshift('20 let s$ = "Hello world"')
+    self.assertEqual(result, '20 LET S$ = "Hello world"')
+    
+
 
 
 

@@ -352,7 +352,7 @@ class TestRuntime(unittest.TestCase):
     result = commands.executeCommand('10 S$ = "Hello " & "world"')
     result = runtime.run()
     self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['S$'], '"HELLO WORLD"')
+    self.assertEqual(data.variables['S$'], '"Hello world"')
 
 
 

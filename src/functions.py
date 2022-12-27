@@ -10,6 +10,9 @@ def evaluate(parts):
     return [0, 'Bad function']
     
   func = parts[0]
+  
+  # math functions
+  
   if func == 'ABS':
     return doAbs(parts)
 
@@ -42,7 +45,15 @@ def evaluate(parts):
 
   if func == 'TAN':
     return doTan(parts)
+    
+  # string functions
   
+  if func == 'ASC':
+    return doAsc(parts)
+  
+  if func == 'CHR$':
+    return doChr(parts)
+    
   return [0, 'Unknown function']
 
 
@@ -164,7 +175,33 @@ def doTan (parts):
     
   else:
     return [0, msg]
+  
+# ascii function
+
+def doAsc(parts):
+  if len(parts) < 2:
+    return [0, 'Bad argument']
+      
+  strWork = parts[1]      
+  if type(strWork) != str:
+    return [0, 'Bad argument']
+      
+  if len(strWork) < 3:
+    return [0, 'Bad value']
+
+  ascWork = ord(strWork[1])
+  return [ascWork, 'OK']
+      
+      # convert number to ascii character
+      
+def doChr(parts):
+  [value, msg] = getNumber(parts)
+  if msg != 'OK':
+    return [0, msg]
     
+  chrWork = '"' + chr(int(value)) + '"'
+  return [chrWork, 'OK']
+      
   
   #------------------
   #  helpers

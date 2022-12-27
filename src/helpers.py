@@ -3,6 +3,21 @@
 import os
 import data
 
+#  upshift user inpuut
+#  note leavel literals in lower case
+
+def upshift(txt):
+  newTxt = ''
+  inQuotes = False
+  for ch in txt:
+    if ch == '"':
+      inQuotes = not inQuotes
+    if inQuotes:
+      newTxt = newTxt + ch
+    else:
+      newTxt = newTxt + ch.upper()
+  return newTxt  
+    
 #  is this string numeric
 
 def isnumeric(str):

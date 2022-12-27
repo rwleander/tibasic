@@ -116,9 +116,23 @@ class TestFunctions(unittest.TestCase):
     self.assertEqual(msg, 'OK')    
     self.assertEqual(value >= 0, True)
     self.assertEqual(value < 1, True)
+
+#  test ascii function
+
+  def testAsc (self):
+    [value, msg] = expressions.evaluate('ASC("A")')
+    self.assertEqual(msg, 'OK')    
+    self.assertEqual(value, 65)
+
+#  test chr$ function
+
+  def testChr (self):
+    [value, msg] = expressions.evaluate('CHR$(65)')
+    self.assertEqual(msg, 'OK')    
+    self.assertEqual(value, '"A"')
+
+
     
-
-
 if __name__ == '__main__':  
     unittest.main()
     

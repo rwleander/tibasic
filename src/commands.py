@@ -10,7 +10,7 @@ import helpers
 # process a command
 
 def executeCommand(cmd):
-  cmdWork = cmd.upper()
+  cmdWork = helpers.upshift(cmd)
   parts = cmdWork.split()
   if len(parts) == 0:
     return ''
