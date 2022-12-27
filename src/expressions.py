@@ -145,7 +145,7 @@ def buildTree(parts):
   return [tree, 'OK']
   
   
-#  calculae the value of the expression
+#  calculate the value of the expression
   
 def calculate(tree):  
   i = tree['end']
@@ -154,7 +154,7 @@ def calculate(tree):
     parts = branch['parts']
     parts = setVariables(parts, tree)           
    
-    if  branch['type'] == 'expr':
+    if  branch['type'] == 'expr':      
       try:
         parts = minusParts(parts)
         parts = calcParts(parts, '^')
@@ -162,6 +162,7 @@ def calculate(tree):
         parts = calcParts(parts, '*')    
         parts = calcParts(parts, '+')
         parts = calcParts(parts, '-')
+        parts = joinStrings(parts)        
         parts = compareParts(parts)
       except:
         return [0, 'Bad expression']
@@ -203,6 +204,9 @@ def setVariables(parts, tree):
     
     elif helpers.isnumeric(item) and item != '-':
       newParts.append (float(item))
+    
+    elif item[0] == '"':
+      newParts.append(item)
     
     elif helpers.isValidVariable(item):      
       if item[len(item) - 1] == '$':
@@ -278,6 +282,33 @@ def calcParts(parts, op):
       if op == '-':
         newItem = lastItem - nextItem
     
+      parts[i - 1] = newItem
+      del parts[i + 1]
+      del parts[i]
+            
+  return parts
+
+# join strings
+
+def joinStrings(parts):            
+  if len(parts) < 3:
+    return parts
+    
+  i = 1
+  while i > 0:
+    i = findOperator(parts, '&')    
+    if (i == 0) or (i == len(parts) - 1):
+      raise Exception
+      
+    if i > 0:
+      lastItem = parts[i - 1]
+      item = parts[i]
+      nextItem = parts[i + 1]
+      
+      if type(lastItem) != str or type(nextItem) != str:
+        raise Exception
+      
+      newItem = lastItem[0: len(lastItem) - 1] + nextItem[1: len(nextItem)]        
       parts[i - 1] = newItem
       del parts[i + 1]
       del parts[i]
