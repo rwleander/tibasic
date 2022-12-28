@@ -131,6 +131,35 @@ class TestFunctions(unittest.TestCase):
     self.assertEqual(msg, 'OK')    
     self.assertEqual(value, '"A"')
 
+#  string length function
+
+
+  def testLen (self):
+    [value, msg] = expressions.evaluate('LEN("Hello world")')
+    self.assertEqual(msg, 'OK')    
+    self.assertEqual(value, 11)
+
+#  test str function
+
+  def testStr (self):
+    [value, msg] = expressions.evaluate('STR$(123.45)')
+    self.assertEqual(msg, 'OK')    
+    self.assertEqual(value, '"123.45"')
+    [value, msg] = expressions.evaluate('STR$(-12)')
+    self.assertEqual(value, '"-12"')
+    [value, msg] = expressions.evaluate('STR$(0)')
+    self.assertEqual(value, '"0"')
+
+#  test value function
+
+  def testVal (self):
+    [value, msg] = expressions.evaluate('VAL("123.45")')
+    self.assertEqual(msg, 'OK')    
+    self.assertEqual(value, 123.45)
+    [value, msg] = expressions.evaluate('VAL("-12")')
+    self.assertEqual(value, -12)
+    [value, msg] = expressions.evaluate('VAL("abcd")')
+    self.assertEqual(msg, 'Bad value')
 
     
 if __name__ == '__main__':  

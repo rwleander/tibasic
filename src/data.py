@@ -24,7 +24,7 @@ reservedWords = ['ABS', 'APPEND', 'ASC', 'ATN', 'BASE', 'BREAK', 'BYE',
 'TAB', 'TAN', 'THEN', 'TO', 'TRACE', 'UNBREAK', 'UNTRACE', 'UPDATE', 'VAL', 'VARIABLE']
 
 functionNames = ['ABS', 'ATN', 'COS', 'EXP', 'INT', 'LOG', 'RND', 'SGN', 'SIN', 'SQR', 'TAN',
-          'ASC', 'CHR$']
+          'ASC', 'CHR$', 'LEN', 'STR$', 'VAL']
 
 
 #  codeList contains each line of code in the form codeList[lineNumber] = full line of code

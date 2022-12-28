@@ -3,6 +3,8 @@
 import math
 import random
 
+import helpers
+
 #  get function results
 
 def evaluate(parts):
@@ -54,6 +56,15 @@ def evaluate(parts):
   if func == 'CHR$':
     return doChr(parts)
     
+  if func == 'LEN':
+    return doLen(parts)
+      
+  if func == 'STR$':
+    return doStr(parts)
+    
+  if func == 'VAL':
+    return doVal(parts)
+      
   return [0, 'Unknown function']
 
 
@@ -179,13 +190,10 @@ def doTan (parts):
 # ascii function
 
 def doAsc(parts):
-  if len(parts) < 2:
-    return [0, 'Bad argument']
-      
-  strWork = parts[1]      
-  if type(strWork) != str:
-    return [0, 'Bad argument']
-      
+  [strWork, msg] = getString(parts)
+  if msg != 'OK':
+    return [0, msg]  
+  
   if len(strWork) < 3:
     return [0, 'Bad value']
 
@@ -201,7 +209,50 @@ def doChr(parts):
     
   chrWork = '"' + chr(int(value)) + '"'
   return [chrWork, 'OK']
-      
+  
+#  get string length
+
+def doLen(parts):
+  [strWork, msg] = getString(parts)
+  if msg != 'OK':
+    return [0, msg]
+
+  n = len(strWork) - 2
+  if n < 0:
+    return [0, 'OK']
+  else:
+    return [n, 'OK']
+  
+#  str$ - convert number to string
+
+def doStr(parts):
+  [value, msg] = getNumber(parts)
+  if msg != 'OK':
+    return [0, msg]
+  
+  #  note: if number ends with.0, remove and just show the integer value
+  
+  strWork = str(value)
+  if strWork[len(strWork) - 2: len(strWork)] == '.0':
+    strWork = strWork[0: len(strWork) - 2]
+    
+  strWork = '"' + strWork + '"'
+  return [strWork, 'OK']
+
+#  value function
+
+def doVal(parts):
+  [strWork, msg] = getString(parts)
+  if msg != 'OK':
+    return [0, msg]
+  
+  strWork = strWork[1: len(strWork) - 1] 
+  if helpers.isnumeric(strWork) == False:
+    return [0, 'Bad value']
+  
+  n = float(strWork)
+  return [n, 'OK']
+  
   
   #------------------
   #  helpers
@@ -215,5 +266,17 @@ def getNumber(parts):
     return [n, 'OK']
   else:
     return [0, 'Bad argument']
+  
+  # get string
+  
+def getString(parts):
+  if len(parts) < 2:
+    return [0, 'Bad argument']
+   
+  strWork = parts[1]
+  if type(strWork) != str:
+    return [0, 'Bad argument']
+    
+  return [strWork, 'OK']
   
   
