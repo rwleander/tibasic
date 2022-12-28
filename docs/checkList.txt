@@ -95,14 +95,14 @@ KEY
 *ASC
 *CHR$
 *LEN
-POS
-SEG$
+*POS
+*SEG$
 *STR$
 *VAL
 
 
 Features:
-Strings
+*Strings
 Arrays
 
 

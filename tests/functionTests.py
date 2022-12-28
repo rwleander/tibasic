@@ -172,12 +172,22 @@ class TestFunctions(unittest.TestCase):
     [value, msg] = expressions.evaluate('SEG$("1234567890", 6, 10)')
     self.assertEqual(value, '"67890"')
     [value, msg] = expressions.evaluate('SEG$("1234567890", 0)')
-    self.assertEqual(msg, 'Bad number')
+    self.assertEqual(msg, 'Bad value')
     [value, msg] = expressions.evaluate('SEG$("1234567890", 3, -1)')
-    self.assertEqual(msg, 'Bad number')
-    
-    
-    
+    self.assertEqual(msg, 'Bad value')
+
+#  test position function
+
+  def testPos (self):
+    [value, msg] = expressions.evaluate('POS("ABCDEFG", "C")')
+    self.assertEqual(msg, 'OK')    
+    self.assertEqual(value, 3)
+    [value, msg] = expressions.evaluate('POS("ABCDEFGABCDEFG", "C", 7)')
+    self.assertEqual(value, 10)
+    [value, msg] = expressions.evaluate('POS("ABCDEFG", "DEF")')
+    self.assertEqual(value, 4)
+    [value, msg] = expressions.evaluate('POS("ABCDEFG", "XYZ")')
+    self.assertEqual(value, 0)
 if __name__ == '__main__':  
     unittest.main()
     

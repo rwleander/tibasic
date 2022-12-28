@@ -59,6 +59,9 @@ def evaluate(parts):
   if func == 'LEN':
     return doLen(parts)
       
+  if func == 'POS':
+    return doPos(parts)
+        
   if func == 'SEG$':
     return doSeg(parts)
     
@@ -226,6 +229,33 @@ def doLen(parts):
   else:
     return [n, 'OK']
   
+  #  position function
+  
+def doPos(parts):
+  [str1, msg] = getString(parts)
+  if msg != 'OK':
+    return [0, msg]
+  
+  if len(parts) < 3:
+   return [0, 'Bad expression']
+   
+  str2 = parts[2]
+  num = 1
+
+  if len(parts) > 3:
+    num = parts[3]
+    if type(num) != float:
+      return [0, 'Bad value']
+      
+  str1 = str1[0: len(str1) - 1]
+  str2 = str2[1: len(str2) - 1]
+  n = str1.find(str2, int(num))
+  
+  if n > 0:
+    return [n, 'OK']
+  else:
+    return [0, 'OK']  
+    
   #  segment function
   
 def doSeg(parts):
@@ -249,7 +279,7 @@ def doSeg(parts):
       return [0, 'Bad expression']
   
   if num1 < 1 or num1 > len(strWork) or num2 < 1:
-    return [0, 'Bad number']
+    return [0, 'Bad value']
   
   strNew = '"' + strWork[int(num1): int(num1 + num2)] + '"'
   return [strNew, 'OK']  
