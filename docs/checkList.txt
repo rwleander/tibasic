@@ -94,11 +94,11 @@ KEY
 
 *ASC
 *CHR$
-LEN
+*LEN
 POS
 SEG$
-STR$
-VAL
+*STR$
+*VAL
 
 
 Features:

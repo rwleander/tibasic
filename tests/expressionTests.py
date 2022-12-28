@@ -115,6 +115,21 @@ class TestExpressions(unittest.TestCase):
     self.assertEqual(tree[1], {'type': 'func', 'parts': ['RND', '~2'], 'value': 0, 'id': 1, 'parent': 0})
     self.assertEqual(tree[2], {'type': 'expr', 'parts': [], 'value': 0, 'id': 2, 'parent': 1})
 
+#  test tree with function, multiple parameters
+
+  def testCreateTreeWithFunction2 (self):
+    [parts, msg] = expressions.splitLine('STR$("Hello", 2, 1)')
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(len(parts), 8)
+    self.assertEqual(parts, ['STR$', '(', '"Hello"', ',', '2', ',', '1', ')'])
+    [tree, msg] = expressions.buildTree(parts)
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(len(tree), 6)
+    self.assertEqual(tree[0], {'type': 'expr', 'parts': ['~1'], 'value': 0, 'id': 0,  'parent': -1})
+    self.assertEqual(tree[1], {'type': 'func', 'parts': ['STR$', '~2', '~3', '~4'], 'value': 0, 'id': 1, 'parent': 0})
+    self.assertEqual(tree[2], {'type': 'expr', 'parts': ['"Hello"'], 'value': 0, 'id': 2, 'parent': 1})
+    self.assertEqual(tree[3], {'type': 'expr', 'parts': ['2'], 'value': 0, 'id': 3, 'parent': 1})
+    self.assertEqual(tree[4], {'type': 'expr', 'parts': ['1'], 'value': 0, 'id': 4, 'parent': 1})
 
 #  test set variables
 

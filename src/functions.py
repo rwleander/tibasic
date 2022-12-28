@@ -59,6 +59,9 @@ def evaluate(parts):
   if func == 'LEN':
     return doLen(parts)
       
+  if func == 'SEG$':
+    return doSeg(parts)
+    
   if func == 'STR$':
     return doStr(parts)
     
@@ -223,6 +226,35 @@ def doLen(parts):
   else:
     return [n, 'OK']
   
+  #  segment function
+  
+def doSeg(parts):
+  [strWork, msg] = getString(parts)
+  if msg != 'OK':
+    return [0, msg]
+
+  strWork = strWork[0: len(strWork) - 1]
+  num1 = 1
+  num2 = 1
+  if len(parts) < 3:
+    return [0, 'Bad expression']
+
+  num1 = parts[2]
+  if type(num1) != float:
+    return [0, 'Bad expression']  
+
+  if len(parts) > 3:
+    num2 = parts[3]
+    if type(num2) != float:
+      return [0, 'Bad expression']
+  
+  if num1 < 1 or num1 > len(strWork) or num2 < 1:
+    return [0, 'Bad number']
+  
+  strNew = '"' + strWork[int(num1): int(num1 + num2)] + '"'
+  return [strNew, 'OK']  
+
+
 #  str$ - convert number to string
 
 def doStr(parts):

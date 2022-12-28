@@ -25,7 +25,7 @@ def evaluate (expr):
 # split the expression into its parts
   
 def splitLine(expr):
-  symbols = ['+', '-', '*', '/', '^', '(', ')', '&']
+  symbols = ['+', '-', '*', '/', '^', '(', ')', '&', ',']
   parts = []
   item = ''
   inString = False
@@ -108,6 +108,24 @@ def buildTree(parts):
       branch = newBranch
                 
     elif item == '(':
+      id = tree['end'] + 1
+      tree['end'] = id 
+      branch['parts'].append('~' + str(id))
+      
+      newBranch = {}
+      newBranch['type'] = 'expr'
+      newBranch['parts'] = []
+      newBranch['value'] = 0
+      newBranch['id'] = id
+      newBranch['parent'] = branch['id']
+      tree[id] = newBranch
+      
+      branch = newBranch
+      
+    elif item == ',':
+      oldBranchId = branch['parent']
+      branch = tree[oldBranchId]
+      
       id = tree['end'] + 1
       tree['end'] = id 
       branch['parts'].append('~' + str(id))
