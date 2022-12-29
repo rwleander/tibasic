@@ -48,51 +48,33 @@ random.seed(0)
   
   # run a line of code
   
-def executeStatement(address):
-  item = data.parseList[address]
-  if item['error'] != 'OK':
-    msg =   item['code'] + '\n' + item['error']
-    return [-1, msg]  
-    
-  if item['statement'] == 'FOR':
-    return runFor(item)
-    
-  if item['statement'] == 'NEXT':
-    return runNext(item)
+def executeStatement(address): 
 
-  if item['statement'] == 'IF':
-    return runIf(item)
-    
-  if item['statement'] == 'GO':
-    return runGo(item)
-    
-  if item['statement'] == 'GOTO':
-    return runGoto(item)
-    
-  if item['statement'] == 'GOSUB':
-    return runGosub(item)
-    
-  if item['statement'] == 'RETURN':
-    return runReturn(item)
-    
-  if item['statement'] == 'LET':
-    return runLet(item)
-    
-  if item['statement'] == 'PRINT':
-    return runPrint(item)
+  functionList = {    
+    'END': runStop,
+    'FOR': runFor,
+    'GO': runGo,
+    'GOSUB': runGosub,
+    'GOTO': runGoto,
+    'IF': runIf,
+    'LET': runLet,
+    'NEXT': runNext,
+    'PRINT': runPrint,
+    'RANDOMIZE': runRandomize,
+    'REM': runRem,
+    'RETURN': runReturn,
+    'STOP': runStop    
+}    
   
-  if item['statement'] == 'REM':
-    return runRem(item)
+  item = data.parseList[address]
+  if item['error'] != 'OK':    
+    return [-1, createError(item)]  
   
-  if item['statement'] == 'RANDOMIZE':
-    return runRandomize(item)
-    
-  if item['statement'] == 'STOP' or item['statement'] == 'END':
-    return runStop(item)
-    
-  msg = item['code'] + '\n' + 'Unknown statement type'
-  return [-1, msg]
-  
+  statement = item['statement']
+  if statement in functionList:
+    return functionList[statement](item)   
+  else:
+    return [-1, createMsg(item, 'unknown statement')]
   
 def runFor(item):
   expr2 = getString (item, 'expr2')

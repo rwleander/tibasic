@@ -8,71 +8,38 @@ import helpers
 #  get function results
 
 def evaluate(parts):
+
+  functionList = {  
+    'ABS': doAbs,
+    'ASC': doAsc,
+    'ATN': doAtn,
+    'CHR$': doChr,
+    'COS': doCos,
+    'EXP': doExp,
+    'INT': doInt,
+    'LEN': doLen,
+    'LOG': doLog,
+    'POS': doPos,
+    'RND': doRnd,
+    'SEG$': doSeg,
+    'SGN': doSgn,
+    'SIN': doSin,
+    'SQR': doSqr,
+    'STR$': doStr,
+    'TAN': doTan,
+    'VAL': doVal    
+  }
+  
   if len(parts) == 0:
     return [0, 'Bad function']
     
   func = parts[0]
-  
-  # math functions
-  
-  if func == 'ABS':
-    return doAbs(parts)
+  if func in functionList:
+    return functionList[func](parts)    
+  else:       
+    return [0, 'Unknown function']
 
-  if func == 'ATN':
-    return doAtn(parts)
-  
-  if func == 'COS':
-    return doCos(parts)
-    
-  if func == 'EXP':
-    return doExp(parts)
-    
-  if func == 'INT':
-    return doInt(parts)
-    
-  if func == 'LOG':
-    return doLog(parts)
-      
-  if func == 'RND':
-    return doRnd(parts)
-        
-  if func == 'SGN':
-    return doSgn(parts)
-
-  if func == 'SIN':
-    return doSin(parts)
-  
-  if func == 'SQR':
-    return doSqr(parts)
-
-  if func == 'TAN':
-    return doTan(parts)
-    
-  # string functions
-  
-  if func == 'ASC':
-    return doAsc(parts)
-  
-  if func == 'CHR$':
-    return doChr(parts)
-    
-  if func == 'LEN':
-    return doLen(parts)
-      
-  if func == 'POS':
-    return doPos(parts)
-        
-  if func == 'SEG$':
-    return doSeg(parts)
-    
-  if func == 'STR$':
-    return doStr(parts)
-    
-  if func == 'VAL':
-    return doVal(parts)
-      
-  return [0, 'Unknown function']
-
+#  math functions
 
 # ABS - absolute value
 
