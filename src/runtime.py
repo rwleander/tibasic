@@ -15,9 +15,9 @@ def run():
   
   clearData()
   
-  rslt = parser.parse()
-  if rslt != 'OK':
-    return rslt
+  result = parser.parse()
+  if result != 'OK':
+    return result
    
   address = data.firstLine
   while address > 0:
@@ -53,24 +53,6 @@ def executeStatement(address):
   if item['error'] != 'OK':
     msg =   item['code'] + '\n' + item['error']
     return [-1, msg]  
-  
-  if item['statement'] == 'LET':
-    return runLet(item)
-  
-  if item['statement'] == 'IF':
-    return runIf(item)
-    
-  if item['statement'] == 'GOTO':
-    return runGoto(item)
-    
-  if item['statement'] == 'GOSUB':
-    return runGosub(item)
-    
-  if item['statement'] == 'GO':
-    return runGo(item)
-    
-  if item['statement'] == 'RETURN':
-    return runReturn(item)
     
   if item['statement'] == 'FOR':
     return runFor(item)
@@ -78,8 +60,23 @@ def executeStatement(address):
   if item['statement'] == 'NEXT':
     return runNext(item)
 
-  if item['statement'] == 'RANDOMIZE':
-    return runRandomize(item)
+  if item['statement'] == 'IF':
+    return runIf(item)
+    
+  if item['statement'] == 'GO':
+    return runGo(item)
+    
+  if item['statement'] == 'GOTO':
+    return runGoto(item)
+    
+  if item['statement'] == 'GOSUB':
+    return runGosub(item)
+    
+  if item['statement'] == 'RETURN':
+    return runReturn(item)
+    
+  if item['statement'] == 'LET':
+    return runLet(item)
     
   if item['statement'] == 'PRINT':
     return runPrint(item)
@@ -87,6 +84,9 @@ def executeStatement(address):
   if item['statement'] == 'REM':
     return runRem(item)
   
+  if item['statement'] == 'RANDOMIZE':
+    return runRandomize(item)
+    
   if item['statement'] == 'STOP' or item['statement'] == 'END':
     return runStop(item)
     
@@ -94,92 +94,6 @@ def executeStatement(address):
   return [-1, msg]
   
   
-  #  run the LET command
-  
-def runLet(item):
-  expr = getString(item, 'expr')
-  variable = getString(item, 'var')
-  if item['error'] != 'OK':    
-    return [-1, createError(item)]
-  
-  [value, msg] = expressions.evaluate(expr)
-  if msg != 'OK':    
-    return [-1, createMsg(item, msg)]
-    
-  msg = helpers.setVariable(variable, value)  
-  if msg == 'OK':
-    return [item['nextLine'], 'OK']
-  else:
-    return [-1, createMsg(item, msg)]
-  
-  # run an if statement
-  
-def runIf(item):
-  line2 = getLineOptional(item, 'line2', item['nextLine'])
-  line1 = getLine(item, 'line1')
-  expr = getString(item, 'expr')
-  if item['error'] != 'OK':    
-    return [-1, createError(item)]
-    
-  [value, msg] = expressions.evaluate(expr)
-  if msg != 'OK':    
-    return [-1, createMsg(item, msg)]
-    
-  if value == True:
-    newLine = line1
-  else:
-    newLine = line2
-  
-  if (newLine in data.parseList) or (newLine == -1):
-    return [newLine, 'OK']
-  else:
-    return [-1, createMsg(item, 'Bad line number')]
-  
-  #  if goto or gosub were coded as two words, route to correct function
-  
-def runGo(item):
-  cmdType = getString(item, 'type')
-  line = getLine(item, 'line')
-  
-  if item['error'] != 'OK':
-    return [-1, createError(item)]
-
-  if cmdType == 'TO':
-    return [line, 'OK']
-    
-  if cmdType == 'SUB':
-    data.gosubStack.append(item['nextLine'])
-    return [line, 'OK']
-  
-  return [-1, createMsg(item, 'Bad command')]
-  
-  # run goto 
-  
-def runGoto(item):
-  line = getLine(item, 'line')
-  if item['error'] == 'OK':  
-    return [line, 'OK']
-  else:
-    return [-1, createError(item)]
-  
-  # run gosub 
-  
-def runGosub(item):
-  line = getLine(item,'line')
-  if item['error'] != 'OK':
-    return [-1, createError(item)]
-    
-  data.gosubStack.append(item['nextLine'])
-  return [line, 'OK']
-
-#  return from gosub
-
-def runReturn(item):
-  addr = data.gosubStack.pop()
-  return [addr, 'OK']
-
-# for statement - push data to for stack then return next line
-
 def runFor(item):
   expr2 = getString (item, 'expr2')
   expr1 = getString(item, 'expr1')
@@ -241,13 +155,93 @@ def runNext(item):
     nextLine = stackItem['nextLine']
   
   return [nextLine, 'OK']
+
+  #  if goto or gosub were coded as two words, route to correct function
   
-  #  randomize - set random sequence
+def runGo(item):
+  cmdType = getString(item, 'type')
+  line = getLine(item, 'line')
   
-def runRandomize(item):
-  random.seed()
-  return [item['nextLine'], 'OK']
+  if item['error'] != 'OK':
+    return [-1, createError(item)]
+
+  if cmdType == 'TO':
+    return [line, 'OK']
+    
+  if cmdType == 'SUB':
+    data.gosubStack.append(item['nextLine'])
+    return [line, 'OK']
   
+  return [-1, createMsg(item, 'Bad command')]
+  
+  # run goto 
+  
+def runGoto(item):
+  line = getLine(item, 'line')
+  if item['error'] == 'OK':  
+    return [line, 'OK']
+  else:
+    return [-1, createError(item)]
+  
+  # run gosub 
+  
+def runGosub(item):
+  line = getLine(item,'line')
+  if item['error'] != 'OK':
+    return [-1, createError(item)]
+    
+  data.gosubStack.append(item['nextLine'])
+  return [line, 'OK']
+
+#  return from gosub
+
+def runReturn(item):
+  addr = data.gosubStack.pop()
+  return [addr, 'OK']
+
+# for statement - push data to for stack then return next line
+  
+  # run an if statement
+  
+def runIf(item):
+  line2 = getLineOptional(item, 'line2', item['nextLine'])
+  line1 = getLine(item, 'line1')
+  expr = getString(item, 'expr')
+  if item['error'] != 'OK':    
+    return [-1, createError(item)]
+    
+  [value, msg] = expressions.evaluate(expr)
+  if msg != 'OK':    
+    return [-1, createMsg(item, msg)]
+    
+  if value == True:
+    newLine = line1
+  else:
+    newLine = line2
+  
+  if (newLine in data.parseList) or (newLine == -1):
+    return [newLine, 'OK']
+  else:
+    return [-1, createMsg(item, 'Bad line number')]
+  
+  #  run the LET command
+  
+def runLet(item):
+  expr = getString(item, 'expr')
+  variable = getString(item, 'var')
+  if item['error'] != 'OK':    
+    return [-1, createError(item)]
+  
+  [value, msg] = expressions.evaluate(expr)
+  if msg != 'OK':    
+    return [-1, createMsg(item, msg)]
+    
+  msg = helpers.setVariable(variable, value)  
+  if msg == 'OK':
+    return [item['nextLine'], 'OK']
+  else:
+    return [-1, createMsg(item, msg)]
+    
 #  run print statement
   
 def runPrint(item):
@@ -264,6 +258,12 @@ def runPrint(item):
   
   # remark
   
+#  randomize - set random sequence
+  
+def runRandomize(item):
+  random.seed()
+  return [item['nextLine'], 'OK']
+
 def runRem(item):
   return [item['nextLine'], 'OK']
   

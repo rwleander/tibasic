@@ -4,19 +4,19 @@ import data
 import helpers
 
 parseRules = {
-  'LET': 'LET var = expr',
-  'PRINT': 'PRINT expr',
-  'IF': 'IF expr THEN line1 [ ELSE line2 ]',
-  'GOTO': 'GOTO line',
+  'END': 'END',
+  'FOR': 'FOR var = expr1 TO expr2 [ STEP expr3 ]',
   'GO': 'GO type line',
   'GOSUB': 'GOSUB line',
-  'RETURN': 'RETURN',
-  'FOR': 'FOR var = expr1 TO expr2 [ STEP expr3 ]',
-'NEXT': 'NEXT',  
-  'REM': 'REM expr',
+  'GOTO': 'GOTO line',
+  'IF': 'IF expr THEN line1 [ ELSE line2 ]',
+  'LET': 'LET var = expr',
+  'NEXT': 'NEXT',  
+  'PRINT': 'PRINT expr',  
   'RANDOMIZE': 'RANDOMIZE',
-  'STOP': 'STOP',
-  'END': 'END'
+  'REM': 'REM expr',
+  'RETURN': 'RETURN',  
+  'STOP': 'STOP'  
 }
 
 #  parse the code list and place in parseList
