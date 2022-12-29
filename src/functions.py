@@ -213,7 +213,7 @@ def doChr(parts):
   if msg != 'OK':
     return [0, msg]
     
-  chrWork = '"' + chr(int(value)) + '"'
+  chrWork = helpers.addQuotes(chr(int(value))) 
   return [chrWork, 'OK']
   
 #  get string length
@@ -248,8 +248,8 @@ def doPos(parts):
       return [0, 'Bad value']
       
   str1 = str1[0: len(str1) - 1]
-  str2 = str2[1: len(str2) - 1]
-  n = str1.find(str2, int(num))
+  str2 = helpers.stripQuotes(str2)
+  n = str1.find(str2, int(num)) 
   
   if n > 0:
     return [n, 'OK']
@@ -281,9 +281,8 @@ def doSeg(parts):
   if num1 < 1 or num1 > len(strWork) or num2 < 1:
     return [0, 'Bad value']
   
-  strNew = '"' + strWork[int(num1): int(num1 + num2)] + '"'
+  strNew = helpers.addQuotes(strWork[int(num1): int(num1 + num2)])
   return [strNew, 'OK']  
-
 
 #  str$ - convert number to string
 
@@ -298,7 +297,7 @@ def doStr(parts):
   if strWork[len(strWork) - 2: len(strWork)] == '.0':
     strWork = strWork[0: len(strWork) - 2]
     
-  strWork = '"' + strWork + '"'
+  strWork = helpers.addQuotes(strWork)
   return [strWork, 'OK']
 
 #  value function

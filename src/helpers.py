@@ -27,6 +27,28 @@ def isnumeric(str):
       
   return True
 
+#  add surrounding quotes to strings
+
+def addQuotes(txt):
+  return '"' + txt + '"'
+
+#  remove surrounding quotes
+
+def stripQuotes(txt):
+  if len(txt) < 3:
+    return ''
+  
+  newTxt = txt
+  if newTxt[0] == '"':
+    newTxt = newTxt[1: len(txt)]
+    
+  if newTxt[len(newTxt) - 1] == '"':
+    newTxt = newTxt[0: len(newTxt) - 1]
+      
+  return newTxt
+    
+  
+
 # is this a valid variable name
 
 def isValidVariable(txt):

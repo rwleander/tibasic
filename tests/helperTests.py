@@ -109,7 +109,22 @@ class TestHelper(unittest.TestCase):
     self.assertEqual(result, '10 LET A = 100')
     result = helpers.upshift('20 let s$ = "Hello world"')
     self.assertEqual(result, '20 LET S$ = "Hello world"')
-    
+
+# test addQuotes function
+
+  def testAddQuotes (self):
+    result = helpers.addQuotes('ABCDEFG')
+    self.assertEqual(result, '"ABCDEFG"')
+    result = helpers.addQuotes('')
+    self.assertEqual(result, '""')
+
+#  test strip quotes function
+
+  def testStripQuotes (self):
+    result = helpers.stripQuotes('"ABCDEFG"')
+    self.assertEqual(result, 'ABCDEFG')
+    result = helpers.stripQuotes(""'')
+    self.assertEqual(result, '')
 
 
 
