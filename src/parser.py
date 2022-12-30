@@ -10,6 +10,7 @@ parseRules = {
   'GOSUB': 'GOSUB line',
   'GOTO': 'GOTO line',
   'IF': 'IF expr THEN line1 [ ELSE line2 ]',
+  'INPUT': 'INPUT list',
   'LET': 'LET var = expr',
   'NEXT': 'NEXT',  
   'PRINT': 'PRINT expr',  
@@ -22,18 +23,21 @@ parseRules = {
 #  parse the code list and place in parseList
 
 def parse():
-  rslt = createIndex()
-  if (rslt != 'OK'):
-    return rslt
+  msg = createIndex()
+  if msg != 'OK':
+    return msg
     
-  rslt = buildParseList()
-  if rslt != 'OK':
-    return rslt
+  msg = buildParseList()
+  if msg != 'OK':
+    return msg
   
-  rslt = parseStatements()
-  return rslt
+  msg = parseStatements()
+  if msg != 'OK':
+    return msg
   
-
+  msg = parseDetails()
+  return msg
+  
 # create an ordered list of line numbers
 
 def createIndex():
@@ -173,5 +177,58 @@ def addExpressions(item, ruleParts, codeParts):
     if word != '[' and  word != ']':
       j = j + 1  
   return item
-    
   
+  
+  #--------------------------
+# parse input, print and other list based statements
+
+def parseDetails():
+  for lineNumber in data.index: 
+    item = data.parseList[lineNumber]
+    statement = item['statement']
+    if statement == 'INPUT':
+      return parseInputList(item)
+  
+  return 'OK'
+  
+  
+  # parse the list of inputs
+  
+def parseInputList(item):
+  listText = item['list']
+  
+  #  find prompt
+  
+  prompt = '?'  
+  if listText[0] == '"':
+    p = listText.find('"', 1)
+    if p > 1: 
+      if listText[p + 1] != ':':
+        item['error'] = 'Bad prompt'  
+      prompt = listText[1: p]
+      listText = listText[p + 2: len(listText)]   
+    else:
+      item['error'] = 'Bad prompt'  
+  item['prompt'] = prompt
+  
+  # seperate prompt and list items delimited by commas
+
+  inputs = []
+  var = ''
+  
+  for ch in listText:    
+    if ch == ',':
+      if var != '':
+        inputs.append(var)
+      var = ''
+    elif ch != ' ':
+      var = var + ch
+    
+  if var != '':
+    inputs.append(var)
+  if len(inputs) == 0:
+    item['error'] = 'Missing inputs'
+    
+  item['inputs'] = inputs
+  return 'OK'
+      

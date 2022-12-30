@@ -353,9 +353,45 @@ class TestRuntime(unittest.TestCase):
     result = runtime.run()
     self.assertEqual(result, 'Done')
     self.assertEqual(data.variables['S$'], '"Hello world"')
+    
+#  test process input function
+
+  def testProcessInput (self):
+    vars = ['A', 'B', 'C']
+    values = [1, 2, 3]
+    result = runtime.processInputs(vars, values)
+    self.assertEqual(result, 'OK')
+    self.assertEqual(data.variables['A'], 1)
+    self.assertEqual(data.variables['B'], 2)
+    self.assertEqual(data.variables['C'], 3)
+
+  def testProcessInput2 (self):
+    vars = ['A$', 'B$', 'C']
+    values = ['Red', '"Blue"', '3']
+    result = runtime.processInputs(vars, values)
+    self.assertEqual(result, 'OK')
+    self.assertEqual(data.variables['A$'], '"Red"')
+    self.assertEqual(data.variables['B$'], '"Blue"')
+    self.assertEqual(data.variables['C'], 3)
 
 
+# test input from string
 
+  def testProcessInput3 (self):
+    vars = ['A$', 'B$', 'C']    
+    result = runtime.processInputsFromString(vars, 'Red, "Blue", 3')
+    self.assertEqual(result, 'OK')
+    self.assertEqual(data.variables['A$'], '"Red"')
+    self.assertEqual(data.variables['B$'], '"Blue"')
+    self.assertEqual(data.variables['C'], 3)
+
+# test split values function
+
+  def testSplitValues (self):
+    result = runtime.splitValues('1, 2, 3')
+    self.assertEqual(result, ['1', '2', '3'])
+    result = runtime.splitValues('Red, "Blue", 3')
+    self.assertEqual(result, ['Red', '"Blue"', '3'])
 
   
 if __name__ == '__main__':  

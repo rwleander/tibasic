@@ -253,6 +253,32 @@ class TestParser(unittest.TestCase):
     self.assertEqual(len(codeParts), 6)
     self.assertEqual(codeParts, ['IF', 'A > B', 'THEN', '40', 'ELSE', '10'])
 
+#  test parse inputs
+
+  def testParseInput (self):
+    data.codeList = {10: '10 INPUT A, B, C'}
+    result = parser.parse()  
+    self.assertEqual(result, 'OK')
+    self.assertEqual(len(data.parseList), 1)
+    item = data.parseList[10]
+    self.assertEqual(item['statement'], 'INPUT')
+    self.assertEqual(item['list'], 'A, B, C')
+    self.assertEqual(item['prompt'], '?')
+    self.assertEqual(item['inputs'], ['A', 'B', 'C'])
+    self.assertEqual(item['error'], 'OK')
+
+  def testParseInput2 (self):
+    data.codeList = {10: '10 INPUT "Numbers:": A, B, C'}
+    result = parser.parse()  
+    self.assertEqual(result, 'OK')
+    self.assertEqual(len(data.parseList), 1)
+    item = data.parseList[10]
+    self.assertEqual(item['statement'], 'INPUT')
+    self.assertEqual(item['list'], '"Numbers:": A, B, C')
+    self.assertEqual(item['prompt'], 'Numbers:')
+    self.assertEqual(item['inputs'], ['A', 'B', 'C'])
+    self.assertEqual(item['error'], 'OK')
+    
   
 if __name__ == '__main__':  
     unittest.main()

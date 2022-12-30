@@ -117,6 +117,8 @@ class TestHelper(unittest.TestCase):
     self.assertEqual(result, '"ABCDEFG"')
     result = helpers.addQuotes('')
     self.assertEqual(result, '""')
+    result = helpers.addQuotes('"Hello"')
+    self.assertEqual(result, '"Hello"')
 
 #  test strip quotes function
 
@@ -125,6 +127,16 @@ class TestHelper(unittest.TestCase):
     self.assertEqual(result, 'ABCDEFG')
     result = helpers.stripQuotes(""'')
     self.assertEqual(result, '')
+
+# test if string variable name
+
+  def testisStringVariable (self):
+    result = helpers.isStringVariable('NAME$')
+    self.assertEqual(result, True)
+    result = helpers.isStringVariable('N')
+    self.assertEqual(result, False)
+
+
 
 
 

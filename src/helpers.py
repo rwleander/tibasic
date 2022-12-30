@@ -18,6 +18,14 @@ def upshift(txt):
       newTxt = newTxt + ch.upper()
   return newTxt  
     
+    #  is this variable name a string
+    
+def isStringVariable(txt):
+  if txt == '':
+    return False
+  else:
+    return txt[len(txt) - 1] == '$'
+      
 #  is this string numeric
 
 def isnumeric(str):
@@ -30,7 +38,17 @@ def isnumeric(str):
 #  add surrounding quotes to strings
 
 def addQuotes(txt):
-  return '"' + txt + '"'
+  if txt == '':
+    return '""'
+    
+  txtWork = txt
+  if txtWork[0] != '"':
+    txtWork = '"' + txtWork
+    
+  if txtWork[len(txtWork) - 1] != '"':
+    txtWork = txtWork + '"'
+ 
+  return txtWork
 
 #  remove surrounding quotes
 
@@ -106,12 +124,13 @@ def setVariable(name, value):
     
 # match type
 
-  lastChar = name[len(name) - 1]
-  if type(value) == int or type(value) == float:
-    if lastChar == '$':
+  if isStringVariable(name):
+    if type(value) != str:    
       return 'Bad type'  
   else:
-    if lastChar != '$':
+    if type(value) == int:
+      value = float(value)
+    if type(value) != float:
       return 'Bad type'
     
   data.variables[name] = value

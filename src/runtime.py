@@ -57,6 +57,7 @@ def executeStatement(address):
     'GOSUB': runGosub,
     'GOTO': runGoto,
     'IF': runIf,
+    'INPUT': runInput,
     'LET': runLet,
     'NEXT': runNext,
     'PRINT': runPrint,
@@ -206,6 +207,22 @@ def runIf(item):
   else:
     return [-1, createMsg(item, 'Bad line number')]
   
+#  get input data
+  
+def runInput(item):
+  prompt =getString(item, 'prompt')
+  vars = item['inputs']
+  
+  txt = input (prompt)
+  
+  msg = processInputsFromString(vars, txt)
+  if msg == 'OK':
+    nextLine = item['nextLine']
+    return [nextLine, 'OK']
+  else:
+    return [-1, createMsg(item, msg)]
+  
+  
   #  run the LET command
   
 def runLet(item):
@@ -233,7 +250,7 @@ def runPrint(item):
     
   [value, msg] = expressions.evaluate(expr)
   if msg != 'OK':    
-    return [-1, createError(item, msg)]
+    return [-1, createMMsg(item, msg)]
     
   print (value)
   return [item['nextLine'], 'OK']
@@ -254,6 +271,75 @@ def runRem(item):
 def runStop(item):
   return [-1, 'OK'] 
 
+
+#-------------------
+#  handle input and output values
+
+#  save input values
+
+def processInputs(vars, values):
+  if len(vars) != len(values):
+    return 'Bad values'
+    
+  i = 0
+  while i < len(vars):
+    var = vars[i]
+    value = values[i]
+    
+    if helpers.isStringVariable(var):
+      if value[0] != '"':
+        value = helpers.addQuotes(value)
+    else:      
+      if type(value) == str:
+        if helpers.isnumeric(value):
+          value = float(value)
+        else:
+          return 'Bad value'
+        
+      if type(value) == int:                    
+        value = float(value)
+        
+    msg = helpers.setVariable(var, value)
+    if msg != 'OK':
+      return msg
+    i = i + 1
+
+  return 'OK'
+  
+#  process input  from comma delimited string
+  
+def processInputsFromString(vars, txt):
+  values = splitValues(txt)      
+  return processInputs(vars, values)
+    
+    # extract data from comma delimited string
+    
+def splitValues(txt):
+  values = []
+  value = ''
+  inQuotes = False
+  
+  for ch in txt:
+    if ch == '"':
+      inQuotes = not inQuotes
+      
+    if inQuotes == True:
+      value = value + ch
+    else:
+      if ch == ',':
+        if value != '':
+          values.append(value)
+        value = ''
+      elif ch != ' ':
+        value = value + ch
+    
+  if value != '':
+    values.append(value)
+    
+  return values
+  
+  
+    
 
 #--------------------
 #  validate and return items from parseList
