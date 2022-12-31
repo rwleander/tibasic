@@ -68,7 +68,8 @@ def cmdNew():
   data.index = []
   data.gosubStack = []
   data.forNextStack = []
-  
+  data.dataList = []
+  data.dataPointer = 0
   
   return 'OK'
 

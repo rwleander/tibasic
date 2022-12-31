@@ -9,6 +9,9 @@ parserList = {}
 gosubStack = []
 forNextStack = []
 
+dataList = []
+dataPointer = 0
+
 firstLine = -1
 quitFlag = False
 

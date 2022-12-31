@@ -55,12 +55,15 @@ Statements:
 ON GOTO (switch/case)
 ON GOSUB
 
-INPUT
-READ
-DATA
+keyboard/screen:
+
+*INPUT
+*READ
+*DATA
 PRINT
 DISPLAY
 
+file read/write:
 OPEN
 INPUT
 PRINT

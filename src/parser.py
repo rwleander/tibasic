@@ -4,6 +4,7 @@ import data
 import helpers
 
 parseRules = {
+  'DATA': 'DATA list',
   'END': 'END',
   'FOR': 'FOR var = expr1 TO expr2 [ STEP expr3 ]',
   'GO': 'GO type line',
@@ -15,6 +16,7 @@ parseRules = {
   'NEXT': 'NEXT',  
   'PRINT': 'PRINT expr',  
   'RANDOMIZE': 'RANDOMIZE',
+  'READ': 'READ list',
   'REM': 'REM expr',
   'RETURN': 'RETURN',  
   'STOP': 'STOP'  
@@ -186,11 +188,31 @@ def parseDetails():
   for lineNumber in data.index: 
     item = data.parseList[lineNumber]
     statement = item['statement']
+    
+    if statement == 'DATA':
+      msg =  parseDataList(item)
+      if msg != 'OK':
+        return msg
+      
     if statement == 'INPUT':
-      return parseInputList(item)
+      msg =  parseInputList(item)
+      if msg != 'OK':
+        return msg
   
+    if statement == 'READ':
+      msg = parseReadList(item)
+      if msg != 'OK':
+        return msg
+      
   return 'OK'
-  
+
+#  parse the list of data items
+
+def parseDataList(item):
+  listText = item['list']
+  values = splitCommaList(listText)
+  item['data'] = values
+  return 'OK'
   
   # parse the list of inputs
   
@@ -210,25 +232,43 @@ def parseInputList(item):
     else:
       item['error'] = 'Bad prompt'  
   item['prompt'] = prompt
-  
-  # seperate prompt and list items delimited by commas
 
-  inputs = []
-  var = ''
-  
-  for ch in listText:    
-    if ch == ',':
-      if var != '':
-        inputs.append(var)
-      var = ''
-    elif ch != ' ':
-      var = var + ch
-    
-  if var != '':
-    inputs.append(var)
-  if len(inputs) == 0:
-    item['error'] = 'Missing inputs'
-    
+  inputs = splitCommaList(listText)
   item['inputs'] = inputs
   return 'OK'
+
+#  [parse read statement
+
+def parseReadList(item):
+  listText = item['list']
+  values = splitCommaList(listText)
+  item['inputs'] = values
+  return 'OK'
+  
       
+#  split comma delimited lists
+      
+def splitCommaList(txt):
+  values = []
+  value = ''
+  inQuotes = False
+ 
+  for ch in txt:
+    if ch == '"':
+      inQuotes = not inQuotes
+    
+    if ch == ',':
+      if value != '':
+        values.append (value)
+      value = ''
+
+    elif ch == ' ':
+      if inQuotes:
+        value = value + ch
+    
+    else:
+      value = value + ch
+      
+  if value != '':
+    values.append (value)
+  return values

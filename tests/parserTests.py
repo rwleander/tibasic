@@ -183,6 +183,22 @@ class TestParser(unittest.TestCase):
     item1 = data.parseList[10]
     self.assertEqual(item1, {'code': '10 STOP', 'statement': 'STOP', 'nextLine': -1, 'error': 'OK'})
     
+    #  test data statement
+
+  def testParserData (self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 DATA 1, 2, 3, 4, 5')
+    result = parser.parse()    
+    self.assertEqual(len(data.parseList), 1)
+    item1 = data.parseList[10]
+    self.assertEqual(item1['code'], '10 DATA 1, 2, 3, 4, 5')
+    self.assertEqual(item1['statement'], 'DATA')
+    self.assertEqual(item1['list'], '1, 2, 3, 4, 5')
+    self.assertEqual(item1['data'], ['1', '2', '3', '4', '5'])
+    
+    
+    
+    
     #------------------
     #  lower level tests
     

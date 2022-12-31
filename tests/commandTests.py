@@ -34,10 +34,15 @@ class TestCommands(unittest.TestCase):
     self.assertEqual(len(data.variables), 1)    
     self.assertEqual(len(data.parseList), 1)
     result = commands.executeCommand('NEW')
+    self.assertEqual(result, 'OK')
     self.assertEqual(len(data.codeList), 0)
     self.assertEqual(len(data.variables), 0)    
     self.assertEqual(len(data.parseList), 0)
-    self.assertEqual(result, 'OK')
+    self.assertEqual(len(data.gosubStack), 0)
+    self.assertEqual(len(data.forNextStack), 0)
+    self.assertEqual(len(data.dataList), 0)
+    self.assertEqual(data.dataPointer, 0)
+    
 
 #  list - lists code to screen
   

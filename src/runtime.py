@@ -18,6 +18,10 @@ def run():
   result = parser.parse()
   if result != 'OK':
     return result
+
+  result = restoreData(data.firstLine)
+  if result != 'OK':
+    return result
    
   address = data.firstLine
   while address > 0:
@@ -35,14 +39,15 @@ def run():
   return 'Done'
   
 #  clear the variables
-  
-  
+    
 def clearData():
   data.variables = {}
 data.index = []
 data.parserList = {}
 data.gosubStack = []
 data.forNextStack = []
+data.dataList = []
+data.dataPointer = 0
 random.seed(0)
   
   
@@ -51,6 +56,7 @@ random.seed(0)
 def executeStatement(address): 
 
   functionList = {    
+    'DATA': runData,
     'END': runStop,
     'FOR': runFor,
     'GO': runGo,
@@ -62,6 +68,7 @@ def executeStatement(address):
     'NEXT': runNext,
     'PRINT': runPrint,
     'RANDOMIZE': runRandomize,
+    'READ': runRead,
     'REM': runRem,
     'RETURN': runReturn,
     'STOP': runStop    
@@ -76,6 +83,14 @@ def executeStatement(address):
     return functionList[statement](item)   
   else:
     return [-1, createMsg(item, 'unknown statement')]
+  
+  # run data statement - ignore - handld by restoreData function
+  
+def runData(item):  
+  nextLine = item['nextLine']
+  return [nextLine, 'OK']
+
+  #  run for statement
   
 def runFor(item):
   expr2 = getString (item, 'expr2')
@@ -263,6 +278,26 @@ def runRandomize(item):
   random.seed()
   return [item['nextLine'], 'OK']
 
+#  read from data list
+
+def runRead(item):
+  vars = item['inputs']
+  values = []
+  
+  for var in vars:
+    if data.dataPointer < len(data.dataList):
+      values.append(data.dataList[data.dataPointer])
+      data.dataPointer = data.dataPointer + 1
+    else:
+      return [-1, createMsg(item, 'Out of data')]
+  
+  msg = processInputs(vars, values)
+  if msg != 'OK':
+    return [-1, createMsg(item, msg)]
+  
+  nextLine = item['nextLine']
+  return [nextLine, 'OK']
+  
 def runRem(item):
   return [item['nextLine'], 'OK']
   
@@ -338,8 +373,25 @@ def splitValues(txt):
     
   return values
   
+  # restore data starting t line number
   
+def restoreData(firstLine):
+  if firstLine not in data.parseList:
+    return 'Bad line number'
+
+  data.dataList = []
+  data.dataPointer = 0    
+  lineNumber = firstLine
+  while lineNumber > 0:
+    item = data.parseList[lineNumber]    
+    if item['statement'] == 'DATA':
+      if item['error'] != 'OK':
+        return item['error']
+      data.dataList.extend(item['data'])
+    lineNumber = item['nextLine']
     
+  return 'OK'    
+  
 
 #--------------------
 #  validate and return items from parseList

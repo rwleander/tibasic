@@ -393,6 +393,29 @@ class TestRuntime(unittest.TestCase):
     result = runtime.splitValues('Red, "Blue", 3')
     self.assertEqual(result, ['Red', '"Blue"', '3'])
 
+#  test initial load of data items
+
+  def testLoadData (self):
+    result = commands.executeCommand('NEW')
+    result = commands.executeCommand('10 DATA 1, 2, 3, 4, 5')
+    result = commands.executeCommand('20 DATA red, blue, green')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Done')
+    self.assertEqual(data.dataList, ['1', '2', '3', '4', '5', 'RED', 'BLUE', 'GREEN'])
+    self.assertEqual(data.dataPointer, 0)
+
+#  test read statement
+
+  def testReadData (self):
+    result = commands.executeCommand('NEW')
+    result = commands.executeCommand('10 READ A$, B$, C$')
+    result = commands.executeCommand('20 DATA red, blue, green')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Done')
+    self.assertEqual(data.variables['A$'], '"RED"')
+    self.assertEqual(data.variables['B$'], '"BLUE"')    
+    self.assertEqual(data.variables['C$'], '"GREEN"')    
+
   
 if __name__ == '__main__':  
     unittest.main()
