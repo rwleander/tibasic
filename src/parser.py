@@ -5,6 +5,7 @@ import helpers
 
 parseRules = {
   'DATA': 'DATA list',
+  'DISPLAY': 'DISPLAY [ list ]',
   'END': 'END',
   'FOR': 'FOR var = expr1 TO expr2 [ STEP expr3 ]',
   'GO': 'GO type line',
@@ -189,6 +190,7 @@ def parseDetails():
 
   functionList = {
     'DATA': parseDataList,
+    'DISPLAY': parsePrintList,
     'INPUT': parseInputList,
     'PRINT': parsePrintList,
     'READ': parseReadList    

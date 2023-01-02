@@ -59,6 +59,7 @@ def executeStatement(address):
 
   functionList = {    
     'DATA': runData,
+    'DISPLAY': runPrint,
     'END': runStop,
     'FOR': runFor,
     'GO': runGo,
@@ -263,6 +264,11 @@ def runLet(item):
   
 def runPrint(item):
   parts = item['parts']  
+  if len(parts) == 0:
+    print()
+    data.printPosition = 0
+    return [item['nextLine'], 'OK']
+    
   for part in parts:
     if part == ';':
       data.printPosition = data.printPosition
@@ -290,11 +296,12 @@ def runPrint(item):
         txt = helpers.formatNumber(txt)
       if txt[0] == '"':
         txt = helpers.stripQuotes(txt)
-      data.printPosition = data.printPosition + len(txt)
-      if data.printPosition >= data.printWidth:
+      nextPosition = data.printPosition + len(txt)
+      if nextPosition >= data.printWidth:
         print()
-        data.printPosition = len(txt)
+        data.printPosition = 0
       print (txt, end = '')
+      data.printPosition = data.printPosition + len(txt)
 
   if parts[len(parts) - 1] not in [':', ';', ',']:
     print()
