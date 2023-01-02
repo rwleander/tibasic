@@ -1,6 +1,7 @@
 #  run time interprets  the code
 
 import random
+import math
 
 import data
 import parser
@@ -48,6 +49,7 @@ data.gosubStack = []
 data.forNextStack = []
 data.dataList = []
 data.dataPointer = 0
+data.printPosition = 0
 random.seed(0)
   
   
@@ -260,15 +262,44 @@ def runLet(item):
 #  run print statement
   
 def runPrint(item):
-  expr = getString(item, 'expr')
-  if item['error'] != 'OK':
-    return [-1, createError(item)]
-    
-  [value, msg] = expressions.evaluate(expr)
-  if msg != 'OK':    
-    return [-1, createMMsg(item, msg)]
-    
-  print (value)
+  parts = item['parts']  
+  for part in parts:
+    if part == ';':
+      data.printPosition = data.printPosition
+    elif part == ':':
+      print()
+      data.printPosition = 0
+ 
+    elif part == ',':
+      zone = math.floor(data.printPosition / 14)
+      nextZone  = (zone + 1) * 14
+      if nextZone >= data.printWidth:
+        print()
+        data.printPosition =0
+      else:
+        tabWidth = nextZone - data.printPosition        
+        print (helpers.tab(tabWidth), end = '')
+        data.printPosition = nextZone
+
+    else:
+      [txt, msg] = expressions.evaluate(part)      
+      if msg != 'OK':
+        return [-1, msg]
+
+      if type(txt) == float:
+        txt = helpers.formatNumber(txt)
+      if txt[0] == '"':
+        txt = helpers.stripQuotes(txt)
+      data.printPosition = data.printPosition + len(txt)
+      if data.printPosition >= data.printWidth:
+        print()
+        data.printPosition = len(txt)
+      print (txt, end = '')
+
+  if parts[len(parts) - 1] not in [':', ';', ',']:
+    print()
+    data.printPosition = 0  
+
   return [item['nextLine'], 'OK']
   
   # remark

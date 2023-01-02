@@ -115,15 +115,14 @@ class TestParser(unittest.TestCase):
 
   def testParserPrint (self):
     commands.executeCommand('NEW')
-    commands.executeCommand('10 PRINT A')
-    commands.executeCommand('20 Print A * B / 2 * A + 2 * B') 
+    commands.executeCommand('10 PRINT A; B, C: "Hello"')
     result = parser.parse()    
-    self.assertEqual(len(data.parseList), 2)
+    self.assertEqual(len(data.parseList), 1)
     item1 = data.parseList[10]
-    self.assertEqual(item1, {'code': '10 PRINT A', 'statement': 'PRINT', 'nextLine': 20, 'expr': 'A', 'error': 'OK'}) 
-    item2 = data.parseList[20]
-    self.assertEqual(item2, {'code': '20 PRINT A * B / 2 * A + 2 * B', 'statement': 'PRINT', 'nextLine': -1, 'expr': 'A * B / 2 * A + 2 * B', 'error': 'OK'}) 
-
+    self.assertEqual(item1['code'], '10 PRINT A; B, C: "Hello"') 
+    self.assertEqual(item1['list'], 'A; B, C: "Hello"') 
+    self.assertEqual(item1['parts'], ['A', ';', 'B', ',', 'C', ':', '"Hello"']) 
+    
 #  test bad print statements
 
   def testParserPrintErrors (self):

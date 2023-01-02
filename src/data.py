@@ -9,6 +9,9 @@ parserList = {}
 gosubStack = []
 forNextStack = []
 
+printPosition = 0
+printWidth = 48
+
 dataList = []
 dataPointer = 0
 
@@ -27,7 +30,7 @@ reservedWords = ['ABS', 'APPEND', 'ASC', 'ATN', 'BASE', 'BREAK', 'BYE',
 'TAB', 'TAN', 'THEN', 'TO', 'TRACE', 'UNBREAK', 'UNTRACE', 'UPDATE', 'VAL', 'VARIABLE']
 
 functionNames = ['ABS', 'ATN', 'COS', 'EXP', 'INT', 'LOG', 'RND', 'SGN', 'SIN', 'SQR', 'TAN',
-          'ASC', 'CHR$', 'LEN', 'POS', 'SEG$', 'STR$', 'VAL']
+          'ASC', 'CHR$', 'LEN', 'POS', 'SEG$', 'STR$', 'TAB', 'VAL']
 
 
 #  codeList contains each line of code in the form codeList[lineNumber] = full line of code

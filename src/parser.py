@@ -14,7 +14,7 @@ parseRules = {
   'INPUT': 'INPUT list',
   'LET': 'LET var = expr',
   'NEXT': 'NEXT',  
-  'PRINT': 'PRINT expr',  
+  'PRINT': 'PRINT [ list ]',  
   'RANDOMIZE': 'RANDOMIZE',
   'READ': 'READ list',
   'REM': 'REM expr',
@@ -186,25 +186,22 @@ def addExpressions(item, ruleParts, codeParts):
 # parse input, print and other list based statements
 
 def parseDetails():
+
+  functionList = {
+    'DATA': parseDataList,
+    'INPUT': parseInputList,
+    'PRINT': parsePrintList,
+    'READ': parseReadList    
+  }
   for lineNumber in data.index: 
-    item = data.parseList[lineNumber]
-    statement = item['statement']
+    item = data.parseList[lineNumber]    
+    statement = item['statement']    
     
-    if statement == 'DATA':
-      msg =  parseDataList(item)
+    if statement in functionList:
+      msg = functionList[statement](item)
       if msg != 'OK':
         return msg
-      
-    if statement == 'INPUT':
-      msg =  parseInputList(item)
-      if msg != 'OK':
-        return msg
-  
-    if statement == 'READ':
-      msg = parseReadList(item)
-      if msg != 'OK':
-        return msg
-      
+        
   return 'OK'
 
 #  parse the list of data items
@@ -237,6 +234,36 @@ def parseInputList(item):
   inputs = splitCommaList(listText)
   item['inputs'] = inputs
   return 'OK'
+
+#  split the print list into its parts
+
+def parsePrintList(item):
+  listText = item['list']    
+  parts = []
+  part = ''
+  inQuotes = False
+  
+  for ch in listText:
+    if ch == '"':
+      inQuotes = not inQuotes
+    
+    if inQuotes == True:
+      part = part + ch    
+      
+    elif ch in [',', ':', ';']:
+      if part != '':
+        parts.append(part)  
+      parts.append(ch)
+      part = ''
+
+    elif ch != ' ':
+      part = part + ch    
+        
+  if part != '':
+    parts.append(part)
+
+  item['parts'] = parts
+  return 'OK'  
 
 #  [parse read statement
 

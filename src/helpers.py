@@ -64,9 +64,27 @@ def stripQuotes(txt):
     newTxt = newTxt[0: len(newTxt) - 1]
       
   return newTxt
-    
-  
+   
+#  add blanks
 
+def tab(n):
+  txt = ''
+  for x in range(n):
+    txt = txt + ' '
+  return txt  
+    
+#   format number - remove trailing zeros and add one space to each side
+  
+def formatNumber(n):
+  txt = str(n)
+  
+  l = len(txt)
+  if l > 2:
+    if txt[l - 2: l] == '.0':
+      txt = txt[0: l - 2]
+  
+  return ' ' + txt + ' '
+  
 # is this a valid variable name
 
 def isValidVariable(txt):

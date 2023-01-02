@@ -60,9 +60,9 @@ keyboard/screen:
 *INPUT
 *READ
 *DATA
-RESTORE
-PRINT
-DISPLAY
+*RESTORE
+*PRINT
+*DISPLAY
 
 file read/write:
 OPEN

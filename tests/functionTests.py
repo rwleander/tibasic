@@ -188,6 +188,18 @@ class TestFunctions(unittest.TestCase):
     self.assertEqual(value, 4)
     [value, msg] = expressions.evaluate('POS("ABCDEFG", "XYZ")')
     self.assertEqual(value, 0)
+
+#  test tab function
+
+  def testTab (self):
+    [value, msg] = expressions.evaluate('TAB(2)')
+    self.assertEqual(msg, 'OK')    
+    self.assertEqual(value, '"  "')
+    [value, msg] = expressions.evaluate('TAB(5)')
+    self.assertEqual(value, '"     "')
+    
+    
+    
 if __name__ == '__main__':  
     unittest.main()
     

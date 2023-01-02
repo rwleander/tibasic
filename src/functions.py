@@ -26,6 +26,7 @@ def evaluate(parts):
     'SIN': doSin,
     'SQR': doSqr,
     'STR$': doStr,
+    'TAB': doTab,
     'TAN': doTan,
     'VAL': doVal    
   }
@@ -148,6 +149,23 @@ def doSqr (parts):
     return [sqr, 'OK']
   else:
     return [0, 'Bad argument']
+  
+  #  tab - return spaces
+  
+def doTab(parts):
+  [n, msg] = getNumber(parts)
+  if msg != 'OK':
+    return [0, msg]
+    
+  txt = '"'
+  for x in range(int(n)):
+    txt = txt + ' '
+  txt = txt + '"'
+  return [txt, 'OK']
+
+
+
+  
   
 # tangent
 

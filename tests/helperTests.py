@@ -136,6 +136,12 @@ class TestHelper(unittest.TestCase):
     result = helpers.isStringVariable('N')
     self.assertEqual(result, False)
 
+#  test format number
+
+  def testFormatNumber (self):
+    result = helpers.formatNumber(23.45)    
+    self.assertEqual(result, ' 23.45 ')
+
 
 
 
