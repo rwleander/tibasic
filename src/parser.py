@@ -18,6 +18,7 @@ parseRules = {
   'RANDOMIZE': 'RANDOMIZE',
   'READ': 'READ list',
   'REM': 'REM expr',
+  'RESTORE': 'RESTORE [ line ]',
   'RETURN': 'RETURN',  
   'STOP': 'STOP'  
 }

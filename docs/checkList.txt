@@ -60,6 +60,7 @@ keyboard/screen:
 *INPUT
 *READ
 *DATA
+RESTORE
 PRINT
 DISPLAY
 

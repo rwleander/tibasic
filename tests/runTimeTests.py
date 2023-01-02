@@ -306,7 +306,7 @@ class TestRuntime(unittest.TestCase):
     data.parseList = {10: '10 LET A = B'}
     line = runtime.getLine(item, 'line')
     self.assertEqual(line, -1)
-    self.assertEqual(item['error'], 'Bad line number')
+    self.assertEqual(item['error'], 'Bad line number - 1X')
 
 #  test get line with line not in program
 
@@ -415,6 +415,25 @@ class TestRuntime(unittest.TestCase):
     self.assertEqual(data.variables['A$'], '"RED"')
     self.assertEqual(data.variables['B$'], '"BLUE"')    
     self.assertEqual(data.variables['C$'], '"GREEN"')    
+
+#  test restore statement
+
+  def testRestore (self):
+    result = commands.executeCommand('NEW')
+    result = commands.executeCommand('10 READ A')
+    result = commands.executeCommand('20 RESTORE')
+    result = commands.executeCommand('30 READ B')
+    result = commands.executeCommand('40 RESTORE 90')
+    result = commands.executeCommand('60 READ C')
+    result = commands.executeCommand('70 DATA 1')
+    result = commands.executeCommand('80 DATA 2')
+    result = commands.executeCommand('90 DATA 3')        
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Done')        
+    self.assertEqual(data.variables['A'], 1)
+    self.assertEqual(data.variables['B'], 1)
+    self.assertEqual(data.variables['C'], 3)
+
 
   
 if __name__ == '__main__':  

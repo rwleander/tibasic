@@ -70,6 +70,7 @@ def executeStatement(address):
     'RANDOMIZE': runRandomize,
     'READ': runRead,
     'REM': runRem,
+    'RESTORE': runRestore,
     'RETURN': runReturn,
     'STOP': runStop    
 }    
@@ -301,6 +302,22 @@ def runRead(item):
 def runRem(item):
   return [item['nextLine'], 'OK']
   
+  #  restore reload  data list
+  
+def runRestore(item):
+  n = data.firstLine
+
+  if 'line' in item:
+    s = item['line']
+    if s != '':
+      n = int(s)
+    
+  msg = restoreData(n)
+  if msg != 'OK':
+    return [-1, createMsg(item, msg)]
+  
+  return [item['nextLine'], 'OK']
+  
   # stop and end
   
 def runStop(item):
@@ -373,15 +390,15 @@ def splitValues(txt):
     
   return values
   
-  # restore data starting t line number
+  # restore data starting at line number
   
-def restoreData(firstLine):
-  if firstLine not in data.parseList:
-    return 'Bad line number'
+def restoreData(n):
+  if n not in data.index:
+    return 'Bad line number - ' + str(n)
 
   data.dataList = []
   data.dataPointer = 0    
-  lineNumber = firstLine
+  lineNumber = n
   while lineNumber > 0:
     item = data.parseList[lineNumber]    
     if item['statement'] == 'DATA':
@@ -412,12 +429,12 @@ def getLine(item, name):
     item['error'] = 'Missing ' + name
     return -1
     
-  str = item[name]
-  if helpers.isnumeric(str) == False:
-    item['error'] = 'Bad line number'    
+  s = item[name]
+  if helpers.isnumeric(s) == False:
+    item['error'] = 'Bad line number - ' + s    
     return -1
-    
-  line =  int(str)
+  
+  line =  int(s)
   if line  in data.parseList:
     return line
   else:
