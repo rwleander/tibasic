@@ -187,13 +187,24 @@ class TestExpressions(unittest.TestCase):
     self.assertEqual(msg, 'OK')
     self.assertEqual(value, -14)
     
-    #   test badi expressions
+    #   test bad expressions
     
   def testEvaluateBad (self):
     [value, msg] = expressions.evaluate('5 + * 4')
     self.assertEqual(msg, 'Bad expression')
+
+# test bug with if statement
     
-# test function call
+  def testEvaluateBadIf (self):
+    data.variables = {'X$': '"Y"'}
+    [value, msg] = expressions.evaluate('S$ = "Y"')
+    self.assertEqual(msg, 'OK')
+
+ 
+    
+    exit
+    
+    
 
   
 if __name__ == '__main__':  

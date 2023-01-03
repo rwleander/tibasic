@@ -342,21 +342,35 @@ def compareParts(parts):
   i = 1
   while i < len(parts) - 1:
     item = parts[i]
-    if item in ['=', '<', '>', '<=', '>=']:
+    if item in ['=', '<', '>', '<=', '>=', '<>']:
       prevItem = parts[i - 1]
-      if isinstance(prevItem, float):
-        prevItem = str(prevItem)
-        
-        if item == '=':
-          item = '=='
-          
-      nextItem = parts[i + 1]
-      if isinstance(nextItem, float):
-        nextItem = str(nextItem)
+      nextItem = parts[i + 1] 
       
-      parts[i] = eval (prevItem + ' ' + item + ' ' + nextItem)
+      if type(prevItem) != type(nextItem):
+        raise Exception
+        
+      value = False
+      if item == '=':
+        value = (prevItem == nextItem)
+          
+      if item == '<':
+        value = (prevItem < nextItem)
+            
+      if item == '<=':
+        value = (prevItem <= nextItem)
+        
+      if item == '>':
+        value = (prevItem > nextItem)
+        
+      if item == '>=':
+        value = (prevItem >= nextItem)
+        
+      if value == '<>':
+        value = (prevItem != nextItem)  
+  
+      parts[i - 1] = value
       del parts[i + 1]
-      del parts[i - 1]
+      del parts[i]
             
   return parts
   

@@ -89,7 +89,7 @@ class TestCommands(unittest.TestCase):
     self.assertEqual(len(data.codeList), 2)
     result = commands.executeCommand('list')
     self.assertEqual(result, '10 LET A = 1\n20 LET B = 2')
-  
+
   def testDeleteLines (self):
     result = commands.executeCommand('New')
     result = commands.executeCommand('20 Let B = 2')
