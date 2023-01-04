@@ -166,38 +166,24 @@ def buildTree(parts):
 #  calculate the value of the expression
   
 def calculate(tree):  
+
+  functionList = {
+    'expr': calculateExpression,
+    'func': calculateFunction,
+    'mat': calculateMatrix
+  }
+  
   i = tree['end']
   while i >= 0:
     branch = tree[i]
     parts = branch['parts']
     parts = setVariables(parts, tree)           
-   
-    if  branch['type'] == 'expr':      
-      try:
-        parts = minusParts(parts)
-        parts = calcParts(parts, '^')
-        parts = calcParts(parts, '/')
-        parts = calcParts(parts, '*')    
-        parts = calcParts(parts, '+')
-        parts = calcParts(parts, '-')
-        parts = joinStrings(parts)        
-        parts = compareParts(parts)
-      except:
-        return [0, 'Bad expression']
-       
-      if len(parts) > 1:
-        return [0, 'Bad expression']
-        
-      if len(parts) == 0:
-        branch['value'] = 0
-      else:
-        branch['value'] = parts[0]        
-    
-    else:
-      [value, msg] = functions.evaluate(parts)
-      if (msg != 'OK'):
-        return [0, msg]           
-      branch['value'] = value    
+    branch['parts'] = parts
+
+    branchType = branch['type']
+    [branch, msg] = functionList[branchType](branch)    
+    if msg != 'OK':
+      return [0, msg]
   
     tree[i] = branch
     i = i - 1
@@ -208,7 +194,7 @@ def calculate(tree):
     
 #  substitute variables and convert numbers to floats
 
-def setVariables(parts, tree):
+def setVariables(parts, tree):  
   newParts = []
   for item in parts:
     if item[0] == '~':
@@ -237,14 +223,69 @@ def setVariables(parts, tree):
     else:
     
       newParts.append(item)
-      
+
   return newParts
 
+#  reduce partial expression
+
+def calculateExpression(branch):
+  parts = branch['parts']  
+  
+  #  reduce parts
+  
+  [parts, msg] = minusParts(parts)
+  if msg != 'OK':
+    return [branch, msg]
+  
+  for operation in ['^', '/', '*', '+', '-']:
+    [parts, msg] = calcParts(parts, operation)
+    if msg != 'OK':
+      return [branch, msg]
+  
+  [parts, msg] = joinStrings(parts)        
+  if msg != 'OK':
+    return [branch, msg]
+    
+  [parts, msg] = compareParts(parts)
+  if msg != 'OK':
+    return [branch, msg]
+  
+# see what we got
+       
+  if len(parts) > 1:
+    return [branch, 'Bad expression']
+        
+  if len(parts) == 0:
+    branch['value'] = 0
+  else:
+    branch['value'] = parts[0]        
+    
+  return [branch, 'OK']
+
+
+#  reduce function parts
+
+def calculateFunction(branch):
+  parts = branch['parts']
+  [value, msg] = functions.evaluate(parts)
+  if (msg != 'OK'):
+    return [branch, msg]           
+    
+  branch['value'] = value    
+  return [branch, 'OK']
+
+#  reduce matrix parts 
+
+def calculateMatrix(branch):
+  parts = branch['parts']
+  return [branch, 'Not ready']
+  
+  
 # switch numbers negative if preceded by -
 
 def minusParts(parts):      
   if len(parts) < 2:    
-    return parts
+    return [parts, 'OK']
   
   i = len (parts) - 2  
   while i >= 0:    
@@ -260,19 +301,19 @@ def minusParts(parts):
         del(parts[i + 1])
     i = i - 1    
     
-  return parts
+  return [parts, 'OK']
 
 # calculate parts
 
 def calcParts(parts, op):            
   if len(parts) < 3:
-    return parts
+    return [parts, 'OK']
     
   i = 1
   while i > 0:
     i = findOperator(parts, op)    
     if (i == 0) or (i == len(parts) - 1):
-      raise Exception
+      return [parts, 'Bad expression']
       
     if i > 0:
       lastItem = parts[i - 1]
@@ -280,7 +321,7 @@ def calcParts(parts, op):
       nextItem = parts[i + 1]
       
       if (isinstance(lastItem, float) == False) or (isinstance(nextItem, float) == False):
-        raise Exception
+        return [parts, 'Bad expression']
         
       newItem = 0
       if op == '^':
@@ -288,7 +329,7 @@ def calcParts(parts, op):
         
       if op == '/':
         if nextItem == 0.0:
-          raise Exception
+          return [parts, 'Bad expression']
         newItem = lastItem / nextItem        
         
       if op == '*':
@@ -304,19 +345,19 @@ def calcParts(parts, op):
       del parts[i + 1]
       del parts[i]
             
-  return parts
+  return [parts, 'OK']
 
 # join strings
 
 def joinStrings(parts):            
   if len(parts) < 3:
-    return parts
+    return [parts, 'OK']
     
   i = 1
   while i > 0:
     i = findOperator(parts, '&')    
     if (i == 0) or (i == len(parts) - 1):
-      raise Exception
+      return [parts, 'Bad expression']
       
     if i > 0:
       lastItem = parts[i - 1]
@@ -324,20 +365,20 @@ def joinStrings(parts):
       nextItem = parts[i + 1]
       
       if type(lastItem) != str or type(nextItem) != str:
-        raise Exception
+        return [parts, 'Bad expression']
       
       newItem = lastItem[0: len(lastItem) - 1] + nextItem[1: len(nextItem)]        
       parts[i - 1] = newItem
       del parts[i + 1]
       del parts[i]
             
-  return parts
+  return [parts, 'OK']
   
   # comparisons
   
 def compareParts(parts):
   if len(parts) < 3:
-    return parts
+    return [parts, 'OK']
     
   i = 1
   while i < len(parts) - 1:
@@ -347,7 +388,7 @@ def compareParts(parts):
       nextItem = parts[i + 1] 
       
       if type(prevItem) != type(nextItem):
-        raise Exception
+        return [parts, 'Bad expression']
         
       value = False
       if item == '=':
@@ -372,7 +413,7 @@ def compareParts(parts):
       del parts[i + 1]
       del parts[i]
             
-  return parts
+  return [parts, 'OK']
   
   
   #  helper to find operators

@@ -199,11 +199,6 @@ class TestExpressions(unittest.TestCase):
     data.variables = {'X$': '"Y"'}
     [value, msg] = expressions.evaluate('S$ = "Y"')
     self.assertEqual(msg, 'OK')
-
- 
-    
-    exit
-    
     
 
   
