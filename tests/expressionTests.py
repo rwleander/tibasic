@@ -196,9 +196,11 @@ class TestExpressions(unittest.TestCase):
 # test bug with if statement
     
   def testEvaluateBadIf (self):
-    data.variables = {'X$': '"Y"'}
-    [value, msg] = expressions.evaluate('S$ = "Y"')
+    [value, msg] = expressions.evaluate('INT(RND() * 100) + 1')
     self.assertEqual(msg, 'OK')
+    self.assertEqual(value > 0, True)
+    self.assertEqual(value < 101, True)
+    
     
 
   

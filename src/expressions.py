@@ -144,7 +144,10 @@ def buildTree(parts):
       oldBranch = branch
       oldId = oldBranch['id']
       tree[oldId] = oldBranch
-      branch = tree[oldBranch['parent']]
+      parentId = oldBranch['parent']
+      if parentId == -1:
+        return [tree, 'Bad expression']
+      branch = tree[parentId]
       
       #  note: if this is a function call, pop the stach twice
       
@@ -176,15 +179,17 @@ def calculate(tree):
   i = tree['end']
   while i >= 0:
     branch = tree[i]
-    parts = branch['parts']
+    parts = branch['parts']    
+    
     parts = setVariables(parts, tree)           
+    
     branch['parts'] = parts
 
     branchType = branch['type']
     [branch, msg] = functionList[branchType](branch)    
     if msg != 'OK':
       return [0, msg]
-  
+
     tree[i] = branch
     i = i - 1
 
@@ -271,6 +276,9 @@ def calculateFunction(branch):
   if (msg != 'OK'):
     return [branch, msg]           
     
+  if type(value) == int:
+    value = float(value)
+      
   branch['value'] = value    
   return [branch, 'OK']
 
