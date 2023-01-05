@@ -10,49 +10,34 @@ import helpers
 # process a command
 
 def executeCommand(cmd):
+  functionList = {
+    'BYE': cmdQuit,
+    'DELETE': cmdDelete,
+    'FILES': cmdFiles,    
+    'LET': cmdLet,
+    'LIST': cmdList,
+    'NEW': cmdNew,
+    'OLD': cmdOld,
+    'PRINT': cmdPrint,
+    'QUIT': cmdQuit,
+    'RESEQUENCE': cmdResequence,
+    'RUN': cmdRun,
+    'SAVE': cmdSave
+  }
+  
   cmdWork = helpers.upshift(cmd)
   parts = cmdWork.split()
   if len(parts) == 0:
     return ''
 
   command = parts[0]      
-  if command == 'NEW':
-    return cmdNew()
+    
+  if command in functionList:
+    return functionList[command](cmdWork)
     
   if command[0] >= '0' and cmdWork[0] <= '9':
     return cmdAddLine(cmdWork)
-
-  if command == 'RESEQUENCE':
-    return cmdResequence()
   
-  if command == 'OLD':
-    return cmdOld(cmdWork)
-    
-  if command == 'SAVE':
-    return cmdSave(cmdWork)
-    
-  if command == 'FILES':
-    return cmdFiles()
-    
-  if command == 'DELETE':
-    return cmdDelete(cmdWork)
-      
-  if command == 'LET':
-    return cmdLet(cmdWork)
-    
-  if command == 'PRINT':
-    return cmdPrint(cmdWork)
-
-  if command == 'LIST':
-    return cmdList(cmdWork)  
-
-  if command == 'RUN':
-    return runtime.run()
-  
-  if command == 'QUIT' or command == 'BYE':
-    data.quitFlag = True
-    return ''
-    
   return 'unknown command'
     
 
@@ -61,7 +46,7 @@ def executeCommand(cmd):
     
 #  NEW - clear lists
     
-def cmdNew():
+def cmdNew(cmdWork):
   data.codeList = {}
   data.variables = {}  
   data.parseList = {}
@@ -70,6 +55,7 @@ def cmdNew():
   data.forNextStack = []
   data.dataList = []
   data.dataPointer = 0
+  data.printPosition = 0
   
   return 'OK'
 
@@ -115,7 +101,7 @@ def cmdAddLine(cmd):
 
 # resequence the list
 
-def cmdResequence():
+def cmdResequence(cmdWork):
   newCodeList = {}
   lineList = {}
   seq = 10
@@ -171,7 +157,7 @@ def cmdOld(cmdWork):
   if msg != 'OK':
     return msg
     
-  cmdNew()
+  cmdNew(cmdWork)
   if helpers.fileExists(fileName) == False:
     return 'File not found'
     
@@ -202,7 +188,7 @@ def cmdSave(cmdWork):
   
   # list files
   
-def cmdFiles():
+def cmdFiles(cmdWork):
   str = ''
   n = 0
   files  = os.listdir()
@@ -272,6 +258,17 @@ def cmdPrint(cmdWork):
   if msg != 'OK':
     return  'Syntax error'    
   return str(value)
+ 
+ ##  run the program
+ 
+def cmdRun(cmdWork):
+  return runtime.run()
+  
+#  quit
+
+def cmdQuit(cmdWork):
+  data.quitFlag = True
+  return 'Bye'
   
 #-------------------
 #  helper functions
