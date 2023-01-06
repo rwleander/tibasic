@@ -26,7 +26,8 @@ def run():
    
   address = data.firstLine
   while address > 0:
-    [newAddress, msg] = executeStatement(address)
+    item = data.parseList[address]
+    [newAddress, msg] = executeStatement(item)
     if msg  != 'OK':    
         return msg    
         
@@ -55,7 +56,7 @@ random.seed(0)
   
   # run a line of code
   
-def executeStatement(address): 
+def executeStatement(item): 
 
   functionList = {    
     'DATA': runData,
@@ -78,7 +79,6 @@ def executeStatement(address):
     'STOP': runStop    
 }    
   
-  item = data.parseList[address]
   if item['error'] != 'OK':    
     return [-1, createError(item)]  
   

@@ -24,6 +24,7 @@ parseRules = {
   'STOP': 'STOP'  
 }
 
+
 #  parse the code list and place in parseList
 
 def parse():
@@ -42,6 +43,42 @@ def parse():
   msg = parseDetails()
   return msg
   
+  #  parse a command line
+
+def parseCommand(cmd):
+
+  functionList = {
+    'DATA': parseDataList,
+    'DISPLAY': parsePrintList,
+    'INPUT': parseInputList,
+    'PRINT': parsePrintList,
+    'READ': parseReadList    
+  }
+
+  parts = cmd.split()
+  statement = item[0]
+  
+  item = {}
+  item['code'] = cmd
+  item['statement'] = parts[0]
+  item['nextLine'] = -1 
+  item['error'] = 'OK'
+  
+      # parse by statement type
+      
+  if statement not in parseRules:      
+    return [item, 'Bad command']
+    
+  rule = parseRules[statement]      
+  ruleParts = rule.split()
+  codeParts= splitCode(cmd, ruleParts)  
+  item = addExpressions(item, ruleParts, codeParts)
+    
+  if statement in functionList:
+    msg = functionList[statement](item)
+      
+  return [item, msg]
+      
 # create an ordered list of line numbers
 
 def createIndex():
@@ -195,6 +232,7 @@ def parseDetails():
     'PRINT': parsePrintList,
     'READ': parseReadList    
   }
+
   for lineNumber in data.index: 
     item = data.parseList[lineNumber]    
     statement = item['statement']    
