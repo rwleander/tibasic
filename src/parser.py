@@ -56,28 +56,30 @@ def parseCommand(cmd):
   }
 
   parts = cmd.split()
-  statement = item[0]
+  statement = parts[0]
   
   item = {}
   item['code'] = cmd
-  item['statement'] = parts[0]
+  item['statement'] = statement
   item['nextLine'] = -1 
   item['error'] = 'OK'
+  item['source'] = 'command'
   
       # parse by statement type
       
   if statement not in parseRules:      
-    return [item, 'Bad command']
+    item['error'] = 'Bad command'
+    return item 
     
   rule = parseRules[statement]      
   ruleParts = rule.split()
-  codeParts= splitCode(cmd, ruleParts)  
+  codeParts= splitCode('00 ' + cmd, ruleParts)  
   item = addExpressions(item, ruleParts, codeParts)
     
   if statement in functionList:
     msg = functionList[statement](item)
       
-  return [item, msg]
+  return item 
       
 # create an ordered list of line numbers
 
@@ -106,6 +108,7 @@ def buildParseList():
     item['statement'] = parts[1]
     item['nextLine'] = -1
     item['error'] = 'OK'
+    item['source'] = 'runtime'
     
     # if implied let, set statement type to let
     

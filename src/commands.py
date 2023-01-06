@@ -4,27 +4,29 @@ import os
 
 import data
 import expressions
+import parser
 import runtime
 import helpers
 
 # process a command
 
 def executeCommand(cmd):
+
   functionList = {
     'BYE': cmdQuit,
     'DELETE': cmdDelete,
-    'FILES': cmdFiles,    
-    'LET': cmdLet,
+    'FILES': cmdFiles,        
     'LIST': cmdList,
     'NEW': cmdNew,
-    'OLD': cmdOld,
-    'PRINT': cmdPrint,
+    'OLD': cmdOld,    
     'QUIT': cmdQuit,
     'RESEQUENCE': cmdResequence,
     'RUN': cmdRun,
     'SAVE': cmdSave
   }
-  
+
+  commandList = ['LET', 'PRINT']
+
   cmdWork = helpers.upshift(cmd)
   parts = cmdWork.split()
   if len(parts) == 0:
@@ -35,6 +37,9 @@ def executeCommand(cmd):
   if command in functionList:
     return functionList[command](cmdWork)
     
+  if command in commandList:
+    return cmdRunCommand(cmdWork)
+        
   if command[0] >= '0' and cmdWork[0] <= '9':
     return cmdAddLine(cmdWork)
   
@@ -263,7 +268,17 @@ def cmdPrint(cmdWork):
  
 def cmdRun(cmdWork):
   return runtime.run()
-  
+ 
+#  run immediate commands like let, input, print, etc
+
+def cmdRunCommand(cmdWork):
+  item = parser.parseCommand(cmdWork)
+  if item['error'] != 'OK':
+    return item['error']
+
+  [addr, msg] = runtime.executeStatement(item)
+  return msg
+ 
 #  quit
 
 def cmdQuit(cmdWork):

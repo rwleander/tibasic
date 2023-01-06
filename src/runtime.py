@@ -492,8 +492,14 @@ def getLineOptional(item, name, defaultLine):
 #  create an error message from an  ite or stringm    
 
 def createError(item):
-  return item['code'] + '\n' + item['error']
+  if item['source'] == 'command':
+    return item['error']
+  else:
+    return item['code'] + '\n' + item['error']
 
 def createMsg(item, msg):
-  return item['code'] + '\n' + msg
+  if item['source'] == 'command':
+    return msg
+  else:  
+    return item['code'] + '\n' + msg
 

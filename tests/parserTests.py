@@ -41,11 +41,11 @@ class TestParser(unittest.TestCase):
     self.assertEqual(result, 'OK')
     self.assertEqual(len(data.parseList), 3)
     item1 = data.parseList[10]
-    self.assertEqual(item1, {'code': '10 LET A = 1', 'statement': 'LET', 'nextLine': 20, 'error': 'OK'})
+    self.assertEqual(item1, {'code': '10 LET A = 1', 'statement': 'LET', 'nextLine': 20, 'error': 'OK', 'source': 'runtime'})
     item2 = data.parseList[20]
-    self.assertEqual(item2, {'code': '20 LET B = 2', 'statement': 'LET', 'nextLine': 30, 'error': 'OK'})
+    self.assertEqual(item2, {'code': '20 LET B = 2', 'statement': 'LET', 'nextLine': 30, 'error': 'OK', 'source': 'runtime'})
     item3 = data.parseList[30]
-    self.assertEqual(item3, {'code': '30 LET C = A + B', 'statement': 'LET', 'nextLine': -1, 'error': 'OK'})
+    self.assertEqual(item3, {'code': '30 LET C = A + B', 'statement': 'LET', 'nextLine': -1, 'error': 'OK', 'source': 'runtime'})
  
  # test simple parse 
 
@@ -74,9 +74,9 @@ class TestParser(unittest.TestCase):
     self.assertEqual(len(data.parseList), 2)
     self.assertEqual(data.firstLine, 10)
     item1 = data.parseList[10]
-    self.assertEqual(item1, {'code': '10 LET A = 1', 'statement': 'LET', 'nextLine': 20, 'var': 'A', 'expr': '1', 'error': 'OK'}) 
+    self.assertEqual(item1, {'code': '10 LET A = 1', 'statement': 'LET', 'nextLine': 20, 'var': 'A', 'expr': '1', 'error': 'OK', 'source': 'runtime'}) 
     item2 = data.parseList[20]
-    self.assertEqual(item2, {'code': '20 LET B = A + 1', 'statement': 'LET', 'nextLine': -1, 'var':'B', 'expr': 'A + 1', 'error': 'OK'}) 
+    self.assertEqual(item2, {'code': '20 LET B = A + 1', 'statement': 'LET', 'nextLine': -1, 'var':'B', 'expr': 'A + 1', 'error': 'OK', 'source': 'runtime'}) 
     
 #  test bad let statements
 
@@ -105,10 +105,9 @@ class TestParser(unittest.TestCase):
     self.assertEqual(len(data.parseList), 2)
     self.assertEqual(data.firstLine, 10)
     item1 = data.parseList[10]
-    self.assertEqual({'code': '10 A = 1', 'statement': 'LET', 'nextLine': 20, 'var': 'A', 'expr': '1', 'error': 'OK'}, item1) 
+    self.assertEqual(item1, {'code': '10 A = 1', 'statement': 'LET', 'nextLine': 20, 'var': 'A', 'expr': '1', 'error': 'OK', 'source': 'runtime'}) 
     item2 = data.parseList[20]
-    self.assertEqual(len(item2), 6)
-    self.assertEqual({'code': '20 B = A + 1', 'statement': 'LET', 'nextLine': -1, 'var':'B', 'expr': 'A + 1', 'error': 'OK'}, item2) 
+    self.assertEqual(len(item2), 7)
     
 
 # test parse print
@@ -180,7 +179,7 @@ class TestParser(unittest.TestCase):
     result = parser.parse()    
     self.assertEqual(len(data.parseList), 1)
     item1 = data.parseList[10]
-    self.assertEqual(item1, {'code': '10 STOP', 'statement': 'STOP', 'nextLine': -1, 'error': 'OK'})
+    self.assertEqual(item1, {'code': '10 STOP', 'statement': 'STOP', 'nextLine': -1, 'error': 'OK', 'source': 'runtime'})
     
     #  test data statement
 

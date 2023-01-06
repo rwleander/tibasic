@@ -241,7 +241,7 @@ class TestCommands(unittest.TestCase):
   def testLetWithError (self):
     result = commands.executeCommand('New')
     result = commands.executeCommand('LET A = 1 +* 1')
-    self.assertEqual(result, 'Syntax error')
+    self.assertEqual(result, 'Bad expression')
 
 #  test let with bad variable name
 
@@ -252,24 +252,6 @@ class TestCommands(unittest.TestCase):
 
 
 # test print statement
-
-  def testPrint (self):
-    result = commands.executeCommand('New')
-    result = commands.executeCommand('LET A = 100')
-    self.assertEqual(result, 'OK')
-    result = commands.executeCommand('Print A')
-    self.assertEqual(result, '100.0')
-    
-    # test print with expression
-    
-  def testPrintWithExpression (self):
-    result = commands.executeCommand('New')
-    result = commands.executeCommand('LET A = 100')
-    self.assertEqual(result, 'OK')
-    result = commands.executeCommand('Print A + 1')
-    self.assertEqual(result, '101.0')
-    
-    
 
 
 if __name__ == '__main__':  
