@@ -25,7 +25,7 @@ def executeCommand(cmd):
     'SAVE': cmdSave
   }
 
-  commandList = ['LET', 'PRINT']
+  commandList = ['DISPLAY', 'INPUT', 'LET', 'PRINT']
 
   cmdWork = helpers.upshift(cmd)
   parts = cmdWork.split()
@@ -225,46 +225,8 @@ def cmdDelete(cmdWork):
   
   #-----------------------
   #  other commands
-  
-  # let statement
-
-def cmdLet(cmdWork):
-  parts = cmdWork.split()
-  if len(parts) < 4:
-    return 'Syntax error'
-	
-  if parts[2] != '=':
-    return 'Syntax error'
-      
-  vName = parts[1]
-    
-  i = cmdWork.find('=')
-  expr = cmdWork[i+2: len(cmdWork)] 
-  [value, msg] = expressions.evaluate(expr)
-  if msg != 'OK':
-    return 'Syntax error'
-    
-  msg = helpers.setVariable(vName,  value)
-  if msg == '':
-    return 'OK'
-  else:
-    return msg
-  
-#print statement
-  
-def cmdPrint(cmdWork):
-  parts = cmdWork.split()
-  if len(parts) < 2:
-    return 'Syntax error'
-  
-  i = cmdWork.find(' ')
-  expr = cmdWork[i+1: len(cmdWork)]
-  [value, msg] = expressions.evaluate(expr)
-  if msg != 'OK':
-    return  'Syntax error'    
-  return str(value)
  
- ##  run the program
+ #  run the program
  
 def cmdRun(cmdWork):
   return runtime.run()
