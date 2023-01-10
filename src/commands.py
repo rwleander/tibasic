@@ -61,6 +61,8 @@ def cmdNew(cmdWork):
   data.dataList = []
   data.dataPointer = 0
   data.printPosition = 0
+  data.matrixList = {}
+  data.matrixBase = 0
   
   return 'OK'
 

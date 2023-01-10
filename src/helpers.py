@@ -68,9 +68,7 @@ def stripQuotes(txt):
 #  add blanks
 
 def tab(n):
-  txt = ''
-  for x in range(n):
-    txt = txt + ' '
+  txt = ' ' * n
   return txt  
     
 #   format number - remove trailing zeros and add one space to each side

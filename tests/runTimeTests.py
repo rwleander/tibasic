@@ -434,6 +434,29 @@ class TestRuntime(unittest.TestCase):
     self.assertEqual(data.variables['B'], 1)
     self.assertEqual(data.variables['C'], 3)
 
+# test dim statement
+
+  def testDim (self):
+    result = commands.executeCommand('NEW')
+    result = commands.executeCommand('10 DIM A(5)')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Done')        
+    self.assertEqual(data.matrixBase, 0)
+    self.assertEqual(len(data.matrixList), 1)
+    self.assertEqual(data.matrixList['A'], {'x': 5, 'y': 1, 'z': 1})
+    self.assertEqual(data.variables['A'], [0, 0, 0, 0, 0])
+
+#  test option base
+
+  def testOption (self):
+    result = commands.executeCommand('NEW')
+    result = commands.executeCommand('10 OPTION BASE 1')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Done')        
+    self.assertEqual(data.matrixOption, 1)
+    
+    
+
 
   
 if __name__ == '__main__':  

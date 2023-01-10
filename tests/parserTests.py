@@ -292,6 +292,37 @@ class TestParser(unittest.TestCase):
     self.assertEqual(item['prompt'], 'Numbers:')
     self.assertEqual(item['inputs'], ['A', 'B', 'C'])
     self.assertEqual(item['error'], 'OK')
+
+#  test parse of dim statement
+
+  def testParseDim (self):
+    data.codeList = {10: '10 DIM A(10)', 20: '20 DIM X$ (5)'}
+    result = parser.parse()  
+    self.assertEqual(result, 'OK')
+    self.assertEqual(len(data.parseList), 2)
+    item = data.parseList[10]
+    self.assertEqual(item['statement'], 'DIM')    
+    self.assertEqual(item['list'], 'A(10)')
+    self.assertEqual(item['var'], 'A')
+    self.assertEqual(item['size'], '10')
+    self.assertEqual(item['error'], 'OK')
+    item2 = data.parseList[20]
+    self.assertEqual(item2['var'], 'X$')
+    self.assertEqual(item2['size'], '5')
+
+#  test option base
+
+  def testParseOption (self):
+    data.codeList = {10: '10 OPTION BASE 0'}
+    result = parser.parse()  
+    self.assertEqual(result, 'OK')
+    self.assertEqual(len(data.parseList), 1)
+    item = data.parseList[10]
+    self.assertEqual(item['statement'], 'OPTION')    
+    self.assertEqual(item['n'], '0')
+    
+    
+    
     
   
 if __name__ == '__main__':  

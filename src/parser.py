@@ -5,6 +5,7 @@ import helpers
 
 parseRules = {
   'DATA': 'DATA list',
+  'DIM': 'DIM list',
   'DISPLAY': 'DISPLAY [ list ]',
   'END': 'END',
   'FOR': 'FOR var = expr1 TO expr2 [ STEP expr3 ]',
@@ -15,6 +16,7 @@ parseRules = {
   'INPUT': 'INPUT list',
   'LET': 'LET var = expr',
   'NEXT': 'NEXT',  
+  'OPTION': 'OPTION BASE n',
   'PRINT': 'PRINT [ list ]',  
   'RANDOMIZE': 'RANDOMIZE',
   'READ': 'READ list',
@@ -230,6 +232,7 @@ def parseDetails():
 
   functionList = {
     'DATA': parseDataList,
+    'DIM': parseDimList,
     'DISPLAY': parsePrintList,
     'INPUT': parseInputList,
     'PRINT': parsePrintList,
@@ -253,6 +256,23 @@ def parseDataList(item):
   listText = item['list']
   values = splitCommaList(listText)
   item['data'] = values
+  return 'OK'
+  
+  #  split dim statement
+  
+def parseDimList(item):
+  listText = item['list']
+  
+  i = listText.find('(')
+  if i < 0:
+    return 'Bad statement'
+  
+  j = listText.find(')')
+  if j < i:
+    return 'Bad statement'
+
+  item['var'] = listText[0: i].strip() 
+  item['size'] = listText[i + 1: j]
   return 'OK'
   
   # parse the list of inputs

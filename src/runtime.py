@@ -51,6 +51,8 @@ data.forNextStack = []
 data.dataList = []
 data.dataPointer = 0
 data.printPosition = 0
+data.matrixList = {}
+data.matrixBase = 0
 random.seed(0)
   
   
@@ -60,6 +62,7 @@ def executeStatement(item):
 
   functionList = {    
     'DATA': runData,
+    'DIM': runDim,
     'DISPLAY': runPrint,
     'END': runStop,
     'FOR': runFor,
@@ -70,6 +73,7 @@ def executeStatement(item):
     'INPUT': runInput,
     'LET': runLet,
     'NEXT': runNext,
+    'OPTION': runOption,
     'PRINT': runPrint,
     'RANDOMIZE': runRandomize,
     'READ': runRead,
@@ -88,12 +92,45 @@ def executeStatement(item):
   else:
     return [-1, createMsg(item, 'unknown statement')]
   
-  # run data statement - ignore - handld by restoreData function
+  # run data statement - ignore - handled by restoreData function
   
 def runData(item):  
   nextLine = item['nextLine']
   return [nextLine, 'OK']
 
+# run dim statement - add to matrix list and initialize variable
+
+def runDim(item):
+  var = getString(item, 'var')
+  size = getString(item, 'size')
+  parts = size.split('.')
+  x = 1
+  y = 1
+  z = 1
+  
+  if len(parts) < 1:
+    return [-1, 'Bad statement']
+    
+  if len(parts) > 0:
+    x = int(parts[0])
+    
+  if len(parts) > 1:
+    y = int (parts[1])
+  
+  if len(parts) == 3:
+    z = int(parts[2])
+  
+  data.matrixList[var] = {'x': x, 'y': y, 'z': z}
+  
+  n = x * y * z
+  if helpers.isStringVariable(var):
+    data.variables [var] = [''] * n
+  else:
+    data.variables[var] = [0] * n
+  
+  nextLine = item['nextLine']
+  return [nextLine, 'OK']
+    
   #  run for statement
   
 def runFor(item):
@@ -259,6 +296,20 @@ def runLet(item):
     return [item['nextLine'], 'OK']
   else:
     return [-1, createMsg(item, msg)]
+    
+    #  change option
+    
+def runOption(item):
+  n = getString(item, 'n')  
+  if n != '0' and n != '1':
+    return [-1, 'Bad statement']
+  
+  if len(data.matrixList) > 0:
+    return [-1, 'Option must be before dim']  
+  
+  data.matrixOption = int(n)
+  nextLine = item['nextLine']
+  return [nextLine, 'OK']
     
 #  run print statement
   

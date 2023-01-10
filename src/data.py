@@ -15,6 +15,9 @@ printWidth = 48
 dataList = []
 dataPointer = 0
 
+matrixList = {}
+matrixBase = 0
+
 firstLine = -1
 quitFlag = False
 
