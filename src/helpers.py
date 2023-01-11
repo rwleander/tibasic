@@ -114,7 +114,7 @@ def isValidVariable(txt):
 
   for ch in txt[1: len(txt) - 1]:
     if ch not in letters and ch not in numbers and ch not in characters:
-      return false  
+      return False  
     
   # last character
   
@@ -152,7 +152,6 @@ def setVariable(name, value):
   data.variables[name] = value
   return 'OK'
   
-
 # get file name from command line
 
 def parseFileName(cmdWork):

@@ -434,6 +434,15 @@ class TestRuntime(unittest.TestCase):
     self.assertEqual(data.variables['B'], 1)
     self.assertEqual(data.variables['C'], 3)
 
+#  test option base
+
+  def testOption (self):
+    result = commands.executeCommand('NEW')
+    result = commands.executeCommand('10 OPTION BASE 1')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Done')        
+    self.assertEqual(data.matrixBase, 1)
+
 # test dim statement
 
   def testDim (self):
@@ -443,17 +452,41 @@ class TestRuntime(unittest.TestCase):
     self.assertEqual(result, 'Done')        
     self.assertEqual(data.matrixBase, 0)
     self.assertEqual(len(data.matrixList), 1)
-    self.assertEqual(data.matrixList['A'], {'x': 5, 'y': 1, 'z': 1})
-    self.assertEqual(data.variables['A'], [0, 0, 0, 0, 0])
+    self.assertEqual(data.matrixList['A'], {'x': 5, 'y': 0, 'z': 0})
+    self.assertEqual(data.variables['A'], [0, 0, 0, 0, 0, 0])
 
-#  test option base
-
-  def testOption (self):
+  def testDim2 (self):
     result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 OPTION BASE 1')
+    result = commands.executeCommand('10 OPTION BASE 1')    
+    result = commands.executeCommand('20 DIM A(5.5)')
     result = commands.executeCommand('RUN')
     self.assertEqual(result, 'Done')        
-    self.assertEqual(data.matrixOption, 1)
+    self.assertEqual(data.matrixBase, 1)
+    self.assertEqual(len(data.matrixList), 1)
+    self.assertEqual(data.matrixList['A'], {'x': 5, 'y': 5, 'z': 0})
+    self.assertEqual(len(data.variables['A']), 25)
+
+  def testDim3 (self):
+    result = commands.executeCommand('NEW')
+    result = commands.executeCommand('10 DIM A(5.5.5)')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Done')        
+    self.assertEqual(data.matrixBase, 0)
+    self.assertEqual(len(data.matrixList), 1)
+    self.assertEqual(data.matrixList['A'], {'x': 5, 'y': 5, 'z': 5})
+    self.assertEqual(len(data.variables['A']), 216)
+
+#  test option base after dim
+
+  def testOption2 (self):
+    result = commands.executeCommand('NEW')
+    result = commands.executeCommand('10 DIM A(5.5.5)')
+    result = commands.executeCommand('20 OPTION BASE 1')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Option must be before dim')
+
+
+
     
     
 

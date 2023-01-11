@@ -320,6 +320,21 @@ class TestParser(unittest.TestCase):
     item = data.parseList[10]
     self.assertEqual(item['statement'], 'OPTION')    
     self.assertEqual(item['n'], '0')
+
+#  test indexed variable in let statement
+
+  def testParseLetIndex (self):
+    data.codeList = {
+      10: '10 DIM A(5)',
+      20: '20 LET A(2) = 2'
+      }
+    result = parser.parse()  
+    self.assertEqual(result, 'OK')
+    self.assertEqual(len(data.parseList), 2)
+    item = data.parseList[20]
+    self.assertEqual(item['var'], 'A(2)')
+    self.assertEqual(item['expr'], '2')
+    
     
     
     

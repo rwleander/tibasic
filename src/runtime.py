@@ -7,6 +7,7 @@ import data
 import parser
 import helpers
 import expressions
+import matrix
 
 #  run the program
 
@@ -103,10 +104,13 @@ def runData(item):
 def runDim(item):
   var = getString(item, 'var')
   size = getString(item, 'size')
+  if helpers.isnumeric (size) == False:
+    return [-1, 'Bad statement']
+    
   parts = size.split('.')
-  x = 1
-  y = 1
-  z = 1
+  x = 0
+  y = 0
+  z = 0
   
   if len(parts) < 1:
     return [-1, 'Bad statement']
@@ -119,15 +123,11 @@ def runDim(item):
   
   if len(parts) == 3:
     z = int(parts[2])
-  
-  data.matrixList[var] = {'x': x, 'y': y, 'z': z}
-  
-  n = x * y * z
-  if helpers.isStringVariable(var):
-    data.variables [var] = [''] * n
-  else:
-    data.variables[var] = [0] * n
-  
+
+  msg= matrix.newVariable(var, x, y, z)  
+  if msg != 'OK':
+    return [-1, 'OK']
+
   nextLine = item['nextLine']
   return [nextLine, 'OK']
     
@@ -291,7 +291,11 @@ def runLet(item):
   if msg != 'OK':    
     return [-1, createMsg(item, msg)]
     
-  msg = helpers.setVariable(variable, value)  
+  if variable.find('(') > 0:
+    msg = matrix.setVariable(variable, value)
+  else:  
+    msg = helpers.setVariable(variable, value)  
+    
   if msg == 'OK':
     return [item['nextLine'], 'OK']
   else:
@@ -299,17 +303,18 @@ def runLet(item):
     
     #  change option
     
-def runOption(item):
+def runOption(item):  
   n = getString(item, 'n')  
   if n != '0' and n != '1':
-    return [-1, 'Bad statement']
+    return [-1, 'Incorrect statement']
   
-  if len(data.matrixList) > 0:
-    return [-1, 'Option must be before dim']  
-  
-  data.matrixOption = int(n)
-  nextLine = item['nextLine']
-  return [nextLine, 'OK']
+  msg = matrix.setOption(int(n))
+  if msg == 'OK':  
+    nextLine = item['nextLine']
+    return [nextLine, 'OK']
+  else:
+    return [-1, msg]
+    
     
 #  run print statement
   
