@@ -104,10 +104,8 @@ def runData(item):
 def runDim(item):
   var = getString(item, 'var')
   size = getString(item, 'size')
-  if helpers.isnumeric (size) == False:
-    return [-1, 'Bad statement']
     
-  parts = size.split('.')
+  parts = size.split(',')
   x = 0
   y = 0
   z = 0

@@ -453,12 +453,12 @@ class TestRuntime(unittest.TestCase):
     self.assertEqual(data.matrixBase, 0)
     self.assertEqual(len(data.matrixList), 1)
     self.assertEqual(data.matrixList['A'], {'x': 5, 'y': 0, 'z': 0})
-    self.assertEqual(data.variables['A'], [0, 0, 0, 0, 0, 0])
+    self.assertEqual(data.variables['A'], [0, 0, 0, 0, 0])
 
   def testDim2 (self):
     result = commands.executeCommand('NEW')
     result = commands.executeCommand('10 OPTION BASE 1')    
-    result = commands.executeCommand('20 DIM A(5.5)')
+    result = commands.executeCommand('20 DIM A(5, 5)')
     result = commands.executeCommand('RUN')
     self.assertEqual(result, 'Done')        
     self.assertEqual(data.matrixBase, 1)
@@ -468,19 +468,63 @@ class TestRuntime(unittest.TestCase):
 
   def testDim3 (self):
     result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 DIM A(5.5.5)')
+    result = commands.executeCommand('10 DIM A(5, 5, 5)')
     result = commands.executeCommand('RUN')
     self.assertEqual(result, 'Done')        
     self.assertEqual(data.matrixBase, 0)
     self.assertEqual(len(data.matrixList), 1)
     self.assertEqual(data.matrixList['A'], {'x': 5, 'y': 5, 'z': 5})
-    self.assertEqual(len(data.variables['A']), 216)
+    self.assertEqual(len(data.variables['A']), 125)
+
+  def testDim4 (self):
+    result = commands.executeCommand('NEW')    
+    result = commands.executeCommand('10 DIM A(5)')
+    result = commands.executeCommand('20 FOR I = 0 TO 4')
+    result = commands.executeCommand('30 A(I) = I')
+    result = commands.executeCommand('40 NEXT')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Done')        
+    self.assertEqual(data.matrixBase, 0)
+    self.assertEqual(len(data.matrixList), 1)
+    self.assertEqual(data.matrixList['A'], {'x': 5, 'y': 0, 'z': 0})
+    self.assertEqual(data.variables['A'], [0, 1, 2, 3, 4])
+
+  def testDim5 (self):
+    result = commands.executeCommand('NEW')    
+    result = commands.executeCommand('5 OPTION BASE 1')
+    result = commands.executeCommand('10 DIM A(5)')
+    result = commands.executeCommand('20 FOR I = 1 TO 5')
+    result = commands.executeCommand('30 A(I) = I')
+    result = commands.executeCommand('40 NEXT')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Done')        
+    self.assertEqual(data.matrixBase, 1)
+    self.assertEqual(len(data.matrixList), 1)
+    self.assertEqual(data.matrixList['A'], {'x': 5, 'y': 0, 'z': 0})
+    self.assertEqual(data.variables['A'], [1, 2, 3, 4, 5])
+
+  def testDim6 (self):
+    result = commands.executeCommand('NEW')    
+    result = commands.executeCommand('5 OPTION BASE 1')
+    result = commands.executeCommand('10 DIM A(3, 3)')
+    result = commands.executeCommand('20 FOR I = 1 TO 3')
+    result = commands.executeCommand('25 FOR J = 1 TO 3')
+    result = commands.executeCommand('30 LET A(I, J) = I + J')
+    result = commands.executeCommand('40 NEXT')
+    result = commands.executeCommand('45 NEXT')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Done')        
+    self.assertEqual(data.matrixBase, 1)
+    self.assertEqual(len(data.matrixList), 1)
+    self.assertEqual(data.matrixList['A'], {'x': 3, 'y': 3, 'z': 0})
+    self.assertEqual(data.variables['A'], [2, 3, 4, 3, 4, 5, 4, 5, 6])
+
 
 #  test option base after dim
 
   def testOption2 (self):
     result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 DIM A(5.5.5)')
+    result = commands.executeCommand('10 DIM A(5, 5, 5)')
     result = commands.executeCommand('20 OPTION BASE 1')
     result = commands.executeCommand('RUN')
     self.assertEqual(result, 'Option must be before dim')

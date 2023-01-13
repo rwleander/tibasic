@@ -54,6 +54,26 @@ class TestMatrix(unittest.TestCase):
     self.assertEqual(x, '10')
     self.assertEqual(y, '5')
     self.assertEqual(z, '3')
+
+#  set an item in a variable
+
+  def testSetVariable (self):
+    data.variables ['A'] = [0, 0, 0, 0, 0, 0]
+    data.matrixList['A'] = {'x': 5, 'y': 0, 'z': 0}
+    result = matrix.setVariable('A(3)', 12)
+    self.assertEqual(result, 'OK')
+    self.assertEqual(data.variables['A'], [0, 0, 0, 13, 0, 0])
+
+
+#  test calculate index
+
+  def testSetVariable (self):
+    data.variables ['A'] = [0, 0, 0, 0, 0, 0]
+    data.matrixList['A'] = {'x': 5, 'y': 0, 'z': 0}
+    [i, msg] = matrix.calculateIndex('A', 4, 0, 0)
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(i, 4)
+    
     
 
 if __name__ == '__main__':  
