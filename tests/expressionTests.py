@@ -201,7 +201,30 @@ class TestExpressions(unittest.TestCase):
     self.assertEqual(value > 0, True)
     self.assertEqual(value < 101, True)
     
-    
+    #  test matrix expression
+       
+  def testCreateTreeMatrix (self):
+    data.matrixList = {'A': {'x': 5, 'y': 0, 'z': 0}}
+    data.variables['A'] = [1, 2, 3, 4, 5]    
+    [parts, msg] = expressions.splitLine('A(3)')
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(parts, ['A', '(', '3', ')'])
+    [tree, msg] = expressions.buildTree(parts)
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(len(tree), 4)
+    self.assertEqual(tree[0], {'type': 'expr', 'parts': ['~1'], 'value': 0,'id': 0, 'parent': -1})
+    self.assertEqual(tree[1], {'type': 'mat', 'parts': ['A', '~2'], 'value': 0,'id': 1, 'parent': 0})
+    self.assertEqual(tree[2], {'type': 'expr', 'parts': ['3'], 'value': 0,'id': 2, 'parent': 1})
+       
+  def testEvaluateMatrix (self):
+    data.matrixList = {'A': {'x': 5, 'y': 0, 'z': 0}}
+    data.variables['A'] = [1, 2, 3, 4, 5]    
+    [value, msg] = expressions.evaluate('A(3)')
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(value, 4)
+
+
+
 
   
 if __name__ == '__main__':  

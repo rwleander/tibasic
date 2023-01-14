@@ -529,11 +529,19 @@ class TestRuntime(unittest.TestCase):
     result = commands.executeCommand('RUN')
     self.assertEqual(result, 'Option must be before dim')
 
+#  test array values within expressions
 
-
-    
-    
-
+  def testArrayExpression (self):
+    result = commands.executeCommand('NEW')    
+    result = commands.executeCommand('10 DIM A(5)')
+    result = commands.executeCommand('20 FOR I = 0 To 4')
+    result = commands.executeCommand('30 LET A(I) = I + 1')
+    result = commands.executeCommand('40 NEXT')
+    result = commands.executeCommand('50 B = A(3)')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Done')        
+    self.assertEqual(data.variables['A'], [1, 2, 3, 4, 5])
+    self.assertEqual(data.variables['B'], 4)
 
   
 if __name__ == '__main__':  

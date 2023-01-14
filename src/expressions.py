@@ -3,6 +3,7 @@
 import data
 import helpers
 import functions
+import matrix
 
 #  evaluate an expression
 
@@ -106,7 +107,21 @@ def buildTree(parts):
       newBranch['parent'] = branch['id']
       tree[id] = newBranch
       branch = newBranch
-                
+    
+    elif item in data.matrixList:
+      id = tree['end'] + 1
+      tree['end'] = id 
+      branch['parts'].append('~' + str(id))
+      
+      newBranch = {}
+      newBranch['type'] = 'mat'
+      newBranch['parts'] = [item]
+      newBranch['value'] = 0
+      newBranch['id'] = id
+      newBranch['parent'] = branch['id']
+      tree[id] = newBranch
+      branch = newBranch
+        
     elif item == '(':
       id = tree['end'] + 1
       tree['end'] = id 
@@ -149,9 +164,9 @@ def buildTree(parts):
         return [tree, 'Bad expression']
       branch = tree[parentId]
       
-      #  note: if this is a function call, pop the stach twice
+      #  note: if this is a function callor matrix item, pop the stack twice
       
-      if branch['type'] == 'func':
+      if branch['type'] == 'func' or branch['type'] == 'mat':
         oldBranch = branch
         oldId = oldBranch['id']
         tree[oldId] = oldBranch
@@ -208,7 +223,10 @@ def setVariables(parts, tree):
       branch = tree[index]
       newParts.append(branch['value'])
     
-    elif item in data.variables:
+    elif item in data.matrixList:
+      newParts.append (item)
+      
+    elif item in data.variables:      
       newParts.append(data.variables[item])
     
     elif helpers.isnumeric(item) and item != '-':
@@ -286,8 +304,15 @@ def calculateFunction(branch):
 
 def calculateMatrix(branch):
   parts = branch['parts']
-  return [branch, 'Not ready']
-  
+  [value, msg] = matrix.evaluate(parts)
+  if (msg != 'OK'):
+    return [branch, msg]           
+    
+  if type(value) == int:
+    value = float(value)
+      
+  branch['value'] = value    
+  return [branch, 'OK']
   
 # switch numbers negative if preceded by -
 

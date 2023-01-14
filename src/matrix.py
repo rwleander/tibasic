@@ -112,6 +112,33 @@ def parseVariable(name):
 
   return [var, x, y, z, 'OK']
 
+# evaluate matrix expression
+
+def evaluate(parts):  
+  var = parts[0]  
+  if var not in data.matrixList:
+    return [-1, 'Bad expression']
+    
+  x = 0
+  y = 0
+  z = 0
+  
+  if len(parts) > 1:
+    x = int(parts[1])
+  if len(parts) > 2:
+    y = int(parts[2])
+  
+  if len(parts) > 3:
+    z = int(parts[3])
+  
+  [i, msg] = calculateIndex(var, x, y, z)
+  if msg != 'OK':
+    return [-1, msg]
+    
+  value = data.variables[var][i]
+  return [value, 'OK']
+  
+ 
 #  calculate index
 
 def calculateIndex(name, x, y, z):  
