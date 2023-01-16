@@ -45,16 +45,16 @@ def run():
     
 def clearData():
   data.variables = {}
-data.index = []
-data.parserList = {}
-data.gosubStack = []
-data.forNextStack = []
-data.dataList = []
-data.dataPointer = 0
-data.printPosition = 0
-data.matrixList = {}
-data.matrixBase = 0
-random.seed(0)
+  data.index = []
+  data.parserList = {}
+  data.gosubStack = []
+  data.forNextStack = []
+  data.dataList = []
+  data.dataPointer = 0
+  data.printPosition = 0
+  data.matrixList = {}
+  data.matrixBase = 0
+  random.seed(0)
   
   
   # run a line of code

@@ -170,6 +170,7 @@ def cmdOld(cmdWork):
     
   with open (fileName, 'r') as fl:
     while  (line := fl.readline().strip()):
+      line = helpers.upshift(line)
       cmdAddLine(line)  
     fl.close()
  

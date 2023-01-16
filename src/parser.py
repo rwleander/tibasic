@@ -305,13 +305,20 @@ def parsePrintList(item):
   parts = []
   part = ''
   inQuotes = False
-  
+  inParens = False
+    
   for ch in listText:
     if ch == '"':
       inQuotes = not inQuotes
+  
+    if ch == '(':
+      inParens = True
+ 
     
-    if inQuotes == True:
+    if inQuotes == True or inParens == True:
       part = part + ch    
+      if ch == ')':
+        inParrens = False
       
     elif ch in [',', ':', ';']:
       if part != '':
