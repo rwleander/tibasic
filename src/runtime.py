@@ -102,29 +102,31 @@ def runData(item):
 # run dim statement - add to matrix list and initialize variable
 
 def runDim(item):
-  var = getString(item, 'var')
-  size = getString(item, 'size')
+  dimList = item['vars']
+  for dimItem  in dimList:
+    var = getString(dimItem, 'id')
+    size = getString(dimItem, 'size')
     
-  parts = size.split(',')
-  x = 0
-  y = 0
-  z = 0
+    parts = size.split(',')
+    x = 0
+    y = 0
+    z = 0
   
-  if len(parts) < 1:
-    return [-1, 'Bad statement']
+    if len(parts) < 1:
+      return [-1, 'Bad statement']
     
-  if len(parts) > 0:
-    x = int(parts[0])
+    if len(parts) > 0:
+      x = int(parts[0])
     
-  if len(parts) > 1:
-    y = int (parts[1])
+    if len(parts) > 1:
+      y = int (parts[1])
   
-  if len(parts) == 3:
-    z = int(parts[2])
+    if len(parts) == 3:
+      z = int(parts[2])
 
-  msg= matrix.newVariable(var, x, y, z)  
-  if msg != 'OK':
-    return [-1, 'OK']
+    msg= matrix.newVariable(var, x, y, z)  
+    if msg != 'OK':
+      return [-1, 'OK']
 
   nextLine = item['nextLine']
   return [nextLine, 'OK']

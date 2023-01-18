@@ -492,16 +492,19 @@ class TestRuntime(unittest.TestCase):
   def testDim5 (self):
     result = commands.executeCommand('NEW')    
     result = commands.executeCommand('5 OPTION BASE 1')
-    result = commands.executeCommand('10 DIM A(5)')
+    result = commands.executeCommand('10 DIM A(5), B(5)')
     result = commands.executeCommand('20 FOR I = 1 TO 5')
     result = commands.executeCommand('30 A(I) = I')
+    result = commands.executeCommand('35 B(I) = I * 2')
     result = commands.executeCommand('40 NEXT')
     result = commands.executeCommand('RUN')
     self.assertEqual(result, 'Done')        
     self.assertEqual(data.matrixBase, 1)
-    self.assertEqual(len(data.matrixList), 1)
+    self.assertEqual(len(data.matrixList), 2)
     self.assertEqual(data.matrixList['A'], {'x': 5, 'y': 0, 'z': 0})
+    self.assertEqual(data.matrixList['B'], {'x': 5, 'y': 0, 'z': 0})
     self.assertEqual(data.variables['A'], [1, 2, 3, 4, 5])
+    self.assertEqual(data.variables['B'], [2, 4, 6, 8, 10])
 
   def testDim6 (self):
     result = commands.executeCommand('NEW')    

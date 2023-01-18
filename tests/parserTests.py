@@ -303,12 +303,22 @@ class TestParser(unittest.TestCase):
     item = data.parseList[10]
     self.assertEqual(item['statement'], 'DIM')    
     self.assertEqual(item['list'], 'A(10)')
-    self.assertEqual(item['var'], 'A')
-    self.assertEqual(item['size'], '10')
+    self.assertEqual(item['vars'], [{'id': 'A', 'size': '10'}])
     self.assertEqual(item['error'], 'OK')
     item2 = data.parseList[20]
-    self.assertEqual(item2['var'], 'X$')
-    self.assertEqual(item2['size'], '5')
+    self.assertEqual(item2['vars'], [{'id': 'X$', 'size': '5'}])    
+
+  def testParseDim2 (self):
+    data.codeList = {10: '10 DIM A(10), B(5, 5)'}
+    result = parser.parse()  
+    self.assertEqual(result, 'OK')
+    self.assertEqual(len(data.parseList), 1)
+    item = data.parseList[10]
+    self.assertEqual(item['statement'], 'DIM')    
+    self.assertEqual(item['list'], 'A(10), B(5, 5)')
+    self.assertEqual(item['vars'], [{'id': 'A', 'size': '10'}, {'id': 'B', 'size': '5, 5'}])
+    self.assertEqual(item['error'], 'OK')
+
 
 #  test option base
 

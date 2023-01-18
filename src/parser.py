@@ -262,17 +262,25 @@ def parseDataList(item):
   
 def parseDimList(item):
   listText = item['list']
+  parts = splitCommaList(listText)
+  vars = [] 
   
-  i = listText.find('(')
-  if i < 0:
-    return 'Bad statement'
+  for part in parts:
+    i = part.find('(')
+    if i < 0:
+      return 'Bad statement '
   
-  j = listText.find(')')
-  if j < i:
-    return 'Bad statement'
+    j = part.find(')')
+    if j < i:
+      return 'Bad statement'
 
-  item['var'] = listText[0: i].strip() 
-  item['size'] = listText[i + 1: j]
+    varName = part[0: i].strip() 
+    varList = {}
+    varList['id'] = varName
+    varList['size'] = part[i + 1: j].strip()
+    vars.append(varList)
+    
+  item['vars'] = vars
   return 'OK'
   
   # parse the list of inputs
@@ -350,23 +358,28 @@ def splitCommaList(txt):
   values = []
   value = ''
   inQuotes = False
+  inParens = False
  
   for ch in txt:
     if ch == '"':
       inQuotes = not inQuotes
+  
+    if ch == '(':      
+      inParens = True  
     
-    if ch == ',':
+    if inQuotes == True or inParens == True:
+      value = value + ch
+      if ch == ')':
+        inParens = False
+      
+    elif ch == ',':
       if value != '':
-        values.append (value)
+        values.append (value.strip())
       value = ''
 
-    elif ch == ' ':
-      if inQuotes:
-        value = value + ch
-    
-    else:
+    else:          
       value = value + ch
-      
+    
   if value != '':
-    values.append (value)
+    values.append (value.strip())
   return values
