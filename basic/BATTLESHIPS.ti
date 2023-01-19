@@ -1,0 +1,23 @@
+10 PRINT "Battleships"
+20 Print
+30 OPTION BASE 1
+35 RANDOMIZE
+40 DIM BOARD$(10, 10), SHOTS$(10, 10), SHIPS$(52), SHIP_SIZE(5)
+50 SHIPs$[1] = "Carrier"
+52 SHIPSIZE[1] = 5
+55 SHIPS$(2) = "Battleship"
+57 SHIP_SIZE(2) = 4
+60 SHIPS$(3) = "Destroyer"
+62 SHIP_SIZE(3) = 3
+65 SHIPS$(4) ="Submarine"
+67 SHIP_SIZE(4) = 3
+70 SHIPS$(5) = "Cruiser"
+72 SHIP_SIZE(5) = 2
+100 REM  Start new game
+110 REM clear boards
+120 FOR i = 1 to 10
+130 FOR J = 1 to 10
+140 LET BOARD$(i, j) = "."
+150 LET SHOTS$(I, J) = "."
+ 
+ 

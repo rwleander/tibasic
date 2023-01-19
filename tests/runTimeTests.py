@@ -546,6 +546,41 @@ class TestRuntime(unittest.TestCase):
     self.assertEqual(data.variables['A'], [1, 2, 3, 4, 5])
     self.assertEqual(data.variables['B'], 4)
 
+#  test on goto
+
+
+  def testOnGoto (self):
+    result = commands.executeCommand('NEW')    
+    result = commands.executeCommand('10 A = 2')
+    result = commands.executeCommand('15 N = 0')
+    result = commands.executeCommand('20 ON A GOTO 30, 40, 50')
+    result = commands.executeCommand('30 N = N + 1')
+    result = commands.executeCommand('40 N = N + 2')
+    result = commands.executeCommand('50 N = N + 3') 
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Done')        
+    self.assertEqual(data.variables['N'], 5)
+
+#  test on gosub
+
+  def testOnGosub (self):
+    result = commands.executeCommand('NEW')    
+    result = commands.executeCommand('10 A = 2')
+    result = commands.executeCommand('15 N = 0')
+    result = commands.executeCommand('20 ON A GOSUB 30, 40, 50')
+    result = commands.executeCommand('25 STOP')
+    result = commands.executeCommand('30 N = 5')
+    result = commands.executeCommand('35 RETURN')
+    result = commands.executeCommand('40 N = 10')
+    result = commands.executeCommand('45 RETURN')
+    result = commands.executeCommand('50 N = 25')
+    result = commands.executeCommand('55 RETURN')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Done')        
+    self.assertEqual(data.variables['N'], 10)
+
+
+
   
 if __name__ == '__main__':  
     unittest.main()

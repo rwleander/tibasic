@@ -16,6 +16,7 @@ parseRules = {
   'INPUT': 'INPUT list',
   'LET': 'LET var = expr',
   'NEXT': 'NEXT',  
+  'ON': 'ON list',
   'OPTION': 'OPTION BASE n',
   'PRINT': 'PRINT [ list ]',  
   'RANDOMIZE': 'RANDOMIZE',
@@ -235,6 +236,7 @@ def parseDetails():
     'DIM': parseDimList,
     'DISPLAY': parsePrintList,
     'INPUT': parseInputList,
+    'ON': parseOnList,
     'PRINT': parsePrintList,
     'READ': parseReadList    
   }
@@ -305,6 +307,38 @@ def parseInputList(item):
   inputs = splitCommaList(listText)
   item['inputs'] = inputs
   return 'OK'
+
+#  parse on gosub or on goto statement
+
+def parseOnList(item):
+  listText = item['list']
+  
+  i = listText.find('GO')
+  if i < 2:
+    item['error'] = 'Bad statement'
+    return 'Bad statement'
+    
+  item['expr'] = listText[0: i].strip()
+ 
+  j = listText.find(' ', i + 3)
+  if j < i:
+    item['error'] = 'Bad statement'
+    return 'Bad statement'
+  
+  keyword = listText[i: j]
+  if keyword == 'GOTO' or keyword == 'GO TO':
+    item['statement'] = 'ON_GOTO'
+  
+  if keyword == 'GOSUB' or keyword == 'GO SUB':
+    item['statement'] = 'ON_GOSUB'
+    
+  item['lines'] = splitCommaList(listText[j: len(listText)])
+  return 'OK'  
+    
+    
+  
+  
+ 
 
 #  split the print list into its parts
 

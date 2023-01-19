@@ -73,7 +73,9 @@ def executeStatement(item):
     'IF': runIf,
     'INPUT': runInput,
     'LET': runLet,
-    'NEXT': runNext,
+    'NEXT': runNext,    
+    'ON_GOSUB': runOnGosub,
+    'ON_GOTO': runOnGoto,
     'OPTION': runOption,
     'PRINT': runPrint,
     'RANDOMIZE': runRandomize,
@@ -300,7 +302,42 @@ def runLet(item):
     return [item['nextLine'], 'OK']
   else:
     return [-1, createMsg(item, msg)]
+
+#  run on gosub
     
+def runOnGosub(item):
+  expr = getString(item, 'expr')
+  lines = item['lines']
+  
+  [value, msg] = expressions.evaluate(expr)
+  if msg != 'OK':
+    return [-1, msg]
+
+  value = int(value) 
+  if value < 1 or value > len(lines):
+    return [-1, 'Bad index']
+  
+  line = lines[value - 1]
+  item['line'] = line
+  return runGosub(item)
+      
+    #  run on goto statement
+    
+def runOnGoto(item):
+  expr = getString(item, 'expr')
+  lines = item['lines']
+  
+  [value, msg] = expressions.evaluate(expr)
+  if msg != 'OK':
+    return [-1, msg]
+
+  value = int(value) 
+  if value < 1 or value > len(lines):
+    return [-1, 'Bad index']
+  
+  line = int(lines[value - 1])
+  return [line, 'OK']
+  
     #  change option
     
 def runOption(item):  

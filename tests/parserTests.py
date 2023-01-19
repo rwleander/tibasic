@@ -344,6 +344,31 @@ class TestParser(unittest.TestCase):
     item = data.parseList[20]
     self.assertEqual(item['var'], 'A(2)')
     self.assertEqual(item['expr'], '2')
+
+#  test on gosub and on goto statements
+
+  def testParseOnGoto (self):
+    data.codeList = {
+      10: '10 A = 3',
+      20: '20 ON A GOTO 30, 40, 50',      
+      30: '30 ON A GOSUB 40, 50, 60'
+      }
+    result = parser.parse()  
+    self.assertEqual(result, 'OK')
+    self.assertEqual(len(data.parseList), 3)
+    item = data.parseList[20]
+    self.assertEqual(item['statement'], 'ON_GOTO')
+    self.assertEqual(item['list'], 'A GOTO 30, 40, 50')      
+    self.assertEqual(item['expr'], 'A')
+    self.assertEqual(item['lines'], ['30', '40', '50'])
+    item2 = data.parseList[30]
+    self.assertEqual(item2['statement'], 'ON_GOSUB')
+    self.assertEqual(item2['list'], 'A GOSUB 40, 50, 60')
+    self.assertEqual(item2['expr'], 'A')
+    self.assertEqual(item2['lines'], ['40', '50', '60'])
+    
+    
+    
     
     
     
