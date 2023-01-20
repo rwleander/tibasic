@@ -29,6 +29,9 @@ def isStringVariable(txt):
 #  is this string numeric
 
 def isnumeric(str):
+  if type(str) == int or type(str) == float:
+    return True
+    
   for  ch in str:
     if ch not in "0123456789-.":      
       return False

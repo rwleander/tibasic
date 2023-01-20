@@ -78,7 +78,7 @@ class TestRuntime(unittest.TestCase):
     result = commands.executeCommand('30 LET A = 2')
     result = commands.executeCommand('40 END')
     result = runtime.run()
-    self.assertEqual(result, 'Infinite loop at line 20')
+    self.assertEqual(result, '20 GOTO 20\nInfinite loop')
 
 # test GO TO (separate words)
 
@@ -530,7 +530,7 @@ class TestRuntime(unittest.TestCase):
     result = commands.executeCommand('10 DIM A(5, 5, 5)')
     result = commands.executeCommand('20 OPTION BASE 1')
     result = commands.executeCommand('RUN')
-    self.assertEqual(result, 'Option must be before dim')
+    self.assertEqual(result, '20 OPTION BASE 1\nOption must be before dim')
 
 #  test array values within expressions
 

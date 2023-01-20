@@ -13,11 +13,19 @@
 67 SHIP_SIZE(4) = 3
 70 SHIPS$(5) = "Cruiser"
 72 SHIP_SIZE(5) = 2
-100 REM  Start new game
-110 REM clear boards
-120 FOR i = 1 to 10
-130 FOR J = 1 to 10
-140 LET BOARD$(i, j) = "."
-150 LET SHOTS$(I, J) = "."
+100 REM  main program loop
+110 REM  set up game
+120 GOSUB 1000
+190 STOP
+1000 REM  set up the game
+1010 REM clear boards
+1020 FOR i = 1 to 10
+1030 FOR J = 1 to 10
+1040 LET BOARD$(i, j) = "."
+1050 LET SHOTS$(I, J) = "."
+1060 NEXT J
+1070 NEXT I
+1090 RETURN
+
  
  

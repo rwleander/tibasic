@@ -1,4 +1,4 @@
-#  run time interprets  the code
+#  run time - interpret and run the program 
 
 import random
 import math
@@ -28,12 +28,15 @@ def run():
   address = data.firstLine
   while address > 0:
     item = data.parseList[address]
-    [newAddress, msg] = executeStatement(item)
-    if msg  != 'OK':    
-        return msg    
+    if item['error'] != 'OK':
+      return createError(item)
+      
+    newAddress = executeStatement(item)
+    if item['error']  != 'OK':    
+        return createError(item)
         
     if address == newAddress:
-      return 'Infinite loop at line ' + str(newAddress)    
+      return createMsg(item, 'Infinite loop')
     address = newAddress
     
   if len(data.forNextStack) > 0:
@@ -87,19 +90,20 @@ def executeStatement(item):
 }    
   
   if item['error'] != 'OK':    
-    return [-1, createError(item)]  
+    return -1 
   
   statement = item['statement']
   if statement in functionList:
     return functionList[statement](item)   
   else:
-    return [-1, createMsg(item, 'unknown statement')]
+    item['error'] = 'Unknown statement'
+    return -1 
   
   # run data statement - ignore - handled by restoreData function
   
 def runData(item):  
   nextLine = item['nextLine']
-  return [nextLine, 'OK']
+  return nextLine 
 
 # run dim statement - add to matrix list and initialize variable
 
@@ -115,7 +119,8 @@ def runDim(item):
     z = 0
   
     if len(parts) < 1:
-      return [-1, 'Bad statement']
+      item['error'] = 'Bad statement'
+      return -1 
     
     if len(parts) > 0:
       x = int(parts[0])
@@ -128,10 +133,10 @@ def runDim(item):
 
     msg= matrix.newVariable(var, x, y, z)  
     if msg != 'OK':
-      return [-1, 'OK']
+      item['error'] = msg
+      return -1 
 
-  nextLine = item['nextLine']
-  return [nextLine, 'OK']
+  return item['nextLine']
     
   #  run for statement
   
@@ -140,27 +145,31 @@ def runFor(item):
   expr1 = getString(item, 'expr1')
   var = getString(item, 'var')
   if item['error'] != 'OK':
-    return [-1, createError(item)]
+    return -1 
   
   step = 1
   nextLine = item['nextLine']
   
   [min, msg] = expressions.evaluate(expr1)
   if msg != 'OK':
-    return [-1, createMsg(item, msg)]
+    item['error'] = msg
+    return -1 
     
   [max, msg] = expressions.evaluate(expr2)
   if msg != 'OK':
-    return [-1, createMsg(item, msg)]
+    item['error'] = msg
+    return -1 
   
   if 'expr3' in item:
     [step, msg] = expressions.evaluate(item['expr3'])
     if msg != 'OK':
-      return [-1, createMsg(item, msg)]
+      item['error'] = msg
+      return -1 
   
   msg = helpers.setVariable(var, min) 
   if msg != 'OK':
-    return [-1, createMsg(item, msg)]
+    item['error'] = msg
+    return -1 
   
   stackItem = {}
   stackItem['var'] = var 
@@ -169,13 +178,14 @@ def runFor(item):
   stackItem['step'] = step
   stackItem['nextLine'] = nextLine
   data.forNextStack.append(stackItem)   
-  return [nextLine, 'OK']
+  return nextLine 
   
 # next - get data from for/next stack and either increment variable or got o next line
   
 def runNext(item):
   if len(data.forNextStack) < 1:
-    return [-1, createMsg(item, 'Missing FOR')]
+    item['error'] = 'Missing FOR'
+    return -1 
     
   stackItem = data.forNextStack[len(data.forNextStack) - 1]
   var = stackItem['var']
@@ -195,7 +205,7 @@ def runNext(item):
     data.variables[var] = value
     nextLine = stackItem['nextLine']
   
-  return [nextLine, 'OK']
+  return nextLine 
 
   #  if goto or gosub were coded as two words, route to correct function
   
@@ -204,44 +214,47 @@ def runGo(item):
   line = getLine(item, 'line')
   
   if item['error'] != 'OK':
-    return [-1, createError(item)]
+    return -1 
 
   if cmdType == 'TO':
-    return [line, 'OK']
+    return line 
     
   if cmdType == 'SUB':
-    data.gosubStack.append(item['nextLine'])
-    return [line, 'OK']
+    item['line'] = line
+    return runGosub(item)
   
-  return [-1, createMsg(item, 'Bad command')]
+  item['error'] = 'Bad command'
+  return -1 
   
   # run goto 
   
 def runGoto(item):
   line = getLine(item, 'line')
   if item['error'] == 'OK':  
-    return [line, 'OK']
+    return line 
   else:
-    return [-1, createError(item)]
+    return -1 
   
   # run gosub 
   
 def runGosub(item):
   line = getLine(item,'line')
   if item['error'] != 'OK':
-    return [-1, createError(item)]
+    return -1 
     
   data.gosubStack.append(item['nextLine'])
-  return [line, 'OK']
+  return line 
 
 #  return from gosub
 
 def runReturn(item):
+  if len(data.gosubStack) == 0:
+    item['error'] = 'Missing GOSUB'
+    return -1
+      
   addr = data.gosubStack.pop()
-  return [addr, 'OK']
+  return addr 
 
-# for statement - push data to for stack then return next line
-  
   # run an if statement
   
 def runIf(item):
@@ -249,21 +262,19 @@ def runIf(item):
   line1 = getLine(item, 'line1')
   expr = getString(item, 'expr')
   if item['error'] != 'OK':    
-    return [-1, createError(item)]
+    return -1 
     
   [value, msg] = expressions.evaluate(expr)
   if msg != 'OK':    
-    return [-1, createMsg(item, msg)]
+    item['error'] = msg
+    return -1 
     
   if value == True:
     newLine = line1
   else:
     newLine = line2
   
-  if (newLine in data.parseList) or (newLine == -1):
-    return [newLine, 'OK']
-  else:
-    return [-1, createMsg(item, 'Bad line number')]
+  return newLine 
   
 #  get input data
   
@@ -276,9 +287,10 @@ def runInput(item):
   msg = processInputsFromString(vars, txt)
   if msg == 'OK':
     nextLine = item['nextLine']
-    return [nextLine, 'OK']
+    return nextLine 
   else:
-    return [-1, createMsg(item, msg)]
+    item['error'] = msg
+    return -1 
   
   
   #  run the LET command
@@ -287,21 +299,23 @@ def runLet(item):
   expr = getString(item, 'expr')
   variable = getString(item, 'var')
   if item['error'] != 'OK':    
-    return [-1, createError(item)]
+    return -1 
   
   [value, msg] = expressions.evaluate(expr)
   if msg != 'OK':    
-    return [-1, createMsg(item, msg)]
+    item['error'] = msg
+    return -1 
     
   if variable.find('(') > 0:
     msg = matrix.setVariable(variable, value)
   else:  
     msg = helpers.setVariable(variable, value)  
     
-  if msg == 'OK':
-    return [item['nextLine'], 'OK']
+  if msg == 'OK':    
+    return item['nextLine'] 
   else:
-    return [-1, createMsg(item, msg)]
+    item['error'] = msg
+    return -1 
 
 #  run on gosub
     
@@ -311,11 +325,13 @@ def runOnGosub(item):
   
   [value, msg] = expressions.evaluate(expr)
   if msg != 'OK':
-    return [-1, msg]
+    item['error'] = msg
+    return -1 
 
   value = int(value) 
   if value < 1 or value > len(lines):
-    return [-1, 'Bad index']
+    item['error'] = 'Bad index'    
+    return -1 
   
   line = lines[value - 1]
   item['line'] = line
@@ -329,28 +345,32 @@ def runOnGoto(item):
   
   [value, msg] = expressions.evaluate(expr)
   if msg != 'OK':
-    return [-1, msg]
+    item['error'] = msg
+    return -1 
 
   value = int(value) 
   if value < 1 or value > len(lines):
-    return [-1, 'Bad index']
+    item['error'] = 'Bad index'
+    return -1 
   
   line = int(lines[value - 1])
-  return [line, 'OK']
+  return line 
   
     #  change option
     
 def runOption(item):  
   n = getString(item, 'n')  
   if n != '0' and n != '1':
-    return [-1, 'Incorrect statement']
+    item['error'] = 'Incorrect statement'
+    return -1 
   
   msg = matrix.setOption(int(n))
   if msg == 'OK':  
     nextLine = item['nextLine']
-    return [nextLine, 'OK']
+    return nextLine 
   else:
-    return [-1, msg]
+    item['error'] = msg
+    return -1 
     
     
 #  run print statement
@@ -360,7 +380,7 @@ def runPrint(item):
   if len(parts) == 0:
     print()
     data.printPosition = 0
-    return [item['nextLine'], 'OK']
+    return item['nextLine']
     
   for part in parts:
     if part == ';':
@@ -383,7 +403,8 @@ def runPrint(item):
     else:
       [txt, msg] = expressions.evaluate(part)      
       if msg != 'OK':
-        return [-1, msg]
+        item['error'] = msg
+        return -1 
 
       if type(txt) == float:
         txt = helpers.formatNumber(txt)
@@ -400,15 +421,13 @@ def runPrint(item):
     print()
     data.printPosition = 0  
 
-  return [item['nextLine'], 'OK']
-  
-  # remark
-  
+  return item['nextLine'] 
+ 
 #  randomize - set random sequence
   
 def runRandomize(item):
   random.seed()
-  return [item['nextLine'], 'OK']
+  return item['nextLine'] 
 
 #  read from data list
 
@@ -421,17 +440,21 @@ def runRead(item):
       values.append(data.dataList[data.dataPointer])
       data.dataPointer = data.dataPointer + 1
     else:
-      return [-1, createMsg(item, 'Out of data')]
+      item['error'] = 'Out of data'
+      return -1 
   
   msg = processInputs(vars, values)
   if msg != 'OK':
-    return [-1, createMsg(item, msg)]
+    item['error'] = msg
+    return -1 
   
   nextLine = item['nextLine']
-  return [nextLine, 'OK']
+  return nextLine 
+  
+  #  REM statement
   
 def runRem(item):
-  return [item['nextLine'], 'OK']
+  return item['nextLine'] 
   
   #  restore reload  data list
   
@@ -445,14 +468,15 @@ def runRestore(item):
     
   msg = restoreData(n)
   if msg != 'OK':
-    return [-1, createMsg(item, msg)]
+    item['error'] = msg
+    return -1 
   
-  return [item['nextLine'], 'OK']
+  return item['nextLine'] 
   
   # stop and end
   
 def runStop(item):
-  return [-1, 'OK'] 
+  return -1 
 
 
 #-------------------

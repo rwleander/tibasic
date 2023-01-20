@@ -32,8 +32,7 @@ def executeCommand(cmd):
   if len(parts) == 0:
     return ''
 
-  command = parts[0]      
-    
+  command = parts[0]          
   if command in functionList:
     return functionList[command](cmdWork)
     
@@ -241,8 +240,8 @@ def cmdRunCommand(cmdWork):
   if item['error'] != 'OK':
     return item['error']
 
-  [addr, msg] = runtime.executeStatement(item)
-  return msg
+  addr = runtime.executeStatement(item)
+  return item['error']
  
 #  quit
 

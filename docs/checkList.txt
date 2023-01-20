@@ -17,14 +17,10 @@ Commands:
 *RESEQUENCE
 NUMBER
 
-xxxDATA
-DIM
 *DISPLAY
 *INPUT
 *LET
 *RANDOMIZE 
-xxxREAD
-xxxRESTORE
 *PRINT
 
 EDIT
@@ -36,7 +32,6 @@ UNTRACE
 
 CALL 
 CLOSE 
-DIM 
 
 
 Statements:
@@ -52,11 +47,10 @@ Statements:
 *FOR TO STEP
 *NEXT
 *REM
+*ON GOTO (switch/case)
+*ON GOSUB
 *STOP
 *END
-
-ON GOTO (switch/case)
-ON GOSUB
 
 keyboard/screen:
 
@@ -77,9 +71,8 @@ CLOSE
 *RANDOMIZE
 DEF
 
-OPTION BASE
-DIM
-
+*OPTION BASE
+*DIM
 
 
 Functions
@@ -107,12 +100,3 @@ KEY
 *STR$
 *VAL
 
-
-Features:
-*Strings
-Arrays
-
-
-Additional notes:
-1. for/next skips code if out of range on first pass
-2. strings cannot exceed 256 characters
