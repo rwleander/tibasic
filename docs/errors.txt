@@ -1,0 +1,28 @@
+Error messages
+
+Commands:
+
+*List
+*Bad line number (number < 0 or > max)
+*Incorrect statement (non-numeric line number)
+*Can't do that (no program in memory)
+
+*Run
+*	Bad line number (number not in code)
+*Can't do that (no program in memory)
+
+*Resequence
+*unknown line numbers are changed to 32767
+*Bad line number (last code line exceeds 32767)
+*No line numbers in this program are changed (after error occurs)
+*Can't do that (no program in memory)
+*Unknown statement
+
+Save
+Bad file name
+Can't do that (no program)
+
+Old
+
+
+

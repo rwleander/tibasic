@@ -68,17 +68,20 @@ def cmdNew(cmdWork):
 #  list code
 
 def cmdList(cmdWork):
+  if len(data.codeList) == 0:
+    return 'Can\'t do that'
+    
   str = ''  
-  index = []  
-  for i in data.codeList:
-    index.append(i)
-  index.sort()  
+  parser. createIndex()
   
-  [first, last, msg] = splitLinesForList(cmdWork, index[0], index[len(index) - 1])
+  [first, last, msg] = getNumbersForList(cmdWork, data.index[0], data.index[len(data.index) - 1])
   if msg != 'OK':
     return msg
     
-  for lineNumber in index:
+  if first > data.index[len(data.index) - 1] or last < data.index[0]:
+    return 'Bad line number'
+      
+  for lineNumber in data.index:
     if lineNumber >= first and lineNumber <= last:
       str = str + data.codeList[lineNumber] 
       if lineNumber < last:
@@ -110,16 +113,29 @@ def cmdAddLine(cmd):
 def cmdResequence(cmdWork):
   newCodeList = {}
   lineList = {}
-  seq = 10
+  seq = 100
+  incr = 10
   
-  for lineNumber in data.codeList:
+  if len(data.codeList) == 0:
+    return 'Can\'t do that'
+  
+  [seq, incr, msg] = getNumbers(cmdWork, seq, incr)
+  if msg != 'OK':
+    return msg
+  
+  parser.createIndex()
+  
+  if seq + incr * len(data.index) > data.maxLine:
+    return 'Bad line number\nNo line numbers in this program are change'
+  
+  for lineNumber in data.index:
     line = data.codeList[lineNumber]
     i = line.index(' ')    
     oldLine = line[0: i]
     newLine = str(seq) + line[i:len(line)]    
     newCodeList[seq] = newLine
     lineList[oldLine] = str(seq)
-    seq = seq + 10
+    seq = seq + incr
     
     # replace line numbers within statements
     
@@ -144,7 +160,11 @@ def cmdResequence(cmdWork):
         line = firstPart + newNum1 + ' ELSE ' + newNum2
       else:
         oldNum1 = parts[len(parts) - 1]
-        newNum1 = lineList[oldNum1]
+        if oldNum1 in lineList:
+          newNum1 = lineList[oldNum1]
+        else:
+          newNum1 = str(data.maxLine)
+        
         i  = len(line) - len(oldNum1)
         line = firstPart + newNum1
       newCodeList[lineNumber] = line
@@ -181,14 +201,11 @@ def cmdSave(cmdWork):
   [fileName, msg] = helpers.parseFileName(cmdWork)
   if msg != 'OK':
     return msg
-        
-  index = []
-  for lineNumber in data.codeList:
-    index.append(lineNumber)
-  index.sort()  
+  
+  parser.createIndex()  
   
   with open (fileName, 'w') as fl:
-    for lineNumber in index:
+    for lineNumber in data.index:
       fl.write (data.codeList[lineNumber] + '\n')
     fl.close()
   return 'OK'
@@ -230,8 +247,8 @@ def cmdDelete(cmdWork):
  
  #  run the program
  
-def cmdRun(cmdWork):
-  return runtime.run()
+def cmdRun(cmdWork):    
+  return runtime.run(cmdWork)
  
 #  run immediate commands like let, input, print, etc
 
@@ -252,43 +269,88 @@ def cmdQuit(cmdWork):
 #-------------------
 #  helper functions
   
-# get first and last line number for list statement
-  
-def splitLinesForList(txt, min, max):
-  numbers = "1234567890"
-  line1 = ''
-  line2 = ''
-  num1 = min
-  num2 = max
+  #  get numbers separated by commas
+      
+def getNumbers(txt, n1, n2):
+  part1 = ''
+  part2 = ''
+  num1 = n1
+  num2 = n2
   msg = 'OK'
-  beforeDash = True
- 
-  if txt == 'LIST':
-    return [min, max, 'OK']
-   
-  for ch in txt:
-    if ch in numbers:
-      if beforeDash:
-        line1 = line1 + ch
-      else:
-        line2 = line2 + ch
-        
-    if ch == '-':
-      if beforeDash == False:
-        return [-1, -1, 'Bad line numbers']
-      else:
-        beforeDash = False      
-
-  if line1 != '':
-    min = int(line1)
   
-  if line2 != '':
-    max = int(line2)
-  
-  if beforeDash:
-    max = min
-  
-  return [min, max, 'OK']
+  i = txt.find(' ')
+  if i < 3:
+    return [n1, n2, 'OK']
     
+  parts = txt[i: len(txt)].split(',')
+  if len(parts) > 0:
+    part1 = parts[0].strip()
+    
+  if len(parts) > 1:
+    part2 = parts[1].strip()
+
+  if part1 != '':
+    if helpers.isnumeric(part1):
+      num1 = int (part1)
+    else:
+      msg = 'Incorrect statement'
+    
+  if part2 != '':
+    if helpers.isnumeric(part2):
+      num2 = int (part2)
+    else:
+      msg = 'Incorrect statement'
+    
+  return [num1, num2, msg]
+      
+# get numbers for list command
+#
+#  list -      list all
+#  list n      list line n
+#  list n-     list lines n through last
+#  list -n  -  list first through line n
+#  list n1-n2  list lines n1 through n2
   
- 
+def getNumbersForList(txt, n1, n2):
+  part1 = ''
+  part2 = ''
+  num1 = 0
+  num2 = 0
+  msg = 'OK'
+  
+  i = txt.find(' ')
+  if i < 3:
+    return [n1, n2, 'OK']
+    
+  parts = txt[i: len(txt)].split('-')
+  if len(parts) > 0:
+    part1 = parts[0].strip()
+    
+  if len(parts) > 1:
+    part2 = parts[1].strip()
+
+  if part1 != '':
+    if helpers.isnumeric(part1):
+      num1 = int (part1)
+    else:
+      msg = 'Incorrect statement'
+    
+  if part2 != '':
+    if helpers.isnumeric(part2):
+      num2 = int (part2)
+    else:
+      msg = 'Incorrect statement'
+    
+  if len(parts) == 1:
+    return [num1, num1, msg]
+  
+  if part1 == '':
+    if part2 == '':
+      return [num1, num2, 'Incorrect statement']
+    else:
+      return [n1, num2, msg]
+  else:
+    if part2 == '':
+      return [num1, n2, msg]
+    else:
+      return [num1, num2, msg]

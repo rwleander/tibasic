@@ -11,9 +11,9 @@ import matrix
 
 #  run the program
 
-def run():
+def run(cmd):
   if len(data.codeList) == 0:
-    return 'No code'
+    return 'Can\'t do that'
   
   clearData()
   
@@ -26,8 +26,20 @@ def run():
     return result
    
   address = data.firstLine
+  parts = cmd.split()
+  if len(parts) == 2:
+    parts[1] = parts[1].strip()
+    if helpers.isnumeric(parts[1]):
+      address = int(parts[1])
+    else:
+      return 'Bad line number'
+      
   while address > 0:
-    item = data.parseList[address]
+    if address in data.parseList:
+      item = data.parseList[address]
+    else:
+      return 'Bad line number - ' + str(address)
+      
     if item['error'] != 'OK':
       return createError(item)
       

@@ -71,6 +71,27 @@ class TestCommands(unittest.TestCase):
     result = commands.executeCommand('LIST 20 - 30')
     self.assertEqual(result, '20 Let B = 30\n30 Let C = A + B')
 
+  def testListNone (self):
+    data.codeList = {} 
+    result = commands.executeCommand('LIST')
+    self.assertEqual(result, 'Can\'t do that')
+
+  def testListBad (self):
+    data.codeList = {10: '10 FOR I = 1 TO 10', 20: '20 PRINT I;',30: '30 NEXT'} 
+    result = commands.executeCommand('LIST xx')
+    self.assertEqual(result, 'Incorrect statement')
+
+  def testListBad2 (self):
+    data.codeList = {10: '10 FOR I = 1 TO 10', 20: '20 PRINT I;',30: '30 NEXT'} 
+    result = commands.executeCommand('LIST -')
+    self.assertEqual(result, 'Incorrect statement')
+
+
+  def testListBad2 (self):
+    data.codeList = {10: '10 FOR I = 1 TO 10', 20: '20 PRINT I;',30: '30 NEXT'} 
+    result = commands.executeCommand('LIST 40')
+    self.assertEqual(result, 'Bad line number')
+    
 #  code lines add, replace or delete
 
   def testAddLine (self):
@@ -123,7 +144,7 @@ class TestCommands(unittest.TestCase):
     result = commands.executeCommand('Resequence')
     self.assertEqual(result, 'OK')
     result = commands.executeCommand('List')
-    self.assertEqual(result, '10 LET A = 1\n20 LET B = 2\n30 LET C = A + B') 
+    self.assertEqual(result, '100 LET A = 1\n110 LET B = 2\n120 LET C = A + B') 
   
   def testResequence2 (self):
     result = commands.executeCommand('New')
@@ -135,12 +156,48 @@ class TestCommands(unittest.TestCase):
     result = commands.executeCommand('80 GOTO 20')
     result = commands.executeCommand('Resequence')
     self.assertEqual(result, 'OK')
-    self.assertEqual(data.codeList[10], '10 LET A = 1')
-    self.assertEqual(data.codeList[20], '20 IF A > 1 THEN 40')
-    self.assertEqual(data.codeList[30], '30 GOSUB 50')
-    self.assertEqual(data.codeList[40], '40 GOTO 10')
-    self.assertEqual(data.codeList[50], '50 RETURN')
-
+    self.assertEqual(data.codeList[100], '100 LET A = 1')
+    self.assertEqual(data.codeList[110], '110 IF A > 1 THEN 130')
+    self.assertEqual(data.codeList[120], '120 GOSUB 140')
+    self.assertEqual(data.codeList[130], '130 GOTO 100')
+    self.assertEqual(data.codeList[140], '140 RETURN')
+  
+  def testResequence3 (self):
+    result = commands.executeCommand('New')
+    result = commands.executeCommand('20 Let A = 1')
+    result = commands.executeCommand('50 IF A > 1 THEN 810')
+    result = commands.executeCommand('70 GOSUB 100')
+    result = commands.executeCommand('80 GOTO 10')
+    result = commands.executeCommand('100 RETURN')
+    result = commands.executeCommand('80 GOTO 20')
+    result = commands.executeCommand('Resequence 200, 20')
+    self.assertEqual(result, 'OK')
+    self.assertEqual(data.codeList[200], '200 LET A = 1')
+    self.assertEqual(data.codeList[220], '220 IF A > 1 THEN 32767')
+    self.assertEqual(data.codeList[240], '240 GOSUB 280')
+    self.assertEqual(data.codeList[260], '260 GOTO 200')
+    self.assertEqual(data.codeList[280], '280 RETURN')
+ 
+  
+  def testResequenceBad (self):
+    result = commands.executeCommand('New')
+    result = commands.executeCommand('Resequence')
+    self.assertEqual(result, 'Can\'t do that')
+  
+  def testResequenceBad2 (self):
+    result = commands.executeCommand('New')
+    result = commands.executeCommand('10 A = 1')
+    result = commands.executeCommand('Resequence xx')
+    self.assertEqual(result, 'Incorrect statement')
+  
+  def testResequenceBad3 (self):
+    result = commands.executeCommand('New')
+    result = commands.executeCommand('10 A = 1')
+    result = commands.executeCommand('20 B = 2')
+    result = commands.executeCommand('30 C = 3')
+    result = commands.executeCommand('Resequence 30000, 1000')
+    self.assertEqual(result, 'Bad line number\nNo line numbers in this program are change')
+    
 #------------------------
 #  file operations
 
@@ -249,6 +306,13 @@ class TestCommands(unittest.TestCase):
     result = commands.executeCommand('New')
     result = commands.executeCommand('LET @A12 = 1')
     self.assertEqual(result, 'Bad name')
+
+#  test run command with errors
+
+  def testRunBad (self):
+    result = commands.executeCommand('New')
+    result = commands.executeCommand('Run')
+    self.assertEqual(result, 'Can\'t do that')
 
 
 # test print statement

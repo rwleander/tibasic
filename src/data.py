@@ -19,6 +19,7 @@ matrixList = {}
 matrixBase = 0
 
 firstLine = -1
+maxLine = 32767
 quitFlag = False
 
 reservedWords = ['ABS', 'APPEND', 'ASC', 'ATN', 'BASE', 'BREAK', 'BYE', 
