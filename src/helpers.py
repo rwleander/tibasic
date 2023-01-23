@@ -160,10 +160,10 @@ def setVariable(name, value):
 def parseFileName(cmdWork):
   parts = cmdWork.split()
   if len(parts) < 2:
-    return ['', 'Missing file name']
+    return ['', 'Incorrect statement']
     
   if len(parts) > 2:
-    return ['', 'Too many arguments']
+    return ['', 'Incorrect statement']
 
   fileName = parts[1] + '.ti'
   return [fileName, 'OK']

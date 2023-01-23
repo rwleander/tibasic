@@ -228,27 +228,29 @@ class TestCommands(unittest.TestCase):
 # save without file name
 
   def testSaveWithoutFile (self):
+    result = commands.executeCommand('NEW')
+    result = commands.executeCommand('SAVE TEST')
+    self.assertEqual(result, 'Can\'t do that')
+    result = commands.executeCommand('10 A = 1')
     result = commands.executeCommand('SAVE')
-    self.assertEqual(result, 'Missing file name');
-
-#   save with too many args
-
-  def testSaveTooManyArgs (self):  
-    result = commands.executeCommand('SAVE test test2')
-    self.assertEqual(result, 'Too many arguments')
-
+    self.assertEqual(result, 'Incorrect statement')
+    result = commands.executeCommand('SAVE TEST, TEST1')
+    self.assertEqual(result, 'Incorrect statement')
 
 # open file with missing name
 
   def testOldWithoutFile (self):
     result = commands.executeCommand('OLD')
-    self.assertEqual(result, 'Missing file name');
+    self.assertEqual(result, 'Incorrect statement');
 
 # open with too many args
     
   def testOldTooManyArgs (self):  
     result = commands.executeCommand('OLD test test2')
-    self.assertEqual(result, 'Too many arguments')
+    self.assertEqual(result, 'Incorrect statement')
+    result = commands.executeCommand('DELETE TEST')
+    result = commands.executeCommand('OLD  TEST')
+    self.assertEqual(result, 'No data found')
 
 # list files
     
@@ -265,13 +267,13 @@ class TestCommands(unittest.TestCase):
     result = commands.executeCommand('Delete TestDelete')
     self.assertEqual(result, 'OK')
     result = commands.executeCommand('OLD TestDelete')
-    self.assertEqual(result, 'File not found')
+    self.assertEqual(result, 'No data found')
 
 # test delete when file doesn't exist
 
   def testDeleteMissingFiles (self):  
     result = commands.executeCommand('Delete TestXYZ')
-    self.assertEqual(result, 'File not found')
+    self.assertEqual(result, 'No data found')
     
     #----------------------
     #   test other commands

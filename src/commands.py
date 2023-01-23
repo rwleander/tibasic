@@ -185,7 +185,7 @@ def cmdOld(cmdWork):
     
   cmdNew(cmdWork)
   if helpers.fileExists(fileName) == False:
-    return 'File not found'
+    return 'No data found'
     
   with open (fileName, 'r') as fl:
     while  (line := fl.readline().strip()):
@@ -198,6 +198,9 @@ def cmdOld(cmdWork):
   #  save a file
   
 def cmdSave(cmdWork):
+  if len(data.codeList) == 0:
+    return 'Can\'t do that'
+    
   [fileName, msg] = helpers.parseFileName(cmdWork)
   if msg != 'OK':
     return msg
@@ -236,7 +239,7 @@ def cmdDelete(cmdWork):
     return msg
     
   if helpers.fileExists(fileName) == False:
-    return 'File not found'
+    return 'No data found'
     
   os.remove(fileName)
   return 'OK'

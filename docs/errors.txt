@@ -18,11 +18,15 @@ Commands:
 *Can't do that (no program in memory)
 *Unknown statement
 
-Save
-Bad file name
-Can't do that (no program)
+*Save
+*Bad file name
+*Can't do that (no program)
+*Incorrect statement
 
-Old
+*Old
+*No data found
 
+*Delete
+*No data found
 
 
