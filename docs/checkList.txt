@@ -100,3 +100,6 @@ KEY
 *STR$
 *VAL
 
+
+Problems:
+resequence not changing numbers to on gosub / goto

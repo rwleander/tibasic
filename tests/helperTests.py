@@ -27,12 +27,12 @@ class TestHelper(unittest.TestCase):
 
   def testParseMissingFiile (self):
     [fileName, result] = helpers.parseFileName('OPEN')
-    self.assertEqual(result, 'Missing file name')
+    self.assertEqual(result, 'Incorrect statement')
     self.assertEqual(fileName, '')
 
   def testParseTooManyFiles (self):
     [fileName, result] = helpers.parseFileName('OPEN TEST1 TEST2')
-    self.assertEqual(result, 'Too many arguments')
+    self.assertEqual(result, 'Incorrect statement')
     self.assertEqual(fileName, '')
 
 # test file exists function

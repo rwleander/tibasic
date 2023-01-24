@@ -345,9 +345,13 @@ def runOnGosub(item):
     item['error'] = 'Bad index'    
     return -1 
   
-  line = lines[value - 1]
-  item['line'] = line
-  return runGosub(item)
+  line = int(lines[value - 1])
+  if line in data.parseList:
+    item['line'] = line
+    return runGosub(item)
+  else:
+    item['error'] = 'Bad line number - ' + str(line)
+    return -1
       
     #  run on goto statement
     
@@ -362,11 +366,15 @@ def runOnGoto(item):
 
   value = int(value) 
   if value < 1 or value > len(lines):
-    item['error'] = 'Bad index'
+    item['error'] = 'Bad value'
     return -1 
   
   line = int(lines[value - 1])
-  return line 
+  if line  in data.parseList:
+    return line
+  else:
+    item['error'] = 'Bad line number - ' + str(line)
+    return -1
   
     #  change option
     

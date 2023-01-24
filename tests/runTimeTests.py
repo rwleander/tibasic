@@ -44,6 +44,15 @@ class TestRuntime(unittest.TestCase):
     result = runtime.run('RUN 30')
     self.assertEqual(data.variables['A'], 30)
 
+# test let with bad expression
+
+  def testRunLet2 (self):
+    result = commands.executeCommand('NEW')
+    result = commands.executeCommand('10 Let A = 4 + * 2')
+    result = runtime.run('RUN')
+    self.assertEqual(result, '10 LET A = 4 + * 2\nBad expression')
+
+
 # test let without keyword
 
 
@@ -581,6 +590,28 @@ class TestRuntime(unittest.TestCase):
     self.assertEqual(result, 'Done')        
     self.assertEqual(data.variables['N'], 5)
 
+  def testOnGotoBadIndex (self):
+    result = commands.executeCommand('NEW')    
+    result = commands.executeCommand('10 A = 20')
+    result = commands.executeCommand('15 N = 0')
+    result = commands.executeCommand('20 ON A GOTO 30, 40, 50')
+    result = commands.executeCommand('30 N = N + 1')
+    result = commands.executeCommand('40 N = N + 2')
+    result = commands.executeCommand('50 N = N + 3') 
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, '20 ON A GOTO 30, 40, 50\nBad value')
+
+  def testOnGotoBadLine (self):
+    result = commands.executeCommand('NEW')    
+    result = commands.executeCommand('10 A = 2')
+    result = commands.executeCommand('15 N = 0')
+    result = commands.executeCommand('20 ON A GOTO 30, 400, 50')
+    result = commands.executeCommand('30 N = N + 1')
+    result = commands.executeCommand('40 N = N + 2')
+    result = commands.executeCommand('50 N = N + 3') 
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, '20 ON A GOTO 30, 400, 50\nBad line number - 400')
+
 #  test on gosub
 
   def testOnGosub (self):
@@ -598,6 +629,38 @@ class TestRuntime(unittest.TestCase):
     result = commands.executeCommand('RUN')
     self.assertEqual(result, 'Done')        
     self.assertEqual(data.variables['N'], 10)
+
+  def testOnGosubBadIndex (self):
+    result = commands.executeCommand('NEW')    
+    result = commands.executeCommand('10 A = 20')
+    result = commands.executeCommand('15 N = 0')
+    result = commands.executeCommand('20 ON A GOSUB 30, 40, 50')
+    result = commands.executeCommand('25 STOP')
+    result = commands.executeCommand('30 N = 5')
+    result = commands.executeCommand('35 RETURN')
+    result = commands.executeCommand('40 N = 10')
+    result = commands.executeCommand('45 RETURN')
+    result = commands.executeCommand('50 N = 25')
+    result = commands.executeCommand('55 RETURN')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, '20 ON A GOSUB 30, 40, 50\nBad index')
+
+  def testOnGosubBadLine (self):
+    result = commands.executeCommand('NEW')    
+    result = commands.executeCommand('10 A = 2')
+    result = commands.executeCommand('15 N = 0')
+    result = commands.executeCommand('20 ON A GOSUB 30, 41, 50')
+    result = commands.executeCommand('25 STOP')
+    result = commands.executeCommand('30 N = 5')
+    result = commands.executeCommand('35 RETURN')
+    result = commands.executeCommand('40 N = 10')
+    result = commands.executeCommand('45 RETURN')
+    result = commands.executeCommand('50 N = 25')
+    result = commands.executeCommand('55 RETURN')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, '20 ON A GOSUB 30, 41, 50\nBad line number - 41')
+
+
 
 
 
