@@ -75,6 +75,28 @@ class TestRuntime(unittest.TestCase):
     self.assertEqual(result, 'Done')
     self.assertEqual(data.variables['B'], 11)
 
+  def testRunIfZero (self):
+    result = commands.executeCommand('NEW')
+    result = commands.executeCommand('10 IF 0 THEN 30')
+    result = commands.executeCommand('20 LET A = 1') 
+    result = commands.executeCommand('25 STOP')
+    result = commands.executeCommand('30 LET A = 2') 
+    result = runtime.run('RUN')
+    self.assertEqual(result, 'Done')
+    self.assertEqual(data.variables['A'], 1)
+
+  def testRunIfLogic(self):
+    result = commands.executeCommand('NEW')
+    result = commands.executeCommand('10 IF ( 5 > 3) * ( 4 > 2) THEN 30')
+    result = commands.executeCommand('20 LET A = 1') 
+    result = commands.executeCommand('25 STOP')
+    result = commands.executeCommand('30 LET A = 2') 
+    result = runtime.run('RUN')
+    self.assertEqual(result, 'Done')
+    self.assertEqual(data.variables['A'], 2)
+
+
+
 # test goto
 
   def testRunGoTo (self):
@@ -162,6 +184,13 @@ class TestRuntime(unittest.TestCase):
     result = runtime.run('RUN')    
     self.assertEqual(result, 'Done')
     self.assertEqual(data.variables['A'], 10)
+
+  def testRunGosubBadLine (self):
+    result = commands.executeCommand('NEW')
+    result = commands.executeCommand('10 LET A = 1')
+    result = commands.executeCommand('20 GO SUB 50')
+    result = runtime.run('RUN')    
+    self.assertEqual(result, '20 GO SUB 50\nBad line number')
 
 
 # test basic for/next

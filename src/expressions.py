@@ -272,7 +272,7 @@ def calculateExpression(branch):
   [parts, msg] = compareParts(parts)
   if msg != 'OK':
     return [branch, msg]
-  
+    
 # see what we got
        
   if len(parts) > 1:
@@ -353,9 +353,7 @@ def calcParts(parts, op):
       item = parts[i]
       nextItem = parts[i + 1]
       
-      if (isinstance(lastItem, float) == False) or (isinstance(nextItem, float) == False):
-        return [parts, 'Bad expression']
-        
+      
       newItem = 0
       if op == '^':
         newItem = lastItem ** nextItem
@@ -366,11 +364,17 @@ def calcParts(parts, op):
         newItem = lastItem / nextItem        
         
       if op == '*':
-        newItem = lastItem * nextItem
-  
+        if type(lastItem) == float and type(nextItem) == float:
+          newItem = lastItem * nextItem        
+        if type(lastItem) == bool and type(nextItem) == bool:
+          newItem = lastItem and nextItem
+    
       if op == '+':
-        newItem = lastItem + nextItem
-  
+        if type(lastItem) == float and type(nextItem) == float:
+          newItem = lastItem + nextItem
+        if type(lastItem) == bool and type (nextItem) == bool:
+          newItem = lastItem or nextItem
+          
       if op == '-':
         newItem = lastItem - nextItem
     
@@ -445,7 +449,9 @@ def compareParts(parts):
       parts[i - 1] = value
       del parts[i + 1]
       del parts[i]
-            
+      
+    i =   i + 1          
+    
   return [parts, 'OK']
   
   
