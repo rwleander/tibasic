@@ -47,12 +47,12 @@ def run(cmd):
     if item['error']  != 'OK':    
         return createError(item)
         
-    if address == newAddress:
+    if address == newAddress and item['statement'] != 'NEXT':
       return createMsg(item, 'Infinite loop')
     address = newAddress
     
   if len(data.forNextStack) > 0:
-    return 'Missing NEXT'
+    return 'For-next error'
     
   return 'Done'
   
@@ -161,7 +161,7 @@ def runFor(item):
   
   step = 1
   nextLine = item['nextLine']
-  
+    
   [min, msg] = expressions.evaluate(expr1)
   if msg != 'OK':
     item['error'] = msg
@@ -176,8 +176,20 @@ def runFor(item):
     [step, msg] = expressions.evaluate(item['expr3'])
     if msg != 'OK':
       item['error'] = msg
+      return -1
+    if step == 0:
+      item['error'] = 'Bad value'
       return -1 
   
+  # if  initial value outside of range, skip to next
+  
+  if (step > 0 and min   > max) or (step < 0 and min < max):
+    end  = item['forNext']
+    nextItem = data.parseList[end]
+    return nextItem['nextLine']
+    
+#otherwise, set up the for/next stack and proceed
+    
   msg = helpers.setVariable(var, min) 
   if msg != 'OK':
     item['error'] = msg
@@ -196,7 +208,7 @@ def runFor(item):
   
 def runNext(item):
   if len(data.forNextStack) < 1:
-    item['error'] = 'Missing FOR'
+    item['error'] = 'For-next error'
     return -1 
     
   stackItem = data.forNextStack[len(data.forNextStack) - 1]

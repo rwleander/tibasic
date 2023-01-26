@@ -15,7 +15,7 @@ parseRules = {
   'IF': 'IF expr THEN line1 [ ELSE line2 ]',
   'INPUT': 'INPUT list',
   'LET': 'LET var = expr',
-  'NEXT': 'NEXT',  
+  'NEXT': 'NEXT [ var ]',  
   'ON': 'ON list',
   'OPTION': 'OPTION BASE n',
   'PRINT': 'PRINT [ list ]',  
@@ -44,7 +44,12 @@ def parse():
     return msg
   
   msg = parseDetails()
+  if msg != 'OK':
+    return msg
+    
+  msg = scanForNext()
   return msg
+    
   
   #  parse a command line
 
@@ -234,7 +239,7 @@ def parseDetails():
   functionList = {
     'DATA': parseDataList,
     'DIM': parseDimList,
-    'DISPLAY': parsePrintList,
+    'DISPLAY': parsePrintList,    
     'INPUT': parseInputList,
     'ON': parseOnList,
     'PRINT': parsePrintList,
@@ -417,3 +422,32 @@ def splitCommaList(txt):
   if value != '':
     values.append (value.strip())
   return values
+
+
+  
+  # Finally, tie together the for and next statements  
+  
+def scanForNext():
+  forStack = []
+  
+  for  lineNumber in data.index:
+    item = data.parseList[lineNumber]    
+    if item['statement'] == 'FOR':
+      forStack.append(item)
+      
+    if item['statement'] == 'NEXT':      
+      if len(forStack) == 0:
+        item['error'] = 'For-next error'
+        return 'For-next error'
+      else:
+        tmpItem = forStack.pop()
+        tmpItem['forNext'] = lineNumber
+        if item['var'] != tmpItem['var'] and item['var'] != '':
+          return 'For-Next error'
+
+    
+  if len(forStack) > 0:
+    return 'For-next error'
+    
+  return 'OK'
+   

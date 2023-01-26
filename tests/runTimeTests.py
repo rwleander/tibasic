@@ -252,18 +252,18 @@ class TestRuntime(unittest.TestCase):
     result = commands.executeCommand('30 Let N = N + 1')
     result = commands.executeCommand('40 NEXT')
     result = runtime.run('RUN')
-    self.assertEqual(result, '40 NEXT\nMissing FOR')
+    self.assertEqual(result, 'For-next error')
 
 # test bad for expression
 
   def testRunForNextBad2 (self):
     result = commands.executeCommand('NEW')
     result = commands.executeCommand('10 LET N = 0')
-    result = commands.executeCommand('20 FOR I = 1 To 3')
+    result = commands.executeCommand('20 FOR I = 1 To 3 STEP 0')
     result = commands.executeCommand('30 Let N = N + 1')
     result = commands.executeCommand('40 NEXT')
     result = runtime.run('RUN')
-    self.assertEqual(result, 'Done')
+    self.assertEqual(result, '20 FOR I = 1 TO 3 STEP 0\nBad value')
 
 # missing next
 
@@ -272,15 +272,21 @@ class TestRuntime(unittest.TestCase):
     result = commands.executeCommand('10 LET N = 0')
     result = commands.executeCommand('20 FOR I = 1 To 5')
     result = commands.executeCommand('30 Let N = N + 1')
-    #result = commands.executeCommand('40 NEXT')
     result = runtime.run('RUN')
-    self.assertEqual(len(data.forNextStack), 1)
-    self.assertEqual(result, 'Missing NEXT')
+    self.assertEqual(result, 'For-next error')
 
+#  when starting value exceeds max, skip the loop
 
-
-
-
+  def testRunForNextIndexOutOfRange (self):
+    result = commands.executeCommand('NEW')
+    result = commands.executeCommand('10 LET N = 0')
+    result = commands.executeCommand('15 LET X = 10')
+    result = commands.executeCommand('20 FOR I = X To 5')
+    result = commands.executeCommand('30 Let N = N + 1')
+    result = commands.executeCommand('40 NEXT')
+    result = runtime.run('RUN')
+    self.assertEqual(result, 'Done')
+    self.assertEqual(data.variables['N'], 0) 
 
 
 #  test remark

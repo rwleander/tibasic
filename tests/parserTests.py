@@ -366,11 +366,55 @@ class TestParser(unittest.TestCase):
     self.assertEqual(item2['list'], 'A GOSUB 40, 50, 60')
     self.assertEqual(item2['expr'], 'A')
     self.assertEqual(item2['lines'], ['40', '50', '60'])
-    
-    
-    
-    
-    
+
+#  test on gosub and on goto statements
+
+# test for/next 
+
+  def testParseForNext (self):
+    data.codeList = {
+      10: '10 A = 3',
+      20: '20 FOR I = 1 TO 10',
+      30: '30 N = N + 1',
+      40: '40 NEXT'
+      }
+    result = parser.parse()  
+    self.assertEqual(result, 'OK')
+    self.assertEqual(len(data.parseList), 4)
+    item = data.parseList[20]
+    self.assertEqual(item['statement'], 'FOR')
+    self.assertEqual(item['forNext'], 40)
+
+  def testParseForNext2 (self):
+    data.codeList = {
+      10: '10 A = 3',
+      20: '20 FOR I = 1 TO 10',
+      25: '25 FOR J = 1 TO 10',
+      30: '30 N = N + 1',
+      40: '40 NEXT',
+      50: '50 NEXT'
+      }
+    result = parser.parse()  
+    self.assertEqual(result, 'OK')
+    item = data.parseList[20]
+    self.assertEqual(item['statement'], 'FOR')
+    self.assertEqual(item['nextLine'], 25)
+    self.assertEqual(item['forNext'], 50)
+    item2 = data.parseList[25]
+    self.assertEqual(item2['statement'], 'FOR')
+    self.assertEqual(item2['forNext'], 40)
+
+  def testParseForNext3 (self):
+    data.codeList = {
+      10: '10 A = 3',
+      20: '20 FOR I = 1 TO 10',
+      25: '25 FOR J = 1 TO 10',
+      30: '30 N = N + 1',
+      40: '40 NEXT I',
+      50: '50 NEXT J'
+      }
+    result = parser.parse()  
+    self.assertEqual(result, 'For-Next error')
     
   
 if __name__ == '__main__':  
