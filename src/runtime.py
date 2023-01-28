@@ -208,7 +208,7 @@ def runFor(item):
   
 def runNext(item):
   if len(data.forNextStack) < 1:
-    item['error'] = 'For-next error'
+    item['error'] = 'Can\'t do that'
     return -1 
     
   stackItem = data.forNextStack[len(data.forNextStack) - 1]
@@ -217,6 +217,10 @@ def runNext(item):
   step   = stackItem['step']
   value = data.variables[var]
   
+  if item['var'] != var and item['var'] != '':
+    item['error'] = 'Can\'t do that'
+    return -1
+   
   value = value + step
 
   # at end of for - remove item from stack, go to next line

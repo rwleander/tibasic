@@ -288,6 +288,21 @@ class TestRuntime(unittest.TestCase):
     self.assertEqual(result, 'Done')
     self.assertEqual(data.variables['N'], 0) 
 
+#  for/next mismatch
+
+  def testRunForNextMismatch (self):
+    result = commands.executeCommand('NEW')
+    result = commands.executeCommand('10 LET N = 0')
+    result = commands.executeCommand('20 FOR I = 1 To 5')
+    result = commands.executeCommand('25 FOR J = 1 To 5')
+    result = commands.executeCommand('30 Let N = N + 1')
+    result = commands.executeCommand('35 IF N > 10 then 50')
+    result = commands.executeCommand('40 NEXT J')
+    result = commands.executeCommand('50 NEXT I')
+    result = runtime.run('RUN')
+    self.assertEqual(result, '50 NEXT I\nCan\'t do that')
+    
+
 
 #  test remark
 
