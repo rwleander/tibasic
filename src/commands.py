@@ -15,6 +15,7 @@ def executeCommand(cmd):
 
   functionList = {
     'BYE': cmdQuit,
+    'EDIT': cmdEdit,
     'DELETE': cmdDelete,
     'FILES': cmdFiles,        
     'LIST': cmdList,
@@ -100,15 +101,8 @@ def cmdAddLine(cmd):
   else:
     return 'Bad line number'
     
-  if len(parts) > 1:
-    data.codeList[lineNumber] = cmd
-  else:
-    if lineNumber in data.codeList:
-      data.codeList.pop(lineNumber)    
-    else:
-      return 'Not in list'
-  return 'OK'
-
+  return editor.addLine(lineNumber, cmd)
+  
 # resequence the list
 
 def cmdResequence(cmdWork):
@@ -186,6 +180,26 @@ def cmdFiles(cmdWork):
   else:
     return 'No files'
     
+#  edit a line of code
+    
+def cmdEdit(cmdWork):
+  [n, code, msg] = editor.preEdit(cmdWork)
+  if msg != 'OK':
+    return msg
+    
+  print (str(n) + ' ' + code)
+  mask = input (str(n) + ' ')
+  while mask != '':
+    code = editor.edit(code, mask)
+    print (str(n) + ' ' + code)
+    mask = input (str(n) + ' ')
+  
+  if code == '':
+    data.codeList.pop(n)
+  else:
+    data.codeList[n] = str(n) + ' ' + code
+  return 'OK'
+  
     # delete file
     
 def cmdDelete(cmdWork):

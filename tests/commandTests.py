@@ -126,7 +126,7 @@ class TestCommands(unittest.TestCase):
     result = commands.executeCommand('20 Let B = 2')
     result = commands.executeCommand('10 Let A = 1')
     result = commands.executeCommand('25')
-    self.assertEqual(result, 'Not in list')
+    self.assertEqual(result, 'Bad line number')
   
   def testAddBadLines (self):
     result = commands.executeCommand('New')

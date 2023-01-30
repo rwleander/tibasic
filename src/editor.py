@@ -1,8 +1,79 @@
 #  editor - functions to edit code
 
 import parser
+import helpers
 import data
 
+#  add or replace code lines
+
+def addLine(n, code):
+  if str(n) == code.strip():
+    if n in data.codeList:
+      data.codeList.pop(n)
+    else:
+      return 'Bad line number'
+  else:
+    data.codeList[n] = code  
+  return 'OK'
+  
+  #  parse edit command
+  
+def preEdit(cmd):
+  parts = cmd.split()
+  if len(parts) < 2:
+    return [-1, '', 'Bad command']
+    
+  if helpers.isnumeric(parts[1]) == False:
+    return [-1, '', 'Bad command']
+  
+  n = int(parts[1])
+  if n not in data.codeList:
+    return [-1, '', 'Bad command']
+  
+  codeLine = data.codeList[n]
+  i = codeLine.find(' ')
+  if i > 0:
+    code = codeLine[i + 1: len(codeLine)]  
+  else:
+    code = ''
+  return [n, code, 'OK']
+  
+  #  edit a line of code
+  
+def edit(txt, mask):
+  functionList = {
+    'D': editDelete,
+    'I': editInsert,
+    'R': editReplace    
+  }
+  
+  shortMask = mask.lstrip()
+  if len (shortMask) == 0:
+    return txt
+    
+  i = len(mask) - len(shortMask)
+  op = shortMask[0].upper()
+  if op not in ['I', 'D', 'R']:
+    op = 'R'
+    
+  return functionList[op](txt, i, shortMask)
+  
+def editDelete(txt, i, mask):
+  n = 0  
+  for ch in mask:
+    if ch.upper() == 'D':
+      n = n + 1  
+  return  txt[0: i] + txt[i + n: len(txt)]
+  
+def editInsert(txt, i, mask):
+  return txt[0: i] + mask[1: len(mask)] + txt[i: len(txt)]
+
+def editReplace(txt, i, mask):
+  if mask[0] == 'R':    
+    newMask = mask[1: len(mask)]
+    return txt[0: i] + newMask + txt[i + len(newMask): len(txt)]
+  else:
+    return txt[0: i] + mask + txt[i + len(mask): len(txt)]
 # resequence the code list
 
 def resequence(base, step):

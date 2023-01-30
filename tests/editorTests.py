@@ -7,6 +7,84 @@ import data
 
 class TestEditor(unittest.TestCase):
 
+#  add / replace lines
+
+#  add the first line
+
+  def testAddLine (self):
+    data.codeList = {}      
+    result = editor.addLine(10, '10 A = 10')
+    self.assertEqual(result, 'OK')
+    self.assertEqual(data.codeList, {10: '10 A = 10'})
+
+#  replace a line
+
+  def testAddLineReplace (self):
+    data.codeList = {10: '10 X = 20'}      
+    result = editor.addLine(10, '10 A = 10')
+    self.assertEqual(result, 'OK')
+    self.assertEqual(data.codeList, {10: '10 A = 10'})
+
+#  delete a line
+
+  def testAddLineDelete (self):
+    data.codeList = {10: '10 X = 20'}      
+    result = editor.addLine(10, '10')
+    self.assertEqual(result, 'OK')
+    self.assertEqual(data.codeList, {})
+
+#  delete line not in list
+
+  def testAddLineBadDelete (self):
+    data.codeList = {10: '10 X = 20'}      
+    result = editor.addLine(20, '20')
+    self.assertEqual(result, 'Bad line number')
+    
+#------------------
+#  test edit functions
+
+#  test pre-edit - parse command and retrieve code
+
+  def testPreEdit (self):
+    data.codeList = {
+      10: '10 A = 1',
+      20: '20 B = 2'
+    }
+    [n, code, msg] = editor.preEdit('EDIT 10')
+    self.assertEqual(n, 10)
+    self.assertEqual(code, 'A = 1')
+    self.assertEqual(msg, 'OK')    
+    [n, code, msg] = editor.preEdit('EDIT')
+    self.assertEqual(msg, 'Bad command')        
+    [n, code, msg] = editor.preEdit('EDIT 15')
+    self.assertEqual(msg, 'Bad command')    
+    [n, code, msg] = editor.preEdit('EDIT xx')
+    self.assertEqual(msg, 'Bad command')
+
+    
+#  test edit function
+
+  def testEdit (self):
+    result = editor.edit('ABCDEFG', '   DDD')
+    self.assertEqual(result, 'ABCG')
+    result = editor.edit('ABCDEFG', 'DDD')
+    self.assertEqual(result, 'DEFG')
+    result = editor.edit('ABCDEFG', '   i123')
+    self.assertEqual(result, 'ABC123DEFG')
+    result = editor.edit('ABCDEFG', '   R123')
+    self.assertEqual(result, 'ABC123G')
+    result = editor.edit('ABCDEFG', '   123')
+    self.assertEqual(result, 'ABC123G')
+
+
+
+
+
+
+
+#------------------
+#  resequence tests
+
 #  test basic resequence
 
   def testResequence (self):
