@@ -15,8 +15,8 @@ Commands:
 *BYE
 *QUIT
 *RESEQUENCE
-NUMBER
-EDIT
+*NUMBER
+*EDIT
 
 *DISPLAY
 *INPUT
@@ -51,6 +51,9 @@ Statements:
 *ON GOSUB
 *STOP
 *END
+
+BREAK
+UNBREAK
 
 keyboard/screen:
 

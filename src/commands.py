@@ -20,6 +20,7 @@ def executeCommand(cmd):
     'FILES': cmdFiles,        
     'LIST': cmdList,
     'NEW': cmdNew,
+    'NUMBER': cmdNumber,
     'OLD': cmdOld,    
     'QUIT': cmdQuit,
     'RESEQUENCE': cmdResequence,
@@ -125,6 +126,23 @@ def cmdResequence(cmdWork):
   #-----------------------
   #  file operations
   
+#  prompt for program
+  
+def cmdNumber(cmdWork):
+  seq = 100
+  incr = 10  
+  [seq, incr, msg] = getNumbers(cmdWork, seq, incr)
+  if msg != 'OK':
+    return msg
+  
+  code = input (str(seq))
+  while code != '':
+    data.codeList[seq] = str(seq) + ' ' + helpers.upshift(code)
+    seq = seq + incr 
+    code = input(str(seq))
+    
+  return 'OK'
+  
   # load a file
   
 def cmdOld(cmdWork):
@@ -191,6 +209,7 @@ def cmdEdit(cmdWork):
   mask = input (str(n) + ' ')
   while mask != '':
     code = editor.edit(code, mask)
+    code = helpers.upshift(code)
     print (str(n) + ' ' + code)
     mask = input (str(n) + ' ')
   
