@@ -12,6 +12,8 @@ forNextStack = []
 printPosition = 0
 printWidth = 48
 
+breakpointList = []
+
 dataList = []
 dataPointer = 0
 
@@ -20,6 +22,7 @@ matrixBase = 0
 
 firstLine = -1
 maxLine = 32767
+address = -1
 quitFlag = False
 
 reservedWords = ['ABS', 'APPEND', 'ASC', 'ATN', 'BASE', 'BREAK', 'BYE', 

@@ -74,9 +74,9 @@ class TestParser(unittest.TestCase):
     self.assertEqual(len(data.parseList), 2)
     self.assertEqual(data.firstLine, 10)
     item1 = data.parseList[10]
-    self.assertEqual(item1, {'code': '10 LET A = 1', 'statement': 'LET', 'nextLine': 20, 'var': 'A', 'expr': '1', 'error': 'OK', 'source': 'runtime'}) 
+    self.assertEqual(item1, {'code': '10 LET A = 1', 'statement': 'LET', 'nextLine': 20, 'var': 'A', 'expr': '1', 'error': 'OK', 'source': 'runtime'})
     item2 = data.parseList[20]
-    self.assertEqual(item2, {'code': '20 LET B = A + 1', 'statement': 'LET', 'nextLine': -1, 'var':'B', 'expr': 'A + 1', 'error': 'OK', 'source': 'runtime'}) 
+    self.assertEqual(item2, {'code': '20 LET B = A + 1', 'statement': 'LET', 'nextLine': -1, 'var':'B', 'expr': 'A + 1', 'error': 'OK', 'source': 'runtime'})
     
 #  test bad let statements
 
@@ -105,7 +105,7 @@ class TestParser(unittest.TestCase):
     self.assertEqual(len(data.parseList), 2)
     self.assertEqual(data.firstLine, 10)
     item1 = data.parseList[10]
-    self.assertEqual(item1, {'code': '10 A = 1', 'statement': 'LET', 'nextLine': 20, 'var': 'A', 'expr': '1', 'error': 'OK', 'source': 'runtime'}) 
+    self.assertEqual(item1, {'code': '10 A = 1', 'statement': 'LET', 'nextLine': 20, 'var': 'A', 'expr': '1', 'error': 'OK', 'source': 'runtime'})
     item2 = data.parseList[20]
     self.assertEqual(len(item2), 7)
     
@@ -415,6 +415,26 @@ class TestParser(unittest.TestCase):
       }
     result = parser.parse()  
     self.assertEqual(result, 'For-Next error')
+
+#  tests for break and unbreak statements
+
+  def testParseBreak (self):
+    commands.executeCommand('NEW')  
+    data.codeList = {
+    10: '10 BREAK 50, 60, 70',
+    20: '20 UNBREAK 20, 30'
+    }      
+    result = parser.parse()  
+    self.assertEqual(result, 'OK')
+    item1 = data.parseList[10]
+    self.assertEqual(item1['statement'], 'BREAK')
+    self.assertEqual(item1['list'], '50, 60, 70')
+    self.assertEqual(item1['lines'], ['50', '60', '70'])
+    item2 = data.parseList[20]
+    self.assertEqual(item2['statement'], 'UNBREAK')
+    self.assertEqual(item2['list'], '20, 30')
+    self.assertEqual(item2['lines'], ['20', '30'])
+    
     
   
 if __name__ == '__main__':  

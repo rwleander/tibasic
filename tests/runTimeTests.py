@@ -710,11 +710,43 @@ class TestRuntime(unittest.TestCase):
     result = commands.executeCommand('RUN')
     self.assertEqual(result, '20 ON A GOSUB 30, 41, 50\nBad line number - 41')
 
+#  test break, unbreak
+
+  def testBreakpoint (self):
+    result = commands.executeCommand('NEW')    
+    result = commands.executeCommand('10 BREAK 40')
+    result = commands.executeCommand('20 N = 0')
+    result = commands.executeCommand('30 FOR I = 1 to 5')
+    result = commands.executeCommand('40 N = N + 1')
+    result = commands.executeCommand('60 NEXT')
+    result = commands.executeCommand('70 REM PRINT N')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Breakpoint at 40\n40 N = N + 1')
+    self.assertEqual(data.variables['N'], 0)
+    result = commands.executeCommand('CONTINUE')
+    self.assertEqual(result, 'Done')
+    self.assertEqual(data.variables['N'], 5)
+
+  def testBreakpoint2 (self):
+    result = commands.executeCommand('NEW')    
+    result = commands.executeCommand('BREAK 40')
+    self.assertEqual(result, 'Bad line number - 40')
+    result = commands.executeCommand('20 N = 0')
+    result = commands.executeCommand('30 FOR I = 1 to 5')
+    result = commands.executeCommand('40 N = N + 1')
+    result = commands.executeCommand('60 NEXT')
+    result = commands.executeCommand('70 REM PRINT N')
+    result = commands.executeCommand('BREAK 40')
+    self.assertEqual(result, 'OK')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Breakpoint at 40\n40 N = N + 1')
+    self.assertEqual(data.variables['N'], 0)
+    result = commands.executeCommand('CONTINUE')
+    self.assertEqual(result, 'Done')
+    self.assertEqual(data.variables['N'], 5)
 
 
 
-
-  
 if __name__ == '__main__':  
     unittest.main()
     

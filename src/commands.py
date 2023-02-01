@@ -14,7 +14,8 @@ import helpers
 def executeCommand(cmd):
 
   functionList = {
-    'BYE': cmdQuit,
+    'BYE': cmdQuit,    
+    'CONTINUE': cmdContinue,
     'EDIT': cmdEdit,
     'DELETE': cmdDelete,
     'FILES': cmdFiles,        
@@ -28,7 +29,7 @@ def executeCommand(cmd):
     'SAVE': cmdSave
   }
 
-  commandList = ['DISPLAY', 'INPUT', 'LET', 'PRINT']
+  commandList = ['BREAK', 'DISPLAY', 'INPUT', 'LET', 'PRINT', 'UNBREAK']
 
   cmdWork = helpers.upshift(cmd)
   parts = cmdWork.split()
@@ -63,6 +64,7 @@ def cmdNew(cmdWork):
   data.dataList = []
   data.dataPointer = 0
   data.printPosition = 0
+  data.breakpointList = []
   data.matrixList = {}
   data.matrixBase = 0
   
@@ -197,6 +199,12 @@ def cmdFiles(cmdWork):
     return str[0:len(str)-1]
   else:
     return 'No files'
+    
+    
+    #  continue after breakpoint
+    
+def cmdContinue(cmdWork):
+  return runtime.runContinue(cmdWork)
     
 #  edit a line of code
     

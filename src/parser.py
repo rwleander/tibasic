@@ -4,6 +4,7 @@ import data
 import helpers
 
 parseRules = {
+  'BREAK': 'BREAK list',
   'DATA': 'DATA list',
   'DIM': 'DIM list',
   'DISPLAY': 'DISPLAY [ list ]',
@@ -24,7 +25,8 @@ parseRules = {
   'REM': 'REM expr',
   'RESTORE': 'RESTORE [ line ]',
   'RETURN': 'RETURN',  
-  'STOP': 'STOP'  
+  'STOP': 'STOP',
+  'UNBREAK': 'UNBREAK list'  
 }
 
 
@@ -56,11 +58,13 @@ def parse():
 def parseCommand(cmd):
 
   functionList = {
+    'BREAK': parseBreakList,
     'DATA': parseDataList,
     'DISPLAY': parsePrintList,
     'INPUT': parseInputList,
     'PRINT': parsePrintList,
-    'READ': parseReadList    
+    'READ': parseReadList,
+'UNBREAK': parseBreakList    
   }
 
   parts = cmd.split()
@@ -71,7 +75,7 @@ def parseCommand(cmd):
   item['statement'] = statement
   item['nextLine'] = -1 
   item['error'] = 'OK'
-  item['source'] = 'command'
+  item['source'] = 'command'  
   
       # parse by statement type
       
@@ -116,8 +120,8 @@ def buildParseList():
     item['statement'] = parts[1]
     item['nextLine'] = -1
     item['error'] = 'OK'
-    item['source'] = 'runtime'
-    
+    item['source'] = 'runtime'    
+        
     # if implied let, set statement type to let
     
     if len(parts) > 2:
@@ -237,13 +241,15 @@ def addExpressions(item, ruleParts, codeParts):
 def parseDetails():
 
   functionList = {
+    'BREAK': parseBreakList,
     'DATA': parseDataList,
     'DIM': parseDimList,
     'DISPLAY': parsePrintList,    
     'INPUT': parseInputList,
     'ON': parseOnList,
     'PRINT': parsePrintList,
-    'READ': parseReadList    
+    'READ': parseReadList,
+'UNBREAK': parseBreakList    
   }
 
   for lineNumber in data.index: 
@@ -257,6 +263,14 @@ def parseDetails():
         
   return 'OK'
 
+#  parse the list of breakpoints for break and unbreak commands
+
+def parseBreakList(item):
+  listText = item['list']
+  values = splitCommaList(listText)
+  item['lines'] = values
+  return 'OK'
+  
 #  parse the list of data items
 
 def parseDataList(item):

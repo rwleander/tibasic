@@ -25,31 +25,43 @@ def run(cmd):
   if result != 'OK':
     return result
    
-  address = data.firstLine
+  data.address = data.firstLine
   parts = cmd.split()
   if len(parts) == 2:
     parts[1] = parts[1].strip()
     if helpers.isnumeric(parts[1]):
-      address = int(parts[1])
+      data.address = int(parts[1])
     else:
       return 'Bad line number'
       
-  while address > 0:
-    if address in data.parseList:
-      item = data.parseList[address]
+  return runContinue(cmd)
+      
+#  continue running code from address
+      
+def runContinue(cmd):
+  if data.address < 0:
+    return 'Can\'t do that'
+    
+  while data.address > 0:
+    if data.address in data.parseList:
+      item = data.parseList[data.address]
     else:
-      return 'Bad line number - ' + str(address)
+      return 'Bad line number - ' + str(data.address)
       
     if item['error'] != 'OK':
       return createError(item)
-      
+  
+    if data.address in data.breakpointList:
+      data.breakpointList.remove(data.address)
+      return 'Breakpoint at ' + str(data.address) + '\n' + item['code']
+    
     newAddress = executeStatement(item)
     if item['error']  != 'OK':    
         return createError(item)
         
-    if address == newAddress and item['statement'] != 'NEXT':
+    if data.address == newAddress and item['statement'] != 'NEXT':
       return createMsg(item, 'Infinite loop')
-    address = newAddress
+    data.address = newAddress
     
   if len(data.forNextStack) > 0:
     return 'For-next error'
@@ -77,6 +89,7 @@ def clearData():
 def executeStatement(item): 
 
   functionList = {    
+    'BREAK': runBreak,
     'DATA': runData,
     'DIM': runDim,
     'DISPLAY': runPrint,
@@ -98,7 +111,8 @@ def executeStatement(item):
     'REM': runRem,
     'RESTORE': runRestore,
     'RETURN': runReturn,
-    'STOP': runStop    
+    'STOP': runStop,
+'UNBREAK': runUnbreak    
 }    
   
   if item['error'] != 'OK':    
@@ -110,6 +124,18 @@ def executeStatement(item):
   else:
     item['error'] = 'Unknown statement'
     return -1 
+  
+  #  set  a breakpoint
+  
+def runBreak(item):  
+  for lineNumber in item['lines']:
+    n = int(lineNumber)
+    if n  in data.codeList:
+      data.breakpointList.append(n)
+      return item['nextLine']
+    else:
+      item['error'] = 'Bad line number - ' + lineNumber
+      return -1
   
   # run data statement - ignore - handled by restoreData function
   
@@ -513,6 +539,19 @@ def runRestore(item):
   
 def runStop(item):
   return -1 
+
+#  clear breakpoint
+  
+def runUnbreak(item):  
+  for lineNumber in item['lines']:
+    n = int(lineNumber)
+    if n  in data.codeList:
+      data.breakpointList.remove(n)
+      return item['nextLine']
+    else:
+      item['error'] = 'Bad line number - ' + lineNumber
+      return -1
+      
 
 
 #-------------------
