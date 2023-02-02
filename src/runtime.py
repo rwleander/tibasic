@@ -64,6 +64,11 @@ def runContinue(cmd):
       data.address = item['nextLine']
       return 'Breakpoint at ' + str(n) + '\n' + item['code']
   
+  #  if trace on, print the line number
+  
+    if data.traceFlag == True:
+      print('<' + str(data.address) + '> ', end='')
+    
     newAddress = executeStatement(item)
     if item['error']  != 'OK':    
         return createError(item)
@@ -121,7 +126,9 @@ def executeStatement(item):
     'RESTORE': runRestore,
     'RETURN': runReturn,
     'STOP': runStop,
-'UNBREAK': runUnbreak    
+    'TRACE': runTrace,    
+'UNBREAK': runUnbreak,
+'UNTRACE': runTrace    
 }    
   
   if item['error'] != 'OK':    
@@ -550,6 +557,12 @@ def runStop(item):
   data.address = -1
   return -1 
 
+#  set or reset trace flag
+
+def runTrace(item):
+  data.traceFlag = (item['statement'] == 'TRACE')
+  return item['nextLine']
+  
 #  clear breakpoint
   
 def runUnbreak(item):  

@@ -26,7 +26,9 @@ parseRules = {
   'RESTORE': 'RESTORE [ line ]',
   'RETURN': 'RETURN',  
   'STOP': 'STOP',
-  'UNBREAK': 'UNBREAK [ list ]'  
+  'TRACE': 'TRACE',
+  'UNBREAK': 'UNBREAK [ list ]',
+'UNTRACE': 'UNTRACE'  
 }
 
 

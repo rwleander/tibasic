@@ -13,6 +13,7 @@ printPosition = 0
 printWidth = 48
 
 breakpointList = []
+traceFlag = False
 
 dataList = []
 dataPointer = 0

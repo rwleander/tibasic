@@ -29,7 +29,7 @@ def executeCommand(cmd):
     'SAVE': cmdSave
   }
 
-  commandList = ['BREAK', 'DISPLAY', 'INPUT', 'LET', 'PRINT', 'STOP', 'UNBREAK']
+  commandList = ['BREAK', 'DISPLAY', 'INPUT', 'LET', 'PRINT', 'STOP', 'TRACE', 'UNBREAK', 'UNTRACE']
 
   cmdWork = helpers.upshift(cmd)
   parts = cmdWork.split()
@@ -65,6 +65,7 @@ def cmdNew(cmdWork):
   data.dataPointer = 0
   data.printPosition = 0
   data.breakpointList = []
+  data.traceFlag = False
   data.matrixList = {}
   data.matrixBase = 0
   
