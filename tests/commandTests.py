@@ -316,8 +316,56 @@ class TestCommands(unittest.TestCase):
     result = commands.executeCommand('Run')
     self.assertEqual(result, 'Can\'t do that')
 
+#  test break/unbreak
+    
+  def testBreakpoint (self):
+    result = commands.executeCommand('NEW')    
+    result = commands.executeCommand('20 N = 0')
+    result = commands.executeCommand('10 UNBREAK 40')
+    result = commands.executeCommand('30 FOR I = 1 to 5')
+    result = commands.executeCommand('40 N = N + 1')
+    result = commands.executeCommand('60 NEXT')
+    result = commands.executeCommand('70 REM PRINT N')
+    result = commands.executeCommand('BREAK 40')
+    self.assertEqual(result, 'OK')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Done')
+    self.assertEqual(data.variables['N'], 5)
 
-# test print statement
+#  test stop command
+
+  def testBreakpoint2 (self):
+    result = commands.executeCommand('NEW')    
+    result = commands.executeCommand('10 N = 0')
+    result = commands.executeCommand('20 FOR I = 1 to 5')
+    result = commands.executeCommand('30 N = N + 1')
+    result = commands.executeCommand('40 BREAK')
+    result = commands.executeCommand('60 NEXT')
+    result = commands.executeCommand('70 REM PRINT N')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Breakpoint at 40\n40 BREAK')
+    self.assertEqual(data.variables['N'], 1)
+    result = commands.executeCommand('STOP')
+    self.assertEqual(result, 'OK')
+    result = commands.executeCommand('CONTINUE')
+    self.assertEqual(result, 'Can\'t do that')
+
+#  test unbreak
+
+  def testBreakpoint3 (self):
+    result = commands.executeCommand('NEW')    
+    result = commands.executeCommand('5 UNBREAK')
+    result = commands.executeCommand('10 N = 0')
+    result = commands.executeCommand('20 FOR I = 1 to 5')
+    result = commands.executeCommand('30 N = N + 1')
+    result = commands.executeCommand('60 NEXT')
+    result = commands.executeCommand('70 REM PRINT N')
+    result = commands.executeCommand('BREAK 20, 30, 50')
+    self.assertEqual(result, 'OK')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Done')
+    self.assertEqual(data.variables['N'], 5)
+    
 
 
 if __name__ == '__main__':  

@@ -51,15 +51,24 @@ def runContinue(cmd):
     if item['error'] != 'OK':
       return createError(item)
   
+  #  if in breakpoint list, stop
+  
     if data.address in data.breakpointList:
       data.breakpointList.remove(data.address)
       return 'Breakpoint at ' + str(data.address) + '\n' + item['code']
-    
+  
+#  if command is break without line numbers, also break
+
+    if  item['statement'] == 'BREAK' and len(item['lines']) == 0:
+      n = data.address
+      data.address = item['nextLine']
+      return 'Breakpoint at ' + str(n) + '\n' + item['code']
+  
     newAddress = executeStatement(item)
     if item['error']  != 'OK':    
         return createError(item)
         
-    if data.address == newAddress and item['statement'] != 'NEXT':
+    if data.address == newAddress and data.address > 0 and item['statement'] != 'NEXT':
       return createMsg(item, 'Infinite loop')
     data.address = newAddress
     
@@ -127,7 +136,7 @@ def executeStatement(item):
   
   #  set  a breakpoint
   
-def runBreak(item):  
+def runBreak(item):    
   for lineNumber in item['lines']:
     n = int(lineNumber)
     if n  in data.codeList:
@@ -538,15 +547,20 @@ def runRestore(item):
   # stop and end
   
 def runStop(item):
+  data.address = -1
   return -1 
 
 #  clear breakpoint
   
 def runUnbreak(item):  
+  if len(item['lines']) == 0:
+    data.breakpointList = []    
+    return item['nextLine']
+    
   for lineNumber in item['lines']:
     n = int(lineNumber)
     if n  in data.codeList:
-      data.breakpointList.remove(n)
+      data.breakpointList.remove(n)      
       return item['nextLine']
     else:
       item['error'] = 'Bad line number - ' + lineNumber

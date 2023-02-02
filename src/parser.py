@@ -4,7 +4,7 @@ import data
 import helpers
 
 parseRules = {
-  'BREAK': 'BREAK list',
+  'BREAK': 'BREAK [ list ]',
   'DATA': 'DATA list',
   'DIM': 'DIM list',
   'DISPLAY': 'DISPLAY [ list ]',
@@ -26,7 +26,7 @@ parseRules = {
   'RESTORE': 'RESTORE [ line ]',
   'RETURN': 'RETURN',  
   'STOP': 'STOP',
-  'UNBREAK': 'UNBREAK list'  
+  'UNBREAK': 'UNBREAK [ list ]'  
 }
 
 

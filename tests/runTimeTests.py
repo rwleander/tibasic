@@ -726,7 +726,7 @@ class TestRuntime(unittest.TestCase):
     result = commands.executeCommand('CONTINUE')
     self.assertEqual(result, 'Done')
     self.assertEqual(data.variables['N'], 5)
-
+    
   def testBreakpoint2 (self):
     result = commands.executeCommand('NEW')    
     result = commands.executeCommand('BREAK 40')

@@ -29,7 +29,7 @@ def executeCommand(cmd):
     'SAVE': cmdSave
   }
 
-  commandList = ['BREAK', 'DISPLAY', 'INPUT', 'LET', 'PRINT', 'UNBREAK']
+  commandList = ['BREAK', 'DISPLAY', 'INPUT', 'LET', 'PRINT', 'STOP', 'UNBREAK']
 
   cmdWork = helpers.upshift(cmd)
   parts = cmdWork.split()
