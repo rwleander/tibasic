@@ -147,10 +147,11 @@ def setVariable(name, value):
     if type(value) != str:    
       return 'Bad type'  
   else:
-    if type(value) == int:
-      value = float(value)
-    if type(value) != float:
-      return 'Bad type'
+    if type(value) != bool:
+      if type(value) == int:
+        value = float(value)
+      if type(value) != float:
+        return 'Bad type'
     
   data.variables[name] = value
   return 'OK'

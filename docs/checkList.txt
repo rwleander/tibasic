@@ -27,8 +27,9 @@ Commands:
 *BREAK
 *UNBREAK
 *CONTINUE
-TRACE
-UNTRACE
+*TRACE
+*UNTRACE
+<escape> key
 
 CALL 
 CLOSE 
@@ -52,8 +53,10 @@ Statements:
 *STOP
 *END
 
-BREAK
-UNBREAK
+*BREAK
+*UNBREAK
+*TRACE
+*UNTRACE
 
 keyboard/screen:
 

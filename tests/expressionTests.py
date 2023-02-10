@@ -81,6 +81,15 @@ class TestExpressions(unittest.TestCase):
     self.assertEqual(tree[1], {'type': 'expr', 'parts': ['3', '/', '~2'], 'value': 0, 'id': 1, 'parent': 0})
     self.assertEqual(tree[2], {'type': 'expr', 'parts': ['4', '+', '5'], 'value': 0, 'id': 2, 'parent': 1})
    
+  def testCreateTree5 (self):
+    [parts, msg] = expressions.splitLine('4 <> 5')
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(parts, ['4', '<>', '5'])
+    [tree, msg] = expressions.buildTree(parts)
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(len(tree), 2)
+    self.assertEqual(tree[0], {'type': 'expr', 'parts': ['4', '<>', '5'], 'value': 0, 'id': 0,  'parent': -1})
+    
   def testCreateTreeFail (self):
     [parts, msg] = expressions.splitLine('2 * (3 / (4 + 5)')
     self.assertEqual(msg, 'OK')
@@ -186,6 +195,19 @@ class TestExpressions(unittest.TestCase):
     [value, msg] = expressions.evaluate('3 * -5 + 1')
     self.assertEqual(msg, 'OK')
     self.assertEqual(value, -14)
+
+  def testEvaluate10 (self):
+    [value, msg] = expressions.evaluate('4 <> 4')
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(value, False)
+
+
+  def testEvaluate11 (self):
+    [value, msg] = expressions.evaluate('4 <> 5')
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(value, True)
+    
+    
     
     #   test bad expressions
     

@@ -77,6 +77,17 @@ class TestParser(unittest.TestCase):
     self.assertEqual(item1, {'code': '10 LET A = 1', 'statement': 'LET', 'nextLine': 20, 'var': 'A', 'expr': '1', 'error': 'OK', 'source': 'runtime'})
     item2 = data.parseList[20]
     self.assertEqual(item2, {'code': '20 LET B = A + 1', 'statement': 'LET', 'nextLine': -1, 'var':'B', 'expr': 'A + 1', 'error': 'OK', 'source': 'runtime'})
+
+  def testParserLet2 (self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 Let A = (4 <> 5)')
+    result = parser.parse()    
+    self.assertEqual(result, 'OK')
+    self.assertEqual(len(data.parseList), 1)
+    self.assertEqual(data.firstLine, 10)
+    item1 = data.parseList[10]
+    self.assertEqual(item1, {'code': '10 LET A = (4 <> 5)', 'statement': 'LET', 'nextLine': -1, 'var': 'A', 'expr': '(4 <> 5)', 'error': 'OK', 'source': 'runtime'})
+    
     
 #  test bad let statements
 

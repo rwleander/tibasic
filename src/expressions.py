@@ -443,7 +443,7 @@ def compareParts(parts):
       if item == '>=':
         value = (prevItem >= nextItem)
         
-      if value == '<>':
+      if item == '<>':
         value = (prevItem != nextItem)  
   
       parts[i - 1] = value

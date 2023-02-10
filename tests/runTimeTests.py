@@ -52,6 +52,12 @@ class TestRuntime(unittest.TestCase):
     result = runtime.run('RUN')
     self.assertEqual(result, '10 LET A = 4 + * 2\nBad expression')
 
+  def testRunLet3 (self):
+    result = commands.executeCommand('NEW')
+    result = commands.executeCommand('10 Let A = (4 <> 5)')
+    result = runtime.run('RUN')
+    self.assertEqual(result, 'Done')
+    self.assertEqual(data.variables['A'], True)
 
 # test let without keyword
 
@@ -84,6 +90,22 @@ class TestRuntime(unittest.TestCase):
     result = runtime.run('RUN')
     self.assertEqual(result, 'Done')
     self.assertEqual(data.variables['A'], 1)
+
+  def testRunIfZer2 (self):
+    result = commands.executeCommand('NEW')
+    result = commands.executeCommand('10 A = 4')
+    result = commands.executeCommand('20 B = 5')
+    result = commands.executeCommand('30 IF  A <> B THEN 50')
+    result = commands.executeCommand('40 LET A = 10')
+    result = commands.executeCommand('50 STOP')
+    result = runtime.run('RUN')
+    self.assertEqual(result, 'Done')
+    self.assertEqual(data.variables['A'], 4)
+    result = commands.executeCommand('10 A = 5')
+    result = runtime.run('RUN')
+    self.assertEqual(result, 'Done')
+    self.assertEqual(data.variables['A'], 10)
+
 
   def testRunIfLogic(self):
     result = commands.executeCommand('NEW')

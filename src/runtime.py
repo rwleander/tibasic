@@ -484,7 +484,9 @@ def runPrint(item):
         item['error'] = msg
         return -1 
 
-      if type(txt) == float:
+      if type(txt) == bool:
+        txt = str(txt)
+      if type(txt) == float or type(txt) == int:
         txt = helpers.formatNumber(txt)
       if txt[0] == '"':
         txt = helpers.stripQuotes(txt)
