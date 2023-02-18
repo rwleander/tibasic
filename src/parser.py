@@ -58,17 +58,6 @@ def parse():
   #  parse a command line
 
 def parseCommand(cmd):
-
-  functionList = {
-    'BREAK': parseBreakList,
-    'DATA': parseDataList,
-    'DISPLAY': parsePrintList,
-    'INPUT': parseInputList,
-    'PRINT': parsePrintList,
-    'READ': parseReadList,
-'UNBREAK': parseBreakList    
-  }
-
   parts = cmd.split()
   statement = parts[0]
   
@@ -90,9 +79,7 @@ def parseCommand(cmd):
   codeParts= splitCode('00 ' + cmd, ruleParts)  
   item = addExpressions(item, ruleParts, codeParts)
     
-  if statement in functionList:
-    msg = functionList[statement](item)
-      
+  msg = selectParseFunction(item)      
   return item 
       
 # create an ordered list of line numbers
@@ -241,6 +228,18 @@ def addExpressions(item, ruleParts, codeParts):
 # parse input, print and other list based statements
 
 def parseDetails():
+  for lineNumber in data.index: 
+    item = data.parseList[lineNumber]    
+    statement = item['statement']    
+    msg = selectParseFunction(item)
+    if msg != 'OK':
+      return msg
+        
+  return 'OK'
+
+#  select   the parse function for this statement
+
+def selectParseFunction(item):
 
   functionList = {
     'BREAK': parseBreakList,
@@ -253,17 +252,13 @@ def parseDetails():
     'READ': parseReadList,
 'UNBREAK': parseBreakList    
   }
+  
+  statement = item['statement']
+  if statement in functionList:
+    return functionList[statement](item)
+  else:
+    return 'OK'
 
-  for lineNumber in data.index: 
-    item = data.parseList[lineNumber]    
-    statement = item['statement']    
-    
-    if statement in functionList:
-      msg = functionList[statement](item)
-      if msg != 'OK':
-        return msg
-        
-  return 'OK'
 
 #  parse the list of breakpoints for break and unbreak commands
 
