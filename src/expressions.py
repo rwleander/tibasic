@@ -1,11 +1,20 @@
-# parse expressions
+#  TI 99/4A BASIC 
+#  By Rick Leander
+#  Copyright (c) 2023 by Rick Leander - all rights reserved
+#
+# expressions.py - parse and evaluate an expressions
+#
+#  Entry point:
+#
+#  [value, error] = expressions.evaluate(expr)
+#
 
 import data
 import helpers
 import functions
 import matrix
 
-#  evaluate an expression
+#  parse  an expression and return the result
 
 def evaluate (expr):
   [parts, msg] = splitLine(expr)
@@ -70,9 +79,9 @@ def splitLine(expr):
       return [parts, 'Missing quote']
 
   return [parts, 'OK']
+ 
   
-  
-  #  build the tree structure from the parts
+#  build the tree structure from the parts
   
 def buildTree(parts):
   tree = {}
@@ -182,6 +191,7 @@ def buildTree(parts):
   
   
 #  calculate the value of the expression
+#  by calculating the result of each tree node
   
 def calculate(tree):  
 
@@ -249,7 +259,7 @@ def setVariables(parts, tree):
 
   return newParts
 
-#  reduce partial expression
+#  reduce partial expressions from each tree node
 
 def calculateExpression(branch):
   parts = branch['parts']  
@@ -336,7 +346,7 @@ def minusParts(parts):
     
   return [parts, 'OK']
 
-# calculate parts
+# reduce expression pairs
 
 def calcParts(parts, op):            
   if len(parts) < 3:
@@ -455,7 +465,7 @@ def compareParts(parts):
   return [parts, 'OK']
   
   
-  #  helper to find operators
+#  helper to find operators
   
 def findOperator(parts, op):
   try:

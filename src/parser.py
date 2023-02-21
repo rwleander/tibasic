@@ -1,7 +1,25 @@
+#  TI 99/4A BASIC 
+#  By Rick Leander
+#  Copyright (c) 2023 by Rick Leander - all rights reserved
+#
 #  parser - scan code for errors and build parseList data structure
+#
+#  Entry points:
+#
+#  Parse the code found in data.codeList:
+#    msg = parser.parse()
+#
+#  Parse the single line command in string cmd:
+#    item = parser.parseCommand(cmd)
+#
+# All functions return either 'OK' or an error message
+#
 
 import data
 import helpers
+
+#  the parseRules dictionary contains a list of 
+#  statements and their formats
 
 parseRules = {
   'BREAK': 'BREAK [ list ]',
@@ -32,7 +50,7 @@ parseRules = {
 }
 
 
-#  parse the code list and place in parseList
+#  parse each line in data.codeList into a dictionary object, then   add it to data.parseList by line number
 
 def parse():
   msg = createIndex()
@@ -55,7 +73,7 @@ def parse():
   return msg
     
   
-  #  parse a command line
+# parse a single command line and return a dictionary containing the parsed data
 
 def parseCommand(cmd):
   parts = cmd.split()
@@ -81,8 +99,13 @@ def parseCommand(cmd):
     
   msg = selectParseFunction(item)      
   return item 
-      
-# create an ordered list of line numbers
+   
+
+# ---------------------   
+#  local functions
+
+# create an ordered list of line numbers in data.index
+#  this array is used to list and save data.codeList in order by line number
 
 def createIndex():
   data.index = []
@@ -96,7 +119,9 @@ def createIndex():
   data.firstLine = data.index[0]  
   return 'OK'
 
-#  build the basic parse list from the index
+#  create a dictionary item for each line of code
+#  containing the code,, code parts, next line and error message,
+#  then add each to data.parseList
 
 def buildParseList():
   data.parseList = {}
@@ -124,7 +149,9 @@ def buildParseList():
     lastLine = lineNumber
   return 'OK'
   
-#  parse individual statements based on statement keyword
+#  parse individual statements using the parseRules dictionary
+#  for each line, add keywords and values to match the statement rules
+#  for example: LET A = B + C becomes {'statement': 'LET', 'var': 'A', 'expr': 'B + C'}
   
 def parseStatements():
   i = 0
@@ -151,11 +178,13 @@ def parseStatements():
     i = i + 1
   return 'OK'
   
-#  split a line of code by the upper case keywords in the rule
+#  split one line of code into its parts using the rule
+#  function matches upper case keywords to determine parts
+#  hope to refactor this code to make it more resilient and handle additional elements
   
 def splitCode(code, ruleParts):
   codeParts = []
-  lastKeyword = ''
+  lastWord = ''
   lastIndex = -1
   for word in ruleParts:
     
@@ -188,7 +217,8 @@ def splitCode(code, ruleParts):
         codeParts.append(code[i: len(code)])
   return codeParts
   
-#  add the expressions to the item list
+#  match up the rule and the extracted code items and add them to data.parseList  
+#  this also needs to be refactored to make it more readable
 
 def addExpressions(item, ruleParts, codeParts):  
   optional = False
@@ -224,9 +254,12 @@ def addExpressions(item, ruleParts, codeParts):
   return item
   
   
-  #--------------------------
-# parse input, print and other list based statements
-
+#--------------------------
+#  second level parsing for more difficult statements
+  
+# check each item in parse list then, if necessary, 
+#  call additional functions to fill in details
+ 
 def parseDetails():
   for lineNumber in data.index: 
     item = data.parseList[lineNumber]    
@@ -237,7 +270,7 @@ def parseDetails():
         
   return 'OK'
 
-#  select   the parse function for this statement
+#  if found in the function list, call the appropriate function
 
 def selectParseFunction(item):
 
@@ -259,8 +292,7 @@ def selectParseFunction(item):
   else:
     return 'OK'
 
-
-#  parse the list of breakpoints for break and unbreak commands
+#  determine  the list of breakpoints for break and unbreak commands
 
 def parseBreakList(item):
   listText = item['list']
@@ -268,7 +300,7 @@ def parseBreakList(item):
   item['lines'] = values
   return 'OK'
   
-#  parse the list of data items
+#  split  the list of data items
 
 def parseDataList(item):
   listText = item['list']
@@ -276,7 +308,7 @@ def parseDataList(item):
   item['data'] = values
   return 'OK'
   
-  #  split dim statement
+#  split dim statements
   
 def parseDimList(item):
   listText = item['list']
@@ -301,12 +333,13 @@ def parseDimList(item):
   item['vars'] = vars
   return 'OK'
   
-  # parse the list of inputs
+# determine  the list of variables for the input statement
   
 def parseInputList(item):
   listText = item['list']
   
-  #  find prompt
+# find the prompt - if it was specified
+#  otherwise default to question mark
   
   prompt = '?'  
   if listText[0] == '"':

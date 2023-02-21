@@ -1,7 +1,10 @@
-#  functions for matrix operations
-
-#  Note:
+#  TI 99/4A BASIC 
+#  By Rick Leander
+#  Copyright (c) 2023 by Rick Leander - all rights reserved
 #
+#  matrix.py - functions for matrix operations
+#
+#  Note:
 #  data.matrixBase determines start of arrays
 #  if 0, index goes from 0 to n - 1
 #  if 1, index goes from 1 to n
@@ -22,7 +25,7 @@ def setOption(value):
   data.matrixBase = value
   return 'OK'
   
-  #  create a new variable 
+#  create a new variable 
   
 def newVariable (name, x, y, z):
   x1 = x
@@ -47,7 +50,7 @@ def newVariable (name, x, y, z):
   data.matrixList[name] = {'x': x, 'y': y, 'z': z}    
   return 'OK'
   
-  #  set value inside matrix variable
+#  set a value inside the matrix variable
   
 def setVariable(name, value):
   [var, exprX, exprY, exprZ, msg] = parseVariable(name)
@@ -137,7 +140,6 @@ def evaluate(parts):
     
   value = data.variables[var][i]
   return [value, 'OK']
-  
  
 #  calculate index
 

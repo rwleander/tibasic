@@ -1,10 +1,15 @@
-#  helper functions created to reproduce functions missing from Circuit Python
+#  TI 99/4A BASIC 
+#  By Rick Leander
+#  Copyright (c) 2023 by Rick Leander - all rights reserved
+#
+#  helpers.py - helper functions used throughout the program
+#
 
 import os
 import data
 
-#  upshift user inpuut
-#  note leavel literals in lower case
+#  upshift user input
+#  note leave literals in lower case
 
 def upshift(txt):
   newTxt = ''
@@ -18,7 +23,7 @@ def upshift(txt):
       newTxt = newTxt + ch.upper()
   return newTxt  
     
-    #  is this variable name a string
+#  does  this variable contain a string
     
 def isStringVariable(txt):
   if txt == '':
@@ -74,7 +79,7 @@ def tab(n):
   txt = ' ' * n
   return txt  
     
-#   format number - remove trailing zeros and add one space to each side
+#   format numbers - remove trailing zeros and add one space to each side
   
 def formatNumber(n):
   txt = str(n)
@@ -168,7 +173,6 @@ def parseFileName(cmdWork):
 
   fileName = parts[1] + '.ti'
   return [fileName, 'OK']
-
 
 # does file exist
 

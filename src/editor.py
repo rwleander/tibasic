@@ -1,4 +1,8 @@
-#  editor - functions to edit code
+#  TI 99/4A BASIC 
+#  By Rick Leander
+#  Copyright (c) 2023 by Rick Leander - all rights reserved
+#
+#  editor.py - functions to edit the basic code
 
 import parser
 import helpers
@@ -16,7 +20,8 @@ def addLine(n, code):
     data.codeList[n] = code  
   return 'OK'
   
-  #  parse edit command
+#  parse the edit command
+#  returns the line number and any error message
   
 def preEdit(cmd):
   parts = cmd.split()
@@ -38,7 +43,12 @@ def preEdit(cmd):
     code = ''
   return [n, code, 'OK']
   
-  #  edit a line of code
+#  edit a line of code
+#  uses the old HP line edit commands
+#  spaces move the cursor to the position within the line
+#  i inserts additional text
+#  d deletes a character
+#  r replaces existing text
   
 def edit(txt, mask):
   functionList = {
@@ -57,6 +67,8 @@ def edit(txt, mask):
     op = 'R'
     
   return functionList[op](txt, i, shortMask)
+
+#  delete characters
   
 def editDelete(txt, i, mask):
   n = 0  
@@ -64,9 +76,13 @@ def editDelete(txt, i, mask):
     if ch.upper() == 'D':
       n = n + 1  
   return  txt[0: i] + txt[i + n: len(txt)]
+
+#  insert text
   
 def editInsert(txt, i, mask):
   return txt[0: i] + mask[1: len(mask)] + txt[i: len(txt)]
+
+#  replace text
 
 def editReplace(txt, i, mask):
   if mask[0] == 'R':    
@@ -74,7 +90,10 @@ def editReplace(txt, i, mask):
     return txt[0: i] + newMask + txt[i + len(newMask): len(txt)]
   else:
     return txt[0: i] + mask + txt[i + len(mask): len(txt)]
+
 # resequence the code list
+#  uses the parser to build the code tree
+#  so we can replace line numbers within gosub and other similar commands
 
 def resequence(base, step):
   functionList = {
@@ -109,8 +128,7 @@ def resequence(base, step):
   data.codeList = newList
   return 'OK'
     
-    
-    # default function to build resequenced line
+# default function to build resequenced line
     
 def resequenceLine(oldNumber, newNumber, item, xref):
   code = item['code']
@@ -151,9 +169,6 @@ def resequenceIf(oldNumber, newNumber, item, xref):
     newText = newText + ' ELSE ' + str(newLine2)
     
   return newText
-  
-    
-  return  str(newNumber) + ' ' + statement + ' ' + str(newGoto)
   
 #  resequence on goto, on gosub    
 

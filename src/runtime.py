@@ -1,4 +1,17 @@
-#  run time - interpret and run the program 
+#  TI 99/4A BASIC 
+#  By Rick Leander
+#  Copyright (c) 2023 by Rick Leander - all rights reserved
+#
+#  runtime.py -  interpret and run the program 
+#
+#  Entry points:
+#
+#  msg = runtime.run(cmd)
+#     note: cmd may contain a line number such as 'RUN 100'
+#     otherwise, cmd will be 'RUN'
+#
+#  msg = runContinue(cmd)
+#
 
 import random
 import math
@@ -82,7 +95,7 @@ def runContinue(cmd):
     
   return 'Done'
   
-#  clear the variables
+#  clear the global variables
     
 def clearData():
   data.variables = {}
@@ -98,7 +111,7 @@ def clearData():
   random.seed(0)
   
   
-  # run a line of code
+# call the appropriate function for the current statement
   
 def executeStatement(item): 
 
@@ -141,7 +154,7 @@ def executeStatement(item):
     item['error'] = 'Unknown statement'
     return -1 
   
-  #  set  a breakpoint
+#  set  a breakpoint
   
 def runBreak(item):    
   for lineNumber in item['lines']:
@@ -153,7 +166,8 @@ def runBreak(item):
       item['error'] = 'Bad line number - ' + lineNumber
       return -1
   
-  # run data statement - ignore - handled by restoreData function
+# data statements are processed at the beginning of the program
+#  go to to next statement when encountered during runtime
   
 def runData(item):  
   nextLine = item['nextLine']
@@ -192,7 +206,7 @@ def runDim(item):
 
   return item['nextLine']
     
-  #  run for statement
+#  run for statement
   
 def runFor(item):
   expr2 = getString (item, 'expr2')
@@ -246,7 +260,7 @@ def runFor(item):
   data.forNextStack.append(stackItem)   
   return nextLine 
   
-# next - get data from for/next stack and either increment variable or got o next line
+# next - get data from for/next stack and either increment variable or go to next line
   
 def runNext(item):
   if len(data.forNextStack) < 1:
@@ -277,7 +291,7 @@ def runNext(item):
   
   return nextLine 
 
-  #  if goto or gosub were coded as two words, route to correct function
+#  if goto or gosub were coded as two words, route to correct function
   
 def runGo(item):
   cmdType = getString(item, 'type')
@@ -296,7 +310,7 @@ def runGo(item):
   item['error'] = 'Bad command'
   return -1 
   
-  # run goto 
+# run go to 
   
 def runGoto(item):
   line = getLine(item, 'line')
@@ -305,7 +319,7 @@ def runGoto(item):
   else:
     return -1 
   
-  # run gosub 
+# run go sub 
   
 def runGosub(item):
   line = getLine(item,'line')
@@ -325,7 +339,7 @@ def runReturn(item):
   addr = data.gosubStack.pop()
   return addr 
 
-  # run an if statement
+# run an if statement
   
 def runIf(item):
   line2 = getLineOptional(item, 'line2', item['nextLine'])
@@ -363,7 +377,7 @@ def runInput(item):
     return -1 
   
   
-  #  run the LET command
+#  run the LET statement
   
 def runLet(item):
   expr = getString(item, 'expr')
@@ -411,7 +425,7 @@ def runOnGosub(item):
     item['error'] = 'Bad line number - ' + str(line)
     return -1
       
-    #  run on goto statement
+#  run on goto statement
     
 def runOnGoto(item):
   expr = getString(item, 'expr')
@@ -434,7 +448,7 @@ def runOnGoto(item):
     item['error'] = 'Bad line number - ' + str(line)
     return -1
   
-    #  change option
+#  change option
     
 def runOption(item):  
   n = getString(item, 'n')  
@@ -503,7 +517,7 @@ def runPrint(item):
 
   return item['nextLine'] 
  
-#  randomize - set random sequence
+# randomize - set random sequence
   
 def runRandomize(item):
   random.seed()
@@ -531,12 +545,12 @@ def runRead(item):
   nextLine = item['nextLine']
   return nextLine 
   
-  #  REM statement
+#  REM statement
   
 def runRem(item):
   return item['nextLine'] 
   
-  #  restore reload  data list
+#  restore reload  data list
   
 def runRestore(item):
   n = data.firstLine
@@ -553,7 +567,7 @@ def runRestore(item):
   
   return item['nextLine'] 
   
-  # stop and end
+# stop and end
   
 def runStop(item):
   data.address = -1
@@ -623,7 +637,7 @@ def processInputsFromString(vars, txt):
   values = splitValues(txt)      
   return processInputs(vars, values)
     
-    # extract data from comma delimited string
+# extract data from comma delimited string
     
 def splitValues(txt):
   values = []
@@ -649,7 +663,7 @@ def splitValues(txt):
     
   return values
   
-  # restore data starting at line number
+# restore data starting at line number
   
 def restoreData(n):
   if n not in data.index:
@@ -672,7 +686,7 @@ def restoreData(n):
 #--------------------
 #  validate and return items from parseList
 
-#  get a string by name
+#  get a string by name from the parse tree
 
 def getString(item, name):
   if name  in item:
@@ -710,7 +724,7 @@ def getLineOptional(item, name, defaultLine):
   else:
     return defaultLine
 
-#  create an error message from an  ite or stringm    
+#  create an error message from an  item or string    
 
 def createError(item):
   if item['source'] == 'command':

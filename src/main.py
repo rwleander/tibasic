@@ -1,9 +1,14 @@
-# main repl loop
+#  TI 99/4A BASIC 
+#  By Rick Leander
+#  Copyright (c) 2023 by Rick Leander - all rights reserved
+#
+# main.py -main program 
+#
 
 import data
 import commands
 
-#main loop
+#  main control loop
 
 print ('TI BASIC READY')
 while data.quitFlag == False:

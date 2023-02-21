@@ -1,12 +1,21 @@
-#  evaluate functions
+#  TI 99/4A BASIC 
+#  By Rick Leander
+#  Copyright (c) 2023 by Rick Leander - all rights reserved
+#
+#  functions.py - evaluate functions
+#
+#  Entry point:
+#
+#  [value, error] = functions.evaluate(parts)
+#
 
 import math
 import random
 
 import helpers
 
-#  get function results
-
+#  call appropriate function based on first part of the expression
+ 
 def evaluate(parts):
 
   functionList = {  
@@ -40,8 +49,6 @@ def evaluate(parts):
   else:       
     return [0, 'Unknown function']
 
-#  math functions
-
 # ABS - absolute value
 
 def doAbs(parts):
@@ -74,7 +81,7 @@ def doCos(parts):
   else:
     return [0, msg]
     
-    #  exponent function
+#  exponent function
     
 def doExp(parts):
   [n, msg] = getNumber(parts)
@@ -113,7 +120,7 @@ def doRnd(parts):
   r = random.random()
   return [r, 'OK']
 
-# sgn - return sign
+# sgn - return sign (-1, 0 or +1)
 
 def doSgn(parts):
   [n, msg] = getNumber(parts)
@@ -150,7 +157,7 @@ def doSqr (parts):
   else:
     return [0, 'Bad argument']
   
-  #  tab - return spaces
+#  tab - return spaces
   
 def doTab(parts):
   [n, msg] = getNumber(parts)

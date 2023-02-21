@@ -1,4 +1,12 @@
-#  commands - parse and run repl commands
+#  TI 99/4A BASIC 
+#  By Rick Leander
+#  Copyright (c) 2023 by Rick Leander - all rights reserved
+#
+#  commands.py - parse and run  keyboard commands
+#
+#  Entry point:#
+#   msg = commands.executeCommand(cmd)
+#   
 
 import os
 
@@ -9,7 +17,7 @@ import editor
 import runtime
 import helpers
 
-# process a command
+# parse the command string then call the appropriate function
 
 def executeCommand(cmd):
 
@@ -52,7 +60,7 @@ def executeCommand(cmd):
 #------------------------------
 #  code editing functions
     
-#  NEW - clear lists
+#  new command resets all data structures 
     
 def cmdNew(cmdWork):
   data.codeList = {}
@@ -71,7 +79,7 @@ def cmdNew(cmdWork):
   
   return 'OK'
 
-#  list code
+#  list part or all of the basic program in memory
 
 def cmdList(cmdWork):
   if len(data.codeList) == 0:
@@ -107,7 +115,7 @@ def cmdAddLine(cmd):
     
   return editor.addLine(lineNumber, cmd)
   
-# resequence the list
+# resequence the basic code in memory
 
 def cmdResequence(cmdWork):
   seq = 100
@@ -129,7 +137,7 @@ def cmdResequence(cmdWork):
   #-----------------------
   #  file operations
   
-#  prompt for program
+#  prompt for basic code, automatically incrementing line nubers 
   
 def cmdNumber(cmdWork):
   seq = 100
@@ -146,7 +154,7 @@ def cmdNumber(cmdWork):
     
   return 'OK'
   
-  # load a file
+# load an existing basic file
   
 def cmdOld(cmdWork):
   [fileName, msg] = helpers.parseFileName(cmdWork)
@@ -165,7 +173,7 @@ def cmdOld(cmdWork):
  
   return 'OK'
   
-  #  save a file
+#  save the basic program to a file in flash memory  
   
 def cmdSave(cmdWork):
   if len(data.codeList) == 0:
@@ -183,7 +191,7 @@ def cmdSave(cmdWork):
     fl.close()
   return 'OK'
   
-  # list files
+# list all basic files in flash memory
   
 def cmdFiles(cmdWork):
   str = ''
@@ -228,7 +236,7 @@ def cmdEdit(cmdWork):
     data.codeList[n] = str(n) + ' ' + code
   return 'OK'
   
-    # delete file
+# delete a basic file from flash memory
     
 def cmdDelete(cmdWork):
   [fileName, msg] = helpers.parseFileName(cmdWork)
@@ -245,7 +253,7 @@ def cmdDelete(cmdWork):
   #-----------------------
   #  other commands
  
- #  run the program
+ #  run the basic program
  
 def cmdRun(cmdWork):    
   return runtime.run(cmdWork)
@@ -260,7 +268,7 @@ def cmdRunCommand(cmdWork):
   addr = runtime.executeStatement(item)
   return item['error']
  
-#  quit
+#  end the python program 
 
 def cmdQuit(cmdWork):
   data.quitFlag = True
@@ -269,7 +277,7 @@ def cmdQuit(cmdWork):
 #-------------------
 #  helper functions
   
-  #  get numbers separated by commas
+#  extract a list of comma delimited numbers from the command line
       
 def getNumbers(txt, n1, n2):
   part1 = ''
@@ -303,7 +311,7 @@ def getNumbers(txt, n1, n2):
     
   return [num1, num2, msg]
       
-# get numbers for list command
+# get range of line numbers for the list command
 #
 #  list -      list all
 #  list n      list line n
