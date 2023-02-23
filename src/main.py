@@ -10,7 +10,7 @@ import commands
 
 #  main control loop
 
-print ('TI BASIC READY')
+print (data.title + ' ready')
 while data.quitFlag == False:
   cmd = input('>')
   msg = commands.executeCommand(cmd)

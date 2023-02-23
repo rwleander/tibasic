@@ -34,7 +34,8 @@ def executeCommand(cmd):
     'QUIT': cmdQuit,
     'RESEQUENCE': cmdResequence,
     'RUN': cmdRun,
-    'SAVE': cmdSave
+    'SAVE': cmdSave,
+    'VERSION': cmdVersion
   }
 
   commandList = ['BREAK', 'DISPLAY', 'INPUT', 'LET', 'PRINT', 'STOP', 'TRACE', 'UNBREAK', 'UNTRACE']
@@ -267,7 +268,12 @@ def cmdRunCommand(cmdWork):
 
   addr = runtime.executeStatement(item)
   return item['error']
- 
+
+#  display version
+
+def cmdVersion(cmdWork):
+  return data.title + ' version ' + data.version
+  
 #  end the python program 
 
 def cmdQuit(cmdWork):

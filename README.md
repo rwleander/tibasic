@@ -16,8 +16,6 @@ tests.bat - run the test suite
 logTests.bat - run test suite with results to file test.log
 upload.bat - upload the MicroPython files to the RP2040  
                make sure to set the correct com port
-			   
-			   
 
-
+Release notes can be found in the docs folder
 

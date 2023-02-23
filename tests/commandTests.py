@@ -316,6 +316,12 @@ class TestCommands(unittest.TestCase):
     result = commands.executeCommand('Run')
     self.assertEqual(result, 'Can\'t do that')
 
+#  test version command
+
+  def testVersion (self):
+    result = commands.executeCommand('VERSION')
+    self.assertEqual(result, 'TI Basic version 0.1.0')
+
 #  test break/unbreak
     
   def testBreakpoint (self):

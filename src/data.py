@@ -4,6 +4,11 @@
 #
 # data.py - global variables
 
+#  title and version number
+
+title = 'TI Basic'
+version = '0.1.0'
+
 #  codeList - dictionary containing the raw basic code indexed by line number
  
 codeList = {}
