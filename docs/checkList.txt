@@ -1,0 +1,108 @@
+exit
+
+Check List
+
+
+Commands:
+
+*NEW
+*LIST
+*OPEN
+*OLD
+*SAVE
+*DELETE
+*RUN
+*BYE
+*QUIT
+*RESEQUENCE
+*NUMBER
+*EDIT
+
+*DISPLAY
+*INPUT
+*LET
+*RANDOMIZE 
+*PRINT
+
+*BREAK
+*UNBREAK
+*CONTINUE
+*TRACE
+*UNTRACE
+<escape> key
+
+CALL 
+CLOSE 
+
+
+Statements:
+
+*LET
+* implied LET
+*IF THEN ELSE
+*GOTO
+* GO TO
+*GOSUB
+*GO SUB
+*RETURN
+*FOR TO STEP
+*NEXT
+*REM
+*ON GOTO (switch/case)
+*ON GOSUB
+*STOP
+*END
+
+*BREAK
+*UNBREAK
+*TRACE
+*UNTRACE
+
+keyboard/screen:
+
+*INPUT
+*READ
+*DATA
+*RESTORE
+*PRINT
+*DISPLAY
+
+file read/write:
+OPEN
+INPUT
+PRINT
+RESTORE
+CLOSE
+
+*RANDOMIZE
+DEF
+
+*OPTION BASE
+*DIM
+
+
+Functions
+
+SOUND
+KEY
+
+*ABS
+*ATN
+*COS
+*EXP
+*INT
+*LOG
+*RND
+*SGN
+*SIN
+*SQR
+*TAN
+
+*ASC
+*CHR$
+*LEN
+*POS
+*SEG$
+*STR$
+*VAL
+

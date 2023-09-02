@@ -1,0 +1,22 @@
+10 PRINT "Guess the Number Game"
+20 PRINT
+30 PRINT "Pick a number between 1 and 100"
+40 RANDOMIZE
+50 LO = 1
+60 HI = 100
+70 GUESS = INT(RND() * 100) + 1
+100 PRINT "Is the number "; GUESS
+110 INPUT "Y or N?": YN$
+120 IF YN$ = "Y" THEN 250
+130 PRINT "Is my guess high or low?"
+140 INPUT "H or L?": HL$
+150 IF HL$ = "L" THEN 180
+160 HI = GUESS
+170 GOTO 190
+180 LO = GUESS
+190 GUESS = INT((HI + LO) / 2)
+200 GOTO 100
+250 PRINT "I guessed the number"
+260 INPUT "Try again? (Y or N)": YN$
+270 IF YN$ = "Y" THEN 50
+280 END
