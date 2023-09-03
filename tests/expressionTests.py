@@ -4,6 +4,8 @@ import unittest
 
 import data
 import expressions
+import commands
+
 
 class TestExpressions(unittest.TestCase):
 
@@ -126,7 +128,7 @@ class TestExpressions(unittest.TestCase):
 
 #  test tree with function, multiple parameters
 
-  def testCreateTreeWithFunction2 (self):
+  def testCreateTreeWithFunction3 (self):
     [parts, msg] = expressions.splitLine('STR$("Hello", 2, 1)')
     self.assertEqual(msg, 'OK')
     self.assertEqual(len(parts), 8)
@@ -139,6 +141,23 @@ class TestExpressions(unittest.TestCase):
     self.assertEqual(tree[2], {'type': 'expr', 'parts': ['"Hello"'], 'value': 0, 'id': 2, 'parent': 1})
     self.assertEqual(tree[3], {'type': 'expr', 'parts': ['2'], 'value': 0, 'id': 3, 'parent': 1})
     self.assertEqual(tree[4], {'type': 'expr', 'parts': ['1'], 'value': 0, 'id': 4, 'parent': 1})
+
+#  build tree substituting user defined function
+
+  def testCreateTreeWithUserFunction (self):
+    commands.executeCommand('New')
+    data.userFunctionList = {'SQUARE': {'arg': 'N', 'expr': 'N * N'}}    
+    [parts, msg] = expressions.splitLine('SQUARE(4)')
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(len(parts), 4)
+    self.assertEqual(parts, ['SQUARE', '(', '4', ')'])
+    [tree, msg] = expressions.buildTree(parts)
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(len(tree), 4)
+    self.assertEqual(tree[0], {'type': 'expr', 'parts': ['~1'], 'value': 0, 'id': 0,  'parent': -1})
+    self.assertEqual(tree[1], {'type': 'udf', 'parts': ['SQUARE', '~2'], 'value': 0, 'id': 1, 'parent': 0})    
+    self.assertEqual(tree[2], {'type': 'expr', 'parts': ['4'], 'value': 0, 'id': 2, 'parent': 1})    
+    
 
 #  test set variables
 
@@ -245,9 +264,15 @@ class TestExpressions(unittest.TestCase):
     self.assertEqual(msg, 'OK')
     self.assertEqual(value, 4)
 
+#  test user defined function
 
-
-
+  def testEvaluateUserFunction (self):
+    commands.executeCommand('New')
+    data.userFunctionList = {'SQUARE': {'arg': 'N', 'expr': 'N * N'}}    
+    [value, msg] = expressions.evaluate('2 * SQUARE(2 + 3)')    
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(value, 50)
+    
   
 if __name__ == '__main__':  
     unittest.main()

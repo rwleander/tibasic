@@ -132,6 +132,7 @@ class TestParser(unittest.TestCase):
     self.assertEqual(item1['code'], '10 PRINT A; B, C: "Hello"') 
     self.assertEqual(item1['list'], 'A; B, C: "Hello"') 
     self.assertEqual(item1['parts'], ['A', ';', 'B', ',', 'C', ':', '"Hello"']) 
+    self.assertEqual(item1['fileNum'], 0)
     
 #  test bad print statements
 
@@ -141,6 +142,18 @@ class TestParser(unittest.TestCase):
     result = parser.parse()    
     self.assertEqual(len(data.parseList), 1)
     item1 = data.parseList[10]
+
+#  test print to file
+
+  def testParserPrintToFile (self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 PRINT #12: A, B, C')
+    result = parser.parse()    
+    self.assertEqual(len(data.parseList), 1)
+    item1 = data.parseList[10]
+    self.assertEqual(item1['list'], '#12: A, B, C')
+    self.assertEqual(item1['fileNum'], 12)
+    self.assertEqual(item1['parts'], ['A', ',', 'B', ',', 'C'])
 
 # test parse if statement
 
@@ -301,8 +314,24 @@ class TestParser(unittest.TestCase):
     self.assertEqual(item['statement'], 'INPUT')
     self.assertEqual(item['list'], '"Numbers:": A, B, C')
     self.assertEqual(item['prompt'], 'Numbers:')
+    self.assertEqual(item['fileNum'], 0)
     self.assertEqual(item['inputs'], ['A', 'B', 'C'])
     self.assertEqual(item['error'], 'OK')
+
+#  test input with file number
+
+  def testParseInputFromFile (self):
+    data.codeList = {10: '10 INPUT #14: A, B, C'}
+    result = parser.parse()  
+    self.assertEqual(result, 'OK')
+    self.assertEqual(len(data.parseList), 1)
+    item = data.parseList[10]
+    self.assertEqual(item['list'], '#14: A, B, C')
+    self.assertEqual(item['prompt'], '?')
+    self.assertEqual(item['fileNum'], 14)
+    self.assertEqual(item['inputs'], ['A', 'B', 'C'])
+    self.assertEqual(item['error'], 'OK')
+
 
 #  test parse of dim statement
 
@@ -445,6 +474,191 @@ class TestParser(unittest.TestCase):
     self.assertEqual(item2['statement'], 'UNBREAK')
     self.assertEqual(item2['list'], '20, 30')
     self.assertEqual(item2['lines'], ['20', '30'])
+    
+#  test parse of open statements
+
+  def testParseOpen (self):
+    commands.executeCommand('NEW')  
+    data.codeList = {10: '10 OPEN #12, "TESTFILE"'}    
+    result = parser.parse()  
+    self.assertEqual(result, 'OK')
+    item1 = data.parseList[10]
+    self.assertEqual(item1['statement'], 'OPEN')
+    self.assertEqual(item1['list'], '#12, "TESTFILE"')
+    self.assertEqual(item1['fileNum'], 12)
+    self.assertEqual(item1['fileName'], 'TESTFILE.dat')
+    self.assertEqual(item1['fileOrg'], 'S')
+    self.assertEqual(item1['maxRecs'], 0)
+    self.assertEqual(item1['fileType'], 'D')
+    self.assertEqual(item1['fileMode'], 'U')
+
+#  test open with file organization type
+
+  def testParseOpenWithOrg (self):
+    commands.executeCommand('NEW')  
+    data.codeList = {10: '10 OPEN #12, "TESTFILE", RELATIVE 20'}    
+    result = parser.parse()  
+    self.assertEqual(result, 'OK')
+    item1 = data.parseList[10]
+    self.assertEqual(item1['statement'], 'OPEN')    
+    self.assertEqual(item1['fileNum'], 12)
+    self.assertEqual(item1['fileName'], 'TESTFILE.dat')
+    self.assertEqual(item1['fileOrg'], 'R')
+    self.assertEqual(item1['maxRecs'], 20)
+    self.assertEqual(item1['fileType'], 'D')
+    self.assertEqual(item1['fileMode'], 'U')
+
+#  test open with file type 
+
+  def testParseOpenWithType (self):
+    commands.executeCommand('NEW')  
+    data.codeList = {10: '10 OPEN #12, "TESTFILE", SEQUENTIAL, INTERNAL'}
+    result = parser.parse()  
+    self.assertEqual(result, 'OK')
+    item1 = data.parseList[10]
+    self.assertEqual(item1['statement'], 'OPEN')    
+    self.assertEqual(item1['fileNum'], 12)
+    self.assertEqual(item1['fileName'], 'TESTFILE.dat')
+    self.assertEqual(item1['fileOrg'], 'S')
+    self.assertEqual(item1['maxRecs'], 0)
+    self.assertEqual(item1['fileType'], 'I')
+    self.assertEqual(item1['fileMode'], 'U')
+    
+#  test open with file mode
+
+  def testParseOpenWithMode (self):
+    commands.executeCommand('NEW')  
+    data.codeList = {10: '10 OPEN #12, "TESTFILE", SEQUENTIAL, INTERNAL, OUTPUT'}
+    result = parser.parse()  
+    self.assertEqual(result, 'OK')
+    item1 = data.parseList[10]
+    self.assertEqual(item1['statement'], 'OPEN')    
+    self.assertEqual(item1['fileNum'], 12)
+    self.assertEqual(item1['fileName'], 'TESTFILE.dat')
+    self.assertEqual(item1['fileOrg'], 'S')
+    self.assertEqual(item1['maxRecs'], 0)
+    self.assertEqual(item1['fileType'], 'I')
+    self.assertEqual(item1['fileMode'], 'O')
+    self.assertEqual(item1['recType'], 'F')
+    self.assertEqual(item1['recWidth'], 80)
+    self.assertEqual(item1['life'], 'P')
+
+    
+#  test file open with record type and lifespan
+
+  def testParseOpenWithRecType (self):
+    commands.executeCommand('NEW')  
+    data.codeList = {10: '10 OPEN #12, "TESTFILE", SEQUENTIAL, INTERNAL, OUTPUT, VARIABLE 120, TEMPORARY'}
+    result = parser.parse()  
+    self.assertEqual(result, 'OK')
+    item1 = data.parseList[10]
+    self.assertEqual(item1['statement'], 'OPEN')    
+    self.assertEqual(item1['fileNum'], 12)
+    self.assertEqual(item1['fileName'], 'TESTFILE.dat')
+    self.assertEqual(item1['fileOrg'], 'S')
+    self.assertEqual(item1['maxRecs'], 0)
+    self.assertEqual(item1['fileType'], 'I')
+    self.assertEqual(item1['fileMode'], 'O')
+    self.assertEqual(item1['recType'], 'V')
+    self.assertEqual(item1['recWidth'], 120)
+    self.assertEqual(item1['life'], 'T')
+    
+
+
+#  test exceptions in open statements
+
+  def testParseOpenExceptions (self):
+    commands.executeCommand('NEW')  
+    data.codeList = {10: '10 OPEN 12, "TESTFILE"'}    
+    result = parser.parse()  
+    self.assertEqual(result, 'Bad file number')
+    
+    data.codeList = {10: '10 OPEN #312, "TESTFILE"'}    
+    result = parser.parse()  
+    self.assertEqual(result, 'Bad file number')
+    
+    data.codeList = {10: '10 OPEN #12, TESTFILE'}    
+    result = parser.parse()  
+    self.assertEqual(result, 'Bad file name')
+    
+    data.codeList = {10: '10 OPEN #12, RESTORE'}    
+    result = parser.parse()  
+    self.assertEqual(result, 'Bad file name')
+    
+    data.codeList = {10: '10 OPEN #12, "TESTFILE", RANDOM'} 
+    result = parser.parse()  
+    self.assertEqual(result, 'Bad file org')
+    
+    data.codeList = {10: '10 OPEN #12, "TESTFILE", SEQUENTIAL, PRINT'} 
+    result = parser.parse()  
+    self.assertEqual(result, 'Bad file type')
+    
+    data.codeList = {10: '10 OPEN #12, "TESTFILE", SEQUENTIAL, INTERNAL, READ'} 
+    result = parser.parse()  
+    self.assertEqual(result, 'Bad file mode')
+    
+    data.codeList = {10: '10 OPEN #12, "TESTFILE", SEQUENTIAL, INTERNAL, INPUT, FIXED x'} 
+    result = parser.parse()  
+    self.assertEqual(result, 'Bad record type')
+    
+    data.codeList = {10: '10 OPEN #12, "TESTFILE", SEQUENTIAL, INTERNAL, INPUT, FIXED 120, TEMP'} 
+    result = parser.parse()  
+    self.assertEqual(result, 'Bad file life')
+        
+    #  test close 
+    
+  def testParseClose (self):
+    commands.executeCommand('NEW')  
+    data.codeList = {90: '90 CLOSE #12'}
+    result = parser.parse()  
+    self.assertEqual(result, 'OK')    
+    item1 = data.parseList[90]
+    self.assertEqual(item1['statement'], 'CLOSE')    
+    self.assertEqual(item1['fileNum'], 12)
+
+#  test close with errors
+    
+  def testParseCloseWithErrrors (self):
+    commands.executeCommand('NEW')      
+    data.codeList = {90: '90 CLOSE #x2'}
+    result = parser.parse()  
+    self.assertEqual(result, 'Bad file number')
+        
+    data.codeList = {90: '90 CLOSE #12: TEMP'}
+    result = parser.parse()  
+    self.assertEqual(result, 'Bad statement')
+    
+    #  test def statement
+    
+  def testParseDef (self):
+    commands.executeCommand('NEW')      
+    data.codeList = {10: '10 DEF SQUARE(NUM) = NUM * NUM'}
+    result = parser.parse()  
+    self.assertEqual(result, 'OK')        
+    item1 = data.parseList[10]
+    self.assertEqual(item1['statement'], 'DEF')    
+    self.assertEqual(item1['func'], 'SQUARE(NUM)') 
+    self.assertEqual(item1['function'], 'SQUARE')
+    self.assertEqual(item1['arg'], 'NUM')
+    self.assertEqual(item1['expr'], 'NUM * NUM')
+
+#  test def with no argument
+    
+  def testParseDefNoArg (self):
+    commands.executeCommand('NEW')      
+    data.codeList = {10: '10 DEF PI() = 3.14159265'}
+    result = parser.parse()  
+    self.assertEqual(result, 'OK')        
+    item1 = data.parseList[10]
+    self.assertEqual(item1['statement'], 'DEF')    
+    self.assertEqual(item1['func'], 'PI()')
+    self.assertEqual(item1['function'], 'PI')
+    self.assertEqual(item1['arg'], '')
+    self.assertEqual(item1['expr'], '3.14159265')
+    
+    
+
+    
     
     
   

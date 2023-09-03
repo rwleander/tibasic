@@ -4,6 +4,7 @@ import unittest
 
 import runtime
 import commands
+import helpers
 import data
 
 class TestRuntime(unittest.TestCase):
@@ -454,46 +455,6 @@ class TestRuntime(unittest.TestCase):
     result = runtime.run('RUN')
     self.assertEqual(result, 'Done')
     self.assertEqual(data.variables['S$'], '"Hello world"')
-    
-#  test process input function
-
-  def testProcessInput (self):
-    vars = ['A', 'B', 'C']
-    values = [1, 2, 3]
-    result = runtime.processInputs(vars, values)
-    self.assertEqual(result, 'OK')
-    self.assertEqual(data.variables['A'], 1)
-    self.assertEqual(data.variables['B'], 2)
-    self.assertEqual(data.variables['C'], 3)
-
-  def testProcessInput2 (self):
-    vars = ['A$', 'B$', 'C']
-    values = ['Red', '"Blue"', '3']
-    result = runtime.processInputs(vars, values)
-    self.assertEqual(result, 'OK')
-    self.assertEqual(data.variables['A$'], '"Red"')
-    self.assertEqual(data.variables['B$'], '"Blue"')
-    self.assertEqual(data.variables['C'], 3)
-
-
-# test input from string
-
-  def testProcessInput3 (self):
-    vars = ['A$', 'B$', 'C']    
-    result = runtime.processInputsFromString(vars, 'Red, "Blue", 3')
-    self.assertEqual(result, 'OK')
-    self.assertEqual(data.variables['A$'], '"Red"')
-    self.assertEqual(data.variables['B$'], '"Blue"')
-    self.assertEqual(data.variables['C'], 3)
-
-# test split values function
-
-  def testSplitValues (self):
-    result = runtime.splitValues('1, 2, 3')
-    self.assertEqual(result, ['1', '2', '3'])
-    result = runtime.splitValues('Red, "Blue", 3')
-    self.assertEqual(result, ['Red', '"Blue"', '3'])
-
 #  test initial load of data items
 
   def testLoadData (self):
@@ -767,8 +728,155 @@ class TestRuntime(unittest.TestCase):
     self.assertEqual(result, 'Done')
     self.assertEqual(data.variables['N'], 5)
 
+#  test basic file open and close
+    
+  def testFileOpenClose (self):
+    commands.executeCommand('NEW')    
+    commands.executeCommand('10 Open #10, "TESTFILE", SEQUENTIAL, INTERNAL, OUTPUT')
+    commands.executeCommand('20 CLOSE #10')
+    result = commands.executeCommand('RUN')    
+    self.assertEqual(result, 'Done')
+    self.assertEqual(helpers.fileExists('TESTFILE.dat'), True)
 
+#  test open/close with delete option
+    
+  def testFileOpenCloseDelete (self):
+    commands.executeCommand('NEW')    
+    commands.executeCommand('10 Open #10, "TESTFILE", SEQUENTIAL, INTERNAL, OUTPUT')
+    commands.executeCommand('20 CLOSE #10: DELETE')
+    result = commands.executeCommand('RUN')    
+    self.assertEqual(result, 'Done')
+    self.assertEqual(helpers.fileExists('TESTFILE.dat'), False)
 
+#  test write file
+    
+  def testFileWrite (self):
+    commands.executeCommand('NEW')    
+    commands.executeCommand('10 Open #10, "TESTFILE", SEQUENTIAL, INTERNAL, OUTPUT')
+    commands.executeCommand('20 PRINT #10: 1, 2, "ABC"')
+    commands.executeCommand('30 CLOSE #10')
+    commands.executeCommand('40 Open #15, "TESTFILE", SEQUENTIAL, INTERNAL, INPUT')    
+    commands.executeCommand('50 INPUT #15: A, B, C$')
+    commands.executeCommand('60 CLOSE #15: DELETE')
+    result = commands.executeCommand('RUN')    
+    self.assertEqual(result, 'Done')
+    self.assertEqual(data.variables['A'], 1)
+    self.assertEqual(data.variables['B'], 2)
+    self.assertEqual(data.variables['C$'], '"ABC"')
+
+#  test eof function
+    
+  def testFileEOF (self):
+    commands.executeCommand('NEW')    
+    commands.executeCommand('10 Open #10, "TESTFILE", SEQUENTIAL, INTERNAL, OUTPUT')
+    commands.executeCommand('20 FOR I = 1 to 5')
+    commands.executeCommand('30 PRINT #10: I')
+    commands.executeCommand('40 NEXT')    
+    commands.executeCommand('50 CLOSE #10')
+    commands.executeCommand('60 Open #15, "TESTFILE", SEQUENTIAL, INTERNAL, INPUT')    
+    commands.executeCommand('70 SUM = 0')
+    commands.executeCommand('80 IF EOF(15) <> 0 THEN 120')
+    commands.executeCommand('90 INPUT #15: J')
+    commands.executeCommand('100 SUM = SUM + J')
+    commands.executeCommand('110 GO TO 80')     
+    commands.executeCommand('120 CLOSE #15: DELETE')
+    result = commands.executeCommand('RUN')    
+    self.assertEqual(result, 'Done')
+    self.assertEqual(helpers.fileExists('TESTFILE.dat'), True)
+    self.assertEqual(data.variables['SUM'], 15)
+
+#  test out of data
+    
+  def testFileEOF (self):
+    commands.executeCommand('NEW')    
+    commands.executeCommand('10 Open #10, "TESTFILE", SEQUENTIAL, INTERNAL, OUTPUT')
+    commands.executeCommand('20 FOR I = 1 to 5')
+    commands.executeCommand('30 PRINT #10: I')
+    commands.executeCommand('40 NEXT')    
+    commands.executeCommand('50 CLOSE #10')
+    commands.executeCommand('60 Open #15, "TESTFILE", SEQUENTIAL, INTERNAL, INPUT')    
+    commands.executeCommand('70 SUM = 0')    
+    commands.executeCommand('90 INPUT #15: J')
+    commands.executeCommand('100 SUM = SUM + J')
+    commands.executeCommand('110 GO TO 90')     
+    commands.executeCommand('120 CLOSE #15: DELETE')    
+    result = commands.executeCommand('RUN')    
+    self.assertEqual(result, '90 INPUT #15: J\nOut of data')
+
+#  test partial read
+    
+  def testFileReadOPartial (self):
+    commands.executeCommand('NEW')    
+    commands.executeCommand('10 Open #10, "TESTFILE", SEQUENTIAL, INTERNAL, OUTPUT')
+    commands.executeCommand('20 PRINT #10: 1, 2, 3, 4')
+    commands.executeCommand('30 CLOSE #10')
+    commands.executeCommand('40 Open #15, "TESTFILE", SEQUENTIAL, INTERNAL, INPUT')    
+    commands.executeCommand('50 INPUT #15: A, B, C')
+    commands.executeCommand('60 CLOSE #15: DELETE')    
+    result = commands.executeCommand('RUN')    
+    self.assertEqual(result, 'Done')
+    self.assertEqual(data.variables['A'], 1)
+    self.assertEqual(data.variables['B'], 2)
+    self.assertEqual(data.variables['C'], 3)
+    
+#  read with too little data
+    
+  def testFileReadOPartial (self):
+    commands.executeCommand('NEW')    
+    commands.executeCommand('10 Open #10, "TESTFILE", SEQUENTIAL, INTERNAL, OUTPUT')
+    commands.executeCommand('20 PRINT #10: 1, 2, 3')
+    commands.executeCommand('30 CLOSE #10')
+    commands.executeCommand('40 Open #15, "TESTFILE", SEQUENTIAL, INTERNAL, INPUT')    
+    commands.executeCommand('50 INPUT #15: A, B, C, D')
+    commands.executeCommand('60 CLOSE #15: DELETE')    
+    result = commands.executeCommand('RUN')    
+    self.assertEqual(result, '50 INPUT #15: A, B, C, D\nBad values')
+
+#  test def statement
+    
+  def testDef (self):
+    commands.executeCommand('NEW')    
+    commands.executeCommand('10 DEF SQUARE(N) = N * N')
+    result = commands.executeCommand('RUN')    
+    self.assertEqual(result, 'Done')
+    self.assertEqual(len(data.userFunctionList), 1)
+    item = data.userFunctionList['SQUARE']
+    self.assertEqual(item['arg'], 'N')
+    self.assertEqual(item['expr'], 'N * N')
+
+    #  test user defined function
+        
+  def testUserFunction (self):
+    commands.executeCommand('NEW')    
+    commands.executeCommand('10 DEF SQUARE(N) = N * N')
+    commands.executeCommand('20 A = SQUARE(2 + 3) * 2')
+    result = commands.executeCommand('RUN')    
+    self.assertEqual(result, 'Done')
+    self.assertEqual(len(data.variables), 1)
+    self.assertEqual(data.variables['A'], 50)
+    
+#  test nested user functions
+
+  def testNestedUserFunction (self):
+    commands.executeCommand('NEW')    
+    commands.executeCommand('10 DEF SQUARE(N) = N * N')
+    commands.executeCommand('20 DEF INCR (N) = N + 1')    
+    commands.executeCommand('30 A = SQUARE(INCR(2))') 
+    result = commands.executeCommand('RUN')    
+    self.assertEqual(result, 'Done')
+    self.assertEqual(len(data.variables), 1)
+    self.assertEqual(data.variables['A'], 9)
+
+#  test bad user function name
+
+  def testBadUserFunction (self):
+    commands.executeCommand('NEW')    
+    commands.executeCommand('10 DEF SQR(N) = N * N')
+    result = commands.executeCommand('RUN')    
+    self.assertEqual(result, 'Bad function name')
+    
+
+    
 if __name__ == '__main__':  
     unittest.main()
     

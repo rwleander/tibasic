@@ -8,6 +8,7 @@ ampy -p %com% put src/runtime.py
 ampy -p %com% put src/expressions.py
 ampy -p %com% put src/functions.py
 ampy -p %com% put src/matrix.py
+ampy -p %com% put src/readWrite.py
 ampy -p %com% put src/main.py
 ampy -p %com% put src/code.py
 ampy -p %com% ls

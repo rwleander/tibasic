@@ -1,0 +1,68 @@
+File system notes, fileLife]
+
+Open fileNumber, fileName, [fileOrg, fileType, mode, recType  
+
+file number must be between 1 and 255
+file numbers are preceded by # sign
+
+file names must be enclosed in quotes
+
+fileOrg: sequential, relative
+specify number of initial record count with number after relative
+default: sequential
+
+fileType: display, internal
+default: display
+ 
+ mode: input, output, update, append
+default: update
+ 
+ recType: fixed, variable
+ specify max length by adding number after fixed or variable
+default: fixed 
+ if fileOrg is relative, only fixed length allowed
+if fixed, records are padded to specified length
+ 
+ fileLife: permanent, temporary
+ default: permanent
+ 
+ 
+ close fileNum delete
+
+files close automatically if break followed by edit, run or bye
+
+
+Input fileNum [, rec n]: list
+
+recNum is used for random access files only
+each input reads an entire record and remaining fields are ignored unless the list ends with a comma
+if there are more fields in the list than values in the record, an additional record is read
+display fields are separated by commas
+internal fields will use csv for input
+random access files start with record 0, if no rec specified, read next line
+random access, if rec num specified, ignore previous ending comma
+
+
+EOF(fileNum) function
+test eof prior to reading data
+file number not preceded by number sign
+eof function does not work with random access files - create and end record to mark end of file
+return values:
+0 - not eof
++1 - logical eof - last record read
+-1 - physical eof - out of disk space
+
+
+Print fileNum [, rec n]: list
+display type files must have comma separators if the data will later be read by TI Basic
+if display type data exceeds record length, a new record will be written
+internal type data will be written in csv format
+random access files are printed sequentially if no rec num specified
+ 
+
+Restore fileNum [, rec n]
+
+repositions file pointer to bof
+if pending print, data will be written before restore operation
+if pending input, remaining input is ignored
+

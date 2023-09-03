@@ -68,14 +68,14 @@ keyboard/screen:
 *DISPLAY
 
 file read/write:
-OPEN
-INPUT
-PRINT
+*OPEN
+*INPUT
+*PRINT
 RESTORE
-CLOSE
+*CLOSE
 
 *RANDOMIZE
-DEF
+*DEF
 
 *OPTION BASE
 *DIM

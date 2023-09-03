@@ -6,4 +6,5 @@ python tests\parserTests.py
 python tests\expressionTests.py 
 python tests\functionTests.py 
 python tests\matrixTests.py 
+python tests\readWriteTests.py 
 python tests\runTimeTests.py 
