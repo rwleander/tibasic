@@ -23,7 +23,7 @@ class TestMatrix(unittest.TestCase):
     self.assertEqual(result, 'Incorrect statement')
 
   def testOption3 (self):
-    data.matrixList = {'A': {'x': 5}}
+    data.matrixList = {'A': {'dimensions': [5, 5], 'n': 25}}
     data.matrixBase = 0
     result = matrix.setOption(1)
     self.assertEqual(result, 'Option must be before dim')
@@ -33,46 +33,91 @@ class TestMatrix(unittest.TestCase):
   def testNewVariable (self):
     data.matrixList = {}
     data.matrixBase = 0
-    result = matrix.newVariable('A', 10, 0, 0) 
+    result = matrix.newVariable('A', [10])
     self.assertEqual(result, 'OK')
+    self.assertEqual(len(data.matrixList), 1)
+    matrixItem = data.matrixList['A']
+    self.assertEqual(matrixItem['dim'], [10])
+    self.assertEqual(matrixItem['len'], 10)
+    self.assertEqual(len(data.variables['A']), 10)
 
-
-#  test parse matrix
-
-  def testparseMatrix (self):
-    [var, x, y, z, msg] = matrix.parseVariable('A(10)')
-    self.assertEqual(msg, 'OK')
-    self.assertEqual(var, 'A')
-    self.assertEqual(x, '10')
-    self.assertEqual(y, '')
-    self.assertEqual(z, '')
-
-  def testParseMatrix2 (self):
-    [var, x, y, z, msg] = matrix.parseVariable('A(10, 5, 3)')
-    self.assertEqual(msg, 'OK')
-    self.assertEqual(var, 'A')
-    self.assertEqual(x, '10')
-    self.assertEqual(y, '5')
-    self.assertEqual(z, '3')
-
-#  set an item in a variable
-
-  def testSetVariable (self):
-    data.variables ['A'] = [0, 0, 0, 0, 0, 0]
-    data.matrixList['A'] = {'x': 5, 'y': 0, 'z': 0}
-    result = matrix.setVariable('A(3)', 12)
+    #  test save variable
+    
+  def testSaveVariable (self):
+    data.matrixList = {}
+    data.variables = {}
+    data.matrixBase = 0
+    result = matrix.newVariable('A', [10])
     self.assertEqual(result, 'OK')
-    self.assertEqual(data.variables['A'], [0, 0, 0, 13, 0, 0])
-
-
+    result = matrix.saveVariable(['A', '(', '3', ')'], 10)
+    self.assertEqual(result, 'OK')
+    self.assertEqual(data.variables['A'][3], 10)
+    #  test save variable with three dimensions
+        
+  def testSaveVariable2 (self):
+    data.matrixList = {}
+    data.variables = {}
+    data.matrixBase = 0
+    result = matrix.newVariable('A', [3, 3, 3])
+    self.assertEqual(result, 'OK')
+    result = matrix.saveVariable(['A', '(', '1', ',', '1', ',', '1', ')'], 10)
+    self.assertEqual(result, 'OK')
+    self.assertEqual(data.variables['A'][13], 10)
+    
+    #  test save variable with subscripts
+    
+  def testSaveVariable3 (self):
+    data.matrixList = {}
+    data.variables = {'i': 1, 'j': 1}
+    data.matrixBase = 0
+    result = matrix.newVariable('A', [3, 3])
+    self.assertEqual(result, 'OK')
+    result = matrix.saveVariable(['A', '(', 'i', ',', 'j', ')'], 10)
+    self.assertEqual(result, 'OK')
+    self.assertEqual(data.variables['A'][4], 10)
+    
+#  test evaluate function
+    
+    
+  def testEvaluate (self):
+    data.matrixList = {}
+    data.variables = {}
+    data.matrixBase = 0
+    result = matrix.newVariable('A', [5])
+    self.assertEqual(result, 'OK')
+    data.variables['A'] = [1, 2, 3, 4, 5]
+    [n, msg] = matrix.evaluate(['A', 3])
+    self.assertEqual(msg, 'OK')
+    self.assertEqual(n, 4)
+        
 #  test calculate index
 
-  def testSetVariable (self):
-    data.variables ['A'] = [0, 0, 0, 0, 0, 0]
-    data.matrixList['A'] = {'x': 5, 'y': 0, 'z': 0}
-    [i, msg] = matrix.calculateIndex('A', 4, 0, 0)
+  def testCalcIndex (self):
+    data.matrixBase = 0    
+    i = matrix.calcIndex([3, 3], [1, 2])
+    self.assertEqual (i, 5)
+    i = matrix.calcIndex([2, 3, 4], [1, 2, 3])
+    self.assertEqual(i, 23)     
+    data.matrixBase = 1        
+    i = matrix.calcIndex([3, 3], [1, 2])
+    self.assertEqual (i, 1)
+    i = matrix.calcIndex([2, 3, 4], [1, 2, 3])
+    self.assertEqual(i, 6)     
+    data.matrixBase = 0
+    i = matrix.calcIndex([3, 3, 3], [1, 2, 3])
+    self.assertEqual(i, -1)
+    i = matrix.calcIndex([3, 3, 3], [1, 2])
+    self.assertEqual(i, -1)
+
+#  test calc subscripts function
+
+  def testCalcSubscripts (self):
+    data.variables = {'I': 1, 'J': 2}
+    [values, msg] = matrix.calcSubscripts(['I', ',', 'J'])
     self.assertEqual(msg, 'OK')
-    self.assertEqual(i, 4)
+    self.assertEqual(values, [1, 2])
+    
+
     
     
 

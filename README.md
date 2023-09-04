@@ -1,8 +1,7 @@
-# TI Basic
+# TI Extended Basic for RP2040
 
-Interpreter for TI BASIC using MicroPython
+Interpreter for TI Extended BASIC using MicroPython
 Intended for Raspberry Pi PICO RP2040
 
-
-Release notes can be found in the docs folder
+See doc folder for release notes
 

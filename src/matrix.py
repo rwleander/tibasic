@@ -1,22 +1,14 @@
-#  TI 99/4A BASIC
-#  By Rick Leander
-#  Copyright (c) 2023 by Rick Leander - all rights reserved
-#
 #  matrix.py - functions for matrix operations
-#
-#  Note:
-#  data.matrixBase determines start of arrays
-#  if 0, index goes from 0 to n - 1
-#  if 1, index goes from 1 to n
 
 import data
-import helpers
 import expressions
+import scanner
+
 
 #  set option base
 
 def setOption(value):
-  if value not in [0, 1]: 
+  if value not in [0, 1]:
     return 'Incorrect statement'
 
   if len(data.matrixList) > 0:
@@ -27,152 +19,98 @@ def setOption(value):
 
 #  create a new variable
 
-def newVariable (name, x, y, z):
-  x1 = x
-  y1 = y
-  z1 = z
+def newVariable (name, dimensions):
+  if len(dimensions) not in range(1, 8):
+    return 'Bad statement'
 
-  if y1 == 0:
-    y1 = 1
-  if z1 == 0:
-    z1 = 1
+  n = 1
+  for  dim in dimensions:
+    n = n * dim
 
-  n = x1 * y1 * z1
   try:
-    if helpers.isStringVariable(name):
+    if scanner.isStringVariable(name):
       data.variables [name] = [''] * n
     else:
       data.variables[name] = [0] * n
   except MemoryError:
     data.variables[name] = 0
-    return [-1, 'Out of memory']
+    return 'Out of memory'
 
-  data.matrixList[name] = {'x': x, 'y': y, 'z': z}
+  data.matrixList[name] = {'dim': dimensions, 'len': n}
   return 'OK'
 
-#  set a value inside the matrix variable
+#  set a value into an array
 
-def setVariable(name, value):
-  [var, exprX, exprY, exprZ, msg] = parseVariable(name)
+def saveVariable(var, value):
+  if len(var) < 4:
+    return 'Bad variable'
+
+  varName = var[0]
+  tokens = var[2: len(var) -1]
+  [subscripts, msg] = calcSubscripts(tokens)
   if msg != 'OK':
     return msg
 
-  [x, msg] = expressions.evaluate(exprX)
-  if msg != 'OK':
-    return msg
-
-  [y, msg] = expressions.evaluate(exprY)
-  if msg != 'OK':
-    return msg
-
-  [z, msg] = expressions.evaluate(exprZ)
-  if msg != 'OK':
-    return msg
-
-  x = int(x)
-  y = int(y)
-  z = int(z)
-  [i, msg] = calculateIndex(var, x, y, z)
-  if msg != 'OK':
-    return msg
-
-  if helpers.isStringVariable(var):
-    data.variables[var][i] = value
-  else:
-    data.variables[var][i] = float(value)
-
+  if varName not in data.matrixList:
+    return 'Bad variable'
+  matrixItem = data.matrixList[varName]
+  i = calcIndex(matrixItem['dim'], subscripts)
+  if i < 0:
+    return 'Bad subscripts'
+  data.variables[varName][i] = value
   return 'OK'
 
-#   parse matrix variable name into its parts
-
-def parseVariable(name):
-  i = name.find('(')
-  if i < 1:
-    return ['', 0, 0, 0, 'Bad name']
-
-  j = name.find(')')
-  if j < i:
-    return ['', 0, 0, 0, 'Bad name']
-
-  var = name[0: i].strip()
-  lst = name[i+1: j]
-  x = ''
-  y = ''
-  z = ''
-
-  parts = lst.split(',')
-  if len(parts) == 0:
-    return ['', 0, 0, 0, 'Bad name']
-
-  if len(parts) > 0:
-    x = parts[0].strip()
-
-  if len(parts) > 1:
-    y = parts[1].strip()
-
-  if len(parts) > 2:
-    z = parts[2].strip()
-
-  return [var, x, y, z, 'OK']
-
-# evaluate matrix expression
+#  evaluate expression
 
 def evaluate(parts):
+  if len(parts) < 2:
+    return [-1, 'Bad expression']
+
   var = parts[0]
+  subscripts = parts[1: len(parts)]
   if var not in data.matrixList:
     return [-1, 'Bad expression']
 
-  x = 0
-  y = 0
-  z = 0
-
-  if len(parts) > 1:
-    x = int(parts[1])
-  if len(parts) > 2:
-    y = int(parts[2])
-
-  if len(parts) > 3:
-    z = int(parts[3])
-
-  [i, msg] = calculateIndex(var, x, y, z)
-  if msg != 'OK':
-    return [-1, msg]
-
-  value = data.variables[var][i]
-  return [value, 'OK']
+  matrixItem = data.matrixList[var]
+  i = calcIndex(matrixItem['dim'], subscripts)
+  n = data.variables[var][i]
+  return [n, 'OK']
 
 #  calculate index
 
-def calculateIndex(name, x, y, z):
-  if name not in data.matrixList:
-    return [-1, 'Unknown variable']
+def calcIndex(dimensions, subscripts):
+  if len(dimensions) != len(subscripts):
+    return -1
 
-  matItem = data.matrixList[name]
-  i = x - data.matrixBase
-  xMin =  data.matrixBase
-  xMax = matItem['x'] - ( 1 - data.matrixBase)
-  yMin = 0
-  yMax = 0
-  zMin = 0
-  zMax = 0
+  n = 0
+  for i in range(0, len(dimensions)):
+    v = int(subscripts[i] - data.matrixBase)
+    if v >= dimensions[i]:
+      return -1
+    n = n * dimensions[i] + v
 
-  if matItem['y'] > 0:
-    i = i + matItem['y'] * (y - data.matrixBase)
-    yMin = xMin
-    yMax = matItem['y'] - (1 - data.matrixBase)
+  return int (n)
 
-  if matItem['z'] > 0:
-    i = i + matItem['z'] * (z - data.matrixBase)
-    zMin = xMin
-    zMax = matItem['z'] - (1 - data.matrixBase)
+#  evaluate subscripts and return in values
 
-  if x < xMin or x > xMax:
-    return [-1, 'Index out of bounds']
+def calcSubscripts(tokens):
+  values = []
+  expr = []
+  error = 'OK'
+  for token in tokens:
+    if token == ',':
+      [v, msg] = expressions.evaluate(expr)
+      if msg != 'OK':
+        error = msg
+      values.append(v)
+      expr = []
+    else:
+      expr.append(token)
 
-  if y < yMin or y > yMax:
-    return [-1, 'Index out of bounds']
+  if len(expr) > 0:
+    [v, msg] = expressions.evaluate(expr)
+    if msg != 'OK':
+      error = msg
+    values.append(v)
 
-  if z < zMin or z > zMax:
-    return [-1, 'Index out of bounds']
-
-  return [i, 'OK']
+  return [values, error]

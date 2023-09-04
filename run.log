@@ -1,0 +1,16 @@
+
+MPY: soft reboot
+TI Extended Basic ready
+>old pi
+OK
+>run
+Calculate pi using random numbers
+
+N             PI
+Missing )
+>
+>quit
+Bye
+MicroPython v1.19.1 on 2022-06-18; Raspberry Pi Pico with RP2040
+Type "help()" for more information.
+>>> 

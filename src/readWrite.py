@@ -7,23 +7,22 @@
 
 import os
 
-import parser
 import commands
+import scanner
 import expressions
+import statements
 import data
-import helpers
 
 
 #  load a program file
 
 def loadCodeFile(fileName):
-  if helpers.fileExists(fileName) is False:
+  if fileExists(fileName) is False:
     return 'No data found'
 
   with open (fileName, 'r', encoding='UTF-8') as fl:
     while  (line := fl.readline().strip()):
-      line = helpers.upshift(line)
-      commands.cmdAddLine(line)
+      commands.executeCommand(line)
     fl.close()
 
   return 'OK'
@@ -31,254 +30,175 @@ def loadCodeFile(fileName):
 #  save the current code file to disk
 
 def saveCodeFile(fileName):
-  parser.createIndex()
+  index = scanner.createIndex()
 
   with open (fileName, 'w', encoding='UTF-8') as fl:
-    for lineNumber in data.index:
-      fl.write (data.codeList[lineNumber] + '\n')
+    for lineNumber in index:
+      codeItem = data.codeList[lineNumber]
+      fl.write (codeItem['code'] + '\n')
     fl.close()
   return 'OK'
 
 #  delete a code file
 
 def deleteCodeFile(fileName):
-  if helpers.fileExists(fileName) is False:
+  if fileExists(fileName) is False:
     return 'No data found'
 
   os.remove(fileName)
   return 'OK'
 
-#  list code files in storage
+#  use the print area to list program and data files
 
-def listCodeFiles():
-  strWork = ''
-  n = 0
-  files  = os.listdir()
-  for file in files:
-    i = file.find('.ti')
-    j = file.find('\\')
-    if (i > 0) and (j < 0):
-      strWork = strWork + file[0:i] + '\t'
-      n = n + 1
-
-  if n > 0:
-    return strWork[0:len(strWork)-1]
-
-  return 'No files'
-
-#--------------------------
-#  functions to open a file
-
-def openFile(item):
-  openFunctions = {
-    'I': openFileInput,
-    'O': openFileOutput,
-    'A': openFileAppend,
-    'U': openFileUpdate
-  }
-
-  fileNum = item['fileNum']
-  if fileNum in data.fileList:
-    item['error'] = 'Bad file number'
-    return
-
-  fileMode = item['fileMode']
-  fileItem = {}
-  fileItem['fileNum'] = item['fileNum']
-  fileItem['fileName'] = item['fileName']
-  fileItem['fileOrg'] = item['fileOrg']
-  fileItem['maxRecs'] = item['maxRecs']
-  fileItem['fileType'] = item['fileType']
-  fileItem['fileMode'] = fileMode
-  fileItem['recType'] = item['recType']
-  fileItem['recWidth'] = item['recWidth']
-  fileItem['life'] = item['life']
-  fileItem['eof'] = 0
-  fileItem['error'] = 'OK'
-
-  if fileMode in openFunctions:
-    openFunctions[fileMode] (fileItem)
-  else:
-    fileItem['error'] = 'Bad file mode - ' + fileMode
-
-  if fileItem['error'] == 'OK':
-    data.fileList[fileNum] = fileItem
-  else:
-    item['error'] = fileItem['error']
-
-#  open a file for input
-
-def openFileInput(fileItem):
-  fileName = fileItem['fileName']
-  fl = open(fileName, 'r', encoding='UTF-8')
-  fileItem['fileHandle'] = fl
-  prereadFile(fileItem)
-
-#  open file for output
-
-def openFileOutput(fileItem):
-  fileName = fileItem['fileName']
-  fl = open(fileName, 'w', encoding='UTF-8')
-  fileItem['fileHandle'] = fl
-
-def openFileAppend(fileItem):
-  fileName = fileItem['fileName']
-  fl = open(fileName, 'a', encoding='UTF-8')
-  fileItem['fileHandle'] = fl
-
-#  open a file for update
-
-def openFileUpdate(fileItem):
-  fileItem['error'] = 'Not ready'
-
-#  read data from file
-
-def inputFile(item):
-  fileNum = item['fileNum']
-  if fileNum not in data.fileList:
-    item['error'] = 'File ' + str(fileNum) + ' not open'
-    return
-
-  fileItem = data.fileList[fileNum]
-  if fileItem['eof'] != 0:
-    item['error'] = 'Out of data'
-    return
-
-  buff = fileItem['buff']
-  varList = item['inputs']
-  item['error'] = processInputsFromString(varList, buff)
-  prereadFile(fileItem)
-
-  #  pre-read a record from the file
-
-def prereadFile(fileItem):
-  fl = fileItem['fileHandle']
-  buff = fl.readline()
-  eof = 0
-  if buff == '':
-    eof = 1
-  fileItem['buff'] = buff.strip()
-  fileItem['eof'] = eof
+def listFiles():
+  printArea = initPrint(data.printWidth, data.printTab)
+  formatText(printArea, 'Program files:')
+  formatNewLine(printArea)
+  codeFiles = os.listdir()
+  for file in codeFiles:
+    if file.find('.ti') > 0:
+      file = file.replace('.ti', '')
+      formatText(printArea, file)
+      formatComma(printArea)
+  formatNewLine(printArea)
+  return printArea
 
 
-#  print to a file
+#-----------------------
+#  helper functions
 
-def printFile(item):
-  fileNum = item['fileNum']
-  if fileNum not in data.fileList:
-    item['error'] = 'File ' + str(fileNum) + ' not open'
-    return
+#  does file exist
 
-  fileItem = data.fileList[fileNum]
-  fl = fileItem['fileHandle']
-  parts = item['parts']
-  buff = ''
-  for expr in parts:
-    if expr in [',', ':', ';']:
-      buff = buff + ', '
-    else:
-      [value, msg] = expressions.evaluate(expr)
-      if msg != 'OK':
-        item['error'] = msg
-        return
-      if type(value) in [int, float, bool]:
-        value = str(value)
-      if type == str:
-        value = helpers.addQuotes(value)
-      buff = buff + value
-  fl.write(buff + '\n')
-
-#  close a file
-
-def closeFile(item):
-  fileNum = item['fileNum']
-  if fileNum not in data.fileList:
-    item['error'] = 'Bad file number'
-    return
-  fileItem = data.fileList[fileNum]
-  fl = fileItem['fileHandle']
-  fl.close()
-
-  if item['delete'] == 'DELETE':
-    os.remove(fileItem['fileName'])
-
-  data.fileList.pop(fileNum)
-
-#  at end of run, close remaining files
-
-def closeAllFiles():
-  for fileNum in data.fileList:
-    fileItem = data.fileList[fileNum]
-    fl = fileItem['fileHandle']
-    fl.close()
-  data.fileList = {}
+def fileExists(fileName):
+  files = os.listdir()
+  return fileName in files
 
 #----------------------
-#  helper functions for read and write
+#  input functions
 
-#  process input  from comma delimited string
-#  note - if empty string, set variable to empty value
+#  load data from input command
 
-def processInputsFromString(variables, txt):
-  if (len(variables) == 1) and (txt == ''):    
-    values = ['""']
-  else:  
-    values = splitValues(txt)
-  return processInputs(variables, values)
+def loadInput(variables, txt):
+  [varList, msg] = scanner.stripCommas(variables)
+  if msg != 'OK':
+    return msg
 
-# extract data from comma delimited string
+  tokens = scanner.findTokens(txt)
+  [values, msg] = scanner.stripCommas(tokens)
+  if msg != 'OK':
+    return msg
 
-def splitValues(txt):
-  values = []
-  value = ''
-  inQuotes = False
-
-  for ch in txt:
-    if ch == '"':
-      inQuotes = not inQuotes
-
-    if inQuotes:
-      value = value + ch
-    else:
-      if ch == ',':
-        if value != '':
-          values.append(value)
-        value = ''
-      elif ch != ' ':
-        value = value + ch
-
-  if value != '':
-    values.append(value)
-
-  return values
-
-#  save input values
-
-def processInputs(variables, values):
-  if len(variables) > len(values):
-    return 'Bad values'
+  if len(varList) != len(values):
+    return 'Bad input'
 
   i = 0
-  while i < len(variables):
-    var = variables[i]
-    value = values[i]
-
-    if helpers.isStringVariable(var):
-      if value[0] != '"':
-        value = helpers.addQuotes(value)
-    else:
-      if type(value) == str:
-        if helpers.isnumeric(value):
-          value = float(value)
-        else:
-          return 'Bad value - ' + value
-
-      if type(value) == int:
-        value = float(value)
-
-    msg = helpers.setVariable(var, value)
+  for varName in varList:
+    msg = statements.saveVariable(varName, values[i])
     if msg != 'OK':
-      return msg
+      return 'Bad input'
     i = i + 1
-
   return 'OK'
+
+#----------------------
+#  format routines for print and display commands
+
+#  initialize print structure
+
+def initPrint(width, tab):
+  return {
+    'buff': '',
+    'lines': [],
+    'width': width,
+    'tab': tab,
+    'error': 'OK'
+  }
+
+#  format print statements
+#
+#  warning - this gets a bit difficult
+#  work is done in the print area
+#  then results can be found in printArea['lines']
+
+def formatPrint(printArea, printList):
+  delimiters = {
+    ',': formatComma,
+    ';': formatSemi,
+    ':': formatNewLine
+  }
+
+  printArea['lines'] = []
+  if len(printList) == 0:
+    formatNewLine(printArea)
+    return printArea['lines']
+
+  expr = []
+  for token in printList:
+    if token in delimiters:
+      formatExpression(printArea, expr)
+      delimiters[token](printArea)
+      expr = []
+    else:
+      expr.append(token)
+
+  if len(expr) > 0:
+    formatExpression(printArea, expr)
+
+  if printList[len(printList) - 1] not in delimiters:
+    formatNewLine(printArea)
+
+  return printArea['lines']
+
+#  add spaces to complete a column
+
+def formatComma(printArea):
+  l = len(printArea['buff'])
+  if l > printArea['width'] - printArea['tab']:
+    formatNewLine(printArea)
+    return
+  t = printArea['tab'] - (l % printArea['tab'])
+  printArea['buff'] = printArea['buff'] + t * ' '
+
+#  ad a space
+
+def formatSemi(printArea):
+  l = len(printArea['buff'])
+  if l < printArea['width']:
+    printArea['buff'] = printArea['buff'] + ' '
+  else:
+    formatNewLine(printArea)
+
+#  add expresion to line
+
+def formatExpression(printArea, expr):
+  lBuff = len(printArea['buff'])
+  [value, msg] = expressions.evaluate(expr)
+  if msg != 'OK':
+    printArea['error'] = msg
+    return
+
+  if type(value) in [float, int, bool]:
+    value = str(value)
+  if len(value) > 0:
+    if value[0] == '"':
+      value = scanner.stripQuotes(value)
+  if value[len(value) -2: len(value)] == '.0':
+    value = value[0: len(value) - 2]
+  lValue = len(value)
+  if lBuff + lValue > printArea['width']:
+    formatNewLine(printArea)
+  printArea['buff'] = printArea['buff'] + value
+
+#  add text to print area
+
+def formatText(printArea, txt):
+  lBuff = len(printArea['buff'])
+  l = len(txt)
+  if lBuff + l > printArea['width']:
+    formatNewLine(printArea)
+  printArea['buff'] = printArea['buff'] + txt
+
+#  add  buff to line
+
+def formatNewLine(printArea):
+  printArea['lines'].append(printArea['buff'])
+  printArea['buff'] = ''

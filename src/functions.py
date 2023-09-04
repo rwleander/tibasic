@@ -1,18 +1,9 @@
-#  TI 99/4A BASIC
-#  By Rick Leander
-#  Copyright (c) 2023 by Rick Leander - all rights reserved
-#
 #  functions.py - evaluate functions
-#
-#  Entry point:
-#
-#  [value, error] = functions.evaluate(parts)
-#
 
 import math
 import random
 
-import helpers
+import scanner
 import data
 
 #  call appropriate function based on first part of the expression
@@ -30,8 +21,12 @@ def evaluate(parts):
     'INT': doInt,
     'LEN': doLen,
     'LOG': doLog,
+    'MAX': doMax,
+    'MIN': doMin,
+    'PI': doPi,
     'POS': doPos,
     'RND': doRnd,
+    'RPT$': doRpt,
     'SEG$': doSeg,
     'SGN': doSgn,
     'SIN': doSin,
@@ -49,7 +44,7 @@ def evaluate(parts):
   if func in functionList:
     return functionList[func](parts)
 
-  return [0, 'Unknown function']
+  return [0, 'Unknown function - ' + str(parts)]
 
 # ABS - absolute value
 
@@ -84,16 +79,17 @@ def doCos(parts):
   return [0, msg]
 
 #  EOF function
+#  not yet implemented
 
 def doEof(parts):
   [n, msg] = getNumber(parts)
   if msg != 'OK':
     return [0, 'Bad argument']
   if n not in data.fileList:
-    return [0, 'Bad argument']  
+    return [0, 'Bad argument']
   fileItem = data.fileList[n]
   return [fileItem['eof'], 'OK']
-  
+
 #  exponent function
 
 def doExp(parts):
@@ -215,7 +211,7 @@ def doChr(parts):
   if msg != 'OK':
     return [0, msg]
 
-  chrWork = helpers.addQuotes(chr(int(value)))
+  chrWork = scanner.addQuotes(chr(int(value)))
   return [chrWork, 'OK']
 
 #  get string length
@@ -230,6 +226,30 @@ def doLen(parts):
     return [0, 'OK']
 
   return [n, 'OK']
+
+#  return max of two numbers
+
+def doMax(parts):
+  if len(parts) != 3:
+    return [0, 'Bad arguments']
+
+  if parts[1] < parts[2]:
+    return [parts[2], 'OK']
+  return [parts[1], 'OK']
+#  return min of two numbers
+
+def doMin(parts):
+  if len(parts) != 3:
+    return [0, 'Bad arguments']
+
+  if parts[1] > parts[2]:
+    return [parts[2], 'OK']
+  return [parts[1], 'OK']
+
+#  return pi
+
+def doPi(parts):
+  return [math.pi, 'OK']
 
   #  position function
 
@@ -250,13 +270,30 @@ def doPos(parts):
       return [0, 'Bad value']
 
   str1 = str1[0: len(str1) - 1]
-  str2 = helpers.stripQuotes(str2)
+  str2 = scanner.stripQuotes(str2)
   n = str1.find(str2, int(num))
 
   if n > 0:
     return [n, 'OK']
-
   return [0, 'OK']
+
+#   repeat string
+
+def doRpt(parts):
+  if len(parts) < 3:
+    return ['""', 'Bad arguments']
+  oldString = str(parts[1])
+  oldString = scanner.stripQuotes(oldString)
+
+  if scanner.isnumeric(parts[2]) is False:
+    return ['""', 'Bad arguments']
+  n = int(parts[2])
+  if n < 1:
+    return ['""', 'Bad arguments']
+  strWork = oldString
+  for n in range(1, n):
+    strWork = strWork + oldString
+  return [scanner.addQuotes(strWork), 'OK']
 
   #  segment function
 
@@ -283,7 +320,7 @@ def doSeg(parts):
   if num1 < 1 or num1 > len(strWork) or num2 < 1:
     return [0, 'Bad value']
 
-  strNew = helpers.addQuotes(strWork[int(num1): int(num1 + num2)])
+  strNew = scanner.addQuotes(strWork[int(num1): int(num1 + num2)])
   return [strNew, 'OK']
 
 #  str$ - convert number to string
@@ -299,7 +336,7 @@ def doStr(parts):
   if strWork[len(strWork) - 2: len(strWork)] == '.0':
     strWork = strWork[0: len(strWork) - 2]
 
-  strWork = helpers.addQuotes(strWork)
+  strWork = scanner.addQuotes(strWork)
   return [strWork, 'OK']
 
 #  value function
@@ -310,7 +347,7 @@ def doVal(parts):
     return [0, msg]
 
   strWork = strWork[1: len(strWork) - 1]
-  if helpers.isnumeric(strWork) is False:
+  if scanner.isnumeric(strWork) is False:
     return [0, 'Bad value']
 
   n = float(strWork)

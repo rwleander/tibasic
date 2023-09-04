@@ -1,882 +1,278 @@
-#  test for run time methods
+#  test for runtime  module
 
 import unittest
 
 import runtime
 import commands
-import helpers
+import scanner
 import data
 
 class TestRuntime(unittest.TestCase):
 
-# test run with no code
+# test  program execution
 
-  def testRunNoCode (self):
-    result = commands.executeCommand('NEW')
-    result = runtime.run('RUN')
-    self.assertEqual(result, 'Can\'t do that')
-
-  def testRunBadLine (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 A = 1')
-    result = runtime.run('RUN xx')
-    self.assertEqual(result, 'Bad line number')
-    result = runtime.run('RUN 20')
-    self.assertEqual(result, 'Bad line number - 20')
-
-# run a line of code
-
-  def testRunLet (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 Let A = 1')
-    result = runtime.run('RUN')
+  def testRun (self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 LET A = 1')
+    commands.executeCommand('20 LET B = 2')
+    commands.executeCommand('30 LET C = A + B')
+    scanner.createIndex()
+    result = runtime.run()    
     self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['A'], 1)
-
-#  test run with line number
-
-  def testRunWithLineNumber (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 A = 10')
-    result = commands.executeCommand('20 STOP')
-    result = commands.executeCommand('30 A = 30')
-    result = runtime.run('RUN')
-    self.assertEqual(data.variables['A'], 10)
-    result = runtime.run('RUN 30')
-    self.assertEqual(data.variables['A'], 30)
-
-# test let with bad expression
-
-  def testRunLet2 (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 Let A = 4 + * 2')
-    result = runtime.run('RUN')
-    self.assertEqual(result, '10 LET A = 4 + * 2\nBad expression')
-
-  def testRunLet3 (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 Let A = (4 <> 5)')
-    result = runtime.run('RUN')
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['A'], True)
-
-# test let without keyword
-
-
-  def testRunImpliedLet (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 A = 1')
-    result = runtime.run('RUN')
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['A'], 1)
-
-# test if statement
+    self.assertEqual(data.variables['C'], 3)
+    
+#  test if statement
 
   def testRunIf (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 Let A = 1')
-    result = commands.executeCommand('20 Let A = A + 1')
-    result = commands.executeCommand('30 IF A < 11 THEN 20')
-    result = commands.executeCommand('40 LET B = A') 
-    result = runtime.run('RUN')
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 LET A = 1')
+    commands.executeCommand('20 IF A = 1 Then 40')
+    commands.executeCommand('30 LET A = 2')
+    commands.executeCommand('40 LET B = A')
+    scanner.createIndex()
+    result = runtime.run()    
     self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['B'], 11)
+    self.assertEqual(data.variables['B'], 1)
 
-  def testRunIfZero (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 IF 0 THEN 30')
-    result = commands.executeCommand('20 LET A = 1') 
-    result = commands.executeCommand('25 STOP')
-    result = commands.executeCommand('30 LET A = 2') 
-    result = runtime.run('RUN')
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['A'], 1)
-
-  def testRunIfZer2 (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 A = 4')
-    result = commands.executeCommand('20 B = 5')
-    result = commands.executeCommand('30 IF  A <> B THEN 50')
-    result = commands.executeCommand('40 LET A = 10')
-    result = commands.executeCommand('50 STOP')
-    result = runtime.run('RUN')
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['A'], 4)
-    result = commands.executeCommand('10 A = 5')
-    result = runtime.run('RUN')
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['A'], 10)
-
-
-  def testRunIfLogic(self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 IF ( 5 > 3) * ( 4 > 2) THEN 30')
-    result = commands.executeCommand('20 LET A = 1') 
-    result = commands.executeCommand('25 STOP')
-    result = commands.executeCommand('30 LET A = 2') 
-    result = runtime.run('RUN')
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['A'], 2)
-
-
-
-# test goto
-
-  def testRunGoTo (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 LET A = 1')
-    result = commands.executeCommand('20 GOTO 40')
-    result = commands.executeCommand('30 LET A = 2')
-    result = commands.executeCommand('40 END')
-    result = runtime.run('RUN')
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['A'], 1)
-
-# test goto with bad line number
-
-  def testRunGoToBad (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 LET A = 1')
-    result = commands.executeCommand('20 GOTO 100')
-    result = commands.executeCommand('30 LET A = 2')
-    result = commands.executeCommand('40 END')
-    result = runtime.run('RUN')
-    self.assertEqual(result, '20 GOTO 100\nBad line number')
-
-#  don't allow infinite loop
-
-  def testRunGoToBad2 (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 LET A = 1')
-    result = commands.executeCommand('20 GOTO 20')
-    result = commands.executeCommand('30 LET A = 2')
-    result = commands.executeCommand('40 END')
-    result = runtime.run('RUN')
-    self.assertEqual(result, '20 GOTO 20\nInfinite loop')
-
-# test GO TO (separate words)
-
-  def testRunGoTo2 (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 LET A = 1')
-    result = commands.executeCommand('20 GO TO 40')
-    result = commands.executeCommand('30 LET A = 2')
-    result = commands.executeCommand('40 END')
-    result = runtime.run('RUN')    
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['A'], 1)
-
-#  test gosub, return
-
-  def testRunGosub (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 LET A = 1')
-    result = commands.executeCommand('20 GOSUB 50')
-    result = commands.executeCommand('30 STOP')
-    result = commands.executeCommand('50 LET A = 10')
-    result = commands.executeCommand('60 RETURN')    
-    result = runtime.run('RUN')
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['A'], 10)
-
-# test nested gosub
-
-  def testRunGosub (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 LET A = 10')
-    result = commands.executeCommand('20 GOSUB 50')
-    result = commands.executeCommand('30 STOP')
-    result = commands.executeCommand('50 LET A = 20')
-    result = commands.executeCommand('60 GOSUB 100')    
-    result = commands.executeCommand('70 RETURN')
-    result = commands.executeCommand('100 LET A = 30')
-    result = commands.executeCommand('110 RETURN')    
-    result = runtime.run('RUN')
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['A'], 30)
-
-#  test go sub (two words)
-
-  def testRunGosub2 (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 LET A = 1')
-    result = commands.executeCommand('20 GO SUB 50')
-    result = commands.executeCommand('30 STOP')
-    result = commands.executeCommand('50 LET A = 10')
-    result = commands.executeCommand('60 RETURN')        
-    result = runtime.run('RUN')    
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['A'], 10)
-
-  def testRunGosubBadLine (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 LET A = 1')
-    result = commands.executeCommand('20 GO SUB 50')
-    result = runtime.run('RUN')    
-    self.assertEqual(result, '20 GO SUB 50\nBad line number')
-
-
-# test basic for/next
-
-  def testRunForNext (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 LET A = 0')
-    result = commands.executeCommand('20 FOR I = 1 TO 5')
-    result = commands.executeCommand('30 LET A = A * 10 + I')
-    result = commands.executeCommand('40 NEXT')
-    result = runtime.run('RUN')
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['A'], 12345)
-
-# test for/next with step
-
-  def testRunForNext2 (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 LET A = 0')
-    result = commands.executeCommand('20 FOR I = 2 TO 8 STEP 2')
-    result = commands.executeCommand('30 LET A = A * 10 + I')
-    result = commands.executeCommand('40 NEXT')
-    result = runtime.run('RUN')
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['A'], 2468)
-
-#  test for/next with negative step
-
-  def testRunForNext3 (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 LET A = 0')
-    result = commands.executeCommand('20 FOR I = 5 TO 1 STEP -1')
-    result = commands.executeCommand('30 LET A = A * 10 + I')
-    result = commands.executeCommand('40 NEXT')
-    result = runtime.run('RUN')
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['A'], 54321)
-
-#  test nested for/next
-
-  def testRunForNext4 (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 LET N = 0')
-    result = commands.executeCommand('20 FOR I = 1 to 2')
-    result = commands.executeCommand('30 FOR J = 1 To 5')
-    result = commands.executeCommand('40 Let N = N + (I * j)')
-    result = commands.executeCommand('50 NEXT')
-    result = commands.executeCommand('60 NEXT')
-    result = runtime.run('RUN')
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['N'], 45)
-
-# test missing for
-
-  def testRunForNextBad (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 LET N = 0')
-    #result = commands.executeCommand('20 FOR I = 1 To 5')
-    result = commands.executeCommand('30 Let N = N + 1')
-    result = commands.executeCommand('40 NEXT')
-    result = runtime.run('RUN')
-    self.assertEqual(result, 'For-next error')
-
-# test bad for expression
-
-  def testRunForNextBad2 (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 LET N = 0')
-    result = commands.executeCommand('20 FOR I = 1 To 3 STEP 0')
-    result = commands.executeCommand('30 Let N = N + 1')
-    result = commands.executeCommand('40 NEXT')
-    result = runtime.run('RUN')
-    self.assertEqual(result, '20 FOR I = 1 TO 3 STEP 0\nBad value')
-
-# missing next
-
-  def testRunForNextBad3 (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 LET N = 0')
-    result = commands.executeCommand('20 FOR I = 1 To 5')
-    result = commands.executeCommand('30 Let N = N + 1')
-    result = runtime.run('RUN')
-    self.assertEqual(result, 'For-next error')
-
-#  when starting value exceeds max, skip the loop
-
-  def testRunForNextIndexOutOfRange (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 LET N = 0')
-    result = commands.executeCommand('15 LET X = 10')
-    result = commands.executeCommand('20 FOR I = X To 5')
-    result = commands.executeCommand('30 Let N = N + 1')
-    result = commands.executeCommand('40 NEXT')
-    result = runtime.run('RUN')
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['N'], 0) 
-
-#  for/next mismatch
-
-  def testRunForNextMismatch (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 LET N = 0')
-    result = commands.executeCommand('20 FOR I = 1 To 5')
-    result = commands.executeCommand('25 FOR J = 1 To 5')
-    result = commands.executeCommand('30 Let N = N + 1')
-    result = commands.executeCommand('35 IF N > 10 then 50')
-    result = commands.executeCommand('40 NEXT J')
-    result = commands.executeCommand('50 NEXT I')
-    result = runtime.run('RUN')
-    self.assertEqual(result, '50 NEXT I\nCan\'t do that')
+    #  test for/next
     
-
-
-#  test remark
-
-  def testRunDef (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 REM This is a comment')
-    result = runtime.run('RUN')
+  def testRunForNext (self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 LET N = 0')
+    commands.executeCommand('20 FOR I = 1 To 10')    
+    commands.executeCommand('30 LET N = N + I')    
+    commands.executeCommand('40 NEXT')
+    commands.executeCommand('50 LET X = N')
+    scanner.createIndex()
+    result = runtime.run()    
     self.assertEqual(result, 'Done')
-    self.assertEqual(len(data.parseList), 1)
-    item1 = data.parseList[10]
-    self.assertEqual(item1['statement'], 'REM')
-
-# test stop statement
-
-  def testRunStop (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 STOP')
-    result = runtime.run('RUN')
+    self.assertEqual(data.variables['I'], 11)
+    self.assertEqual(data.variables['N'], 55)
+    
+#  test rem and stop/end
+    
+  def testRemark (self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 REM test program')
+    commands.executeCommand('20 REM')
+    commands.executeCommand('30 STOP')
+    commands.executeCommand('40 END')
+    scanner.createIndex()
+    result = runtime.run()    
     self.assertEqual(result, 'Done')
-    self.assertEqual(len(data.parseList), 1)
-    item1 = data.parseList[10]
-    self.assertEqual(item1['statement'], 'STOP')
+    
+#  test gosub
 
-# test end
-
-  def testRunEnd (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 END')
-    result = runtime.run('RUN')
+  def testRunGosub (self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 LET N = 0')
+    commands.executeCommand('20 GOSUB 50')
+    commands.executeCommand('30 STOP')
+    commands.executeCommand('50 LET N = 5')
+    commands.executeCommand('60 RETURN')
+    self.assertEqual(len(data.codeList), 5)
+    result = commands.executeCommand('RUN')
     self.assertEqual(result, 'Done')
-    self.assertEqual(len(data.parseList), 1)
-    item1 = data.parseList[10]
-    self.assertEqual(item1['statement'], 'END')
+    self.assertEqual(data.variables['N'], 5)
+
+#  test call subroutine
+
+  def testRunCall (self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 LET N = 5')
+    commands.executeCommand('20 Call TESTIT (N)')
+    commands.executeCommand('30 STOP')
+    commands.executeCommand('50 SUB TESTIT(X)')
+    commands.executeCommand('60 BREAK')
+    commands.executeCommand('70 EXIT SUB')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Break 70')
+    self.assertEqual(data.variables['X'], 5)
+    result = commands.executeCommand('CONTINUE')
+    self.assertEqual(result, 'Done')
+    self.assertEqual(len(data.variables), 1)
+    self.assertEqual(data.variables['N'], 5)
+
+#  test subroutine call with array
+
+  def testRunCall2 (self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 DIM A(3, 3)')
+    commands.executeCommand('15 A(1, 1) = 11')
+    commands.executeCommand('20 Call TESTIT (A)')
+    commands.executeCommand('30 STOP')
+    commands.executeCommand('50 SUB TESTIT(X)')
+    commands.executeCommand('50 SUB TESTIT(X)')
+    commands.executeCommand('55 Z = X(1, 1)')
+    commands.executeCommand('60 BREAK')
+    commands.executeCommand('70 EXIT SUB')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Break 70')
+    self.assertEqual(len(data.stack), 1)
+    stackItem = data.stack[0]
+    self.assertTrue('mats' in stackItem)
+    self.assertEqual(len(data.variables), 2)
+    self.assertEqual(data.variables['Z'], 11)
+    self.assertEqual(len(data.matrixList), 1)
+    result = commands.executeCommand('CONTINUE')
+    self.assertEqual(result, 'Done')
+    self.assertEqual(len(data.variables), 1)
+    self.assertEqual(len(data.matrixList), 1)
 
 
-#---------------------
-#  test helper functions
-
-# test getstring
 
 
-  def testRunGetString (self):
-    item = {'expr': 'A < B', 'error': 'OK'}
-    expr = runtime.getString(item, 'expr')    
-    self.assertEqual(expr, 'A < B')
-    self.assertEqual(item['error'], 'OK')
-
-#  test get string with missing item
-
-  def testRunGetStringWithError (self):
-    item = {'expr1': 'A < B', 'error': 'OK'}
-    expr = runtime.getString(item, 'expr')    
-    self.assertEqual(expr, 'error')
-    self.assertEqual(item['error'], 'Missing expr')
-
-#  test get line number
-
-  def testRunGetLine (self):
-    item = {'line': '10', 'error': 'OK'}
-    data.parseList = {10: '10 LET A = B'}
-    line = runtime.getLine(item, 'line')
-    self.assertEqual(line, 10)
-    self.assertEqual(item['error'], 'OK')
-
-# get line with missing item
-
-#  test get line number
-
-  def testRunGetLineMissing (self):
-    item = {'line1': '10', 'error': 'OK'}
-    data.parseList = {10: '10 LET A = B'}
-    line = runtime.getLine(item, 'line')
-    self.assertEqual(line, -1)
-    self.assertEqual(item['error'], 'Missing line')
-
-#  test with bad line number
-
-  def testRunGetLineBad (self):
-    item = {'line': '1X', 'error': 'OK'}
-    data.parseList = {10: '10 LET A = B'}
-    line = runtime.getLine(item, 'line')
-    self.assertEqual(line, -1)
-    self.assertEqual(item['error'], 'Bad line number - 1X')
-
-#  test get line with line not in program
-
-  def testRunGetLineMissing2 (self):
-    item = {'line': '20', 'error': 'OK'}
-    data.parseList = {10: '10 LET A = B'}
-    line = runtime.getLine(item, 'line')
-    self.assertEqual(line, 20)
-    self.assertEqual(item['error'], 'Bad line number')
-
-# test get line optional
-
-  def testRunGetLineOptional (self):
-    item = {'line': '10', 'error': 'OK'}
-    data.parseList = {10: '10 LET A = B', 20: '20 LET B = 1'}
-    line = runtime.getLineOptional(item, 'line', 20)
-    self.assertEqual(line, 10)
-    self.assertEqual(item['error'], 'OK')
-
-#  get optional line not in item
-
-  def testRunGetLineOptionalMissing (self):
-    item = {'line1': '10', 'error': 'OK'}
-    data.parseList = {10: '10 LET A = B', 20: '20 LET B = 1'}
-    line = runtime.getLineOptional(item, 'line2', 20)
-    self.assertEqual(line, 20)
-    self.assertEqual(item['error'], 'OK')
-
-#  test randomize
+#  test random numbers
 
   def testRunRandomize (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 RANDOMIZE')
-    result = commands.executeCommand('20 R = RND()')
-    result = runtime.run('RUN')
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['R'] > 0, True)
-
-#  test string join
-
-  def testRunStringCat (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 S$ = "Hello " & "world"')
-    result = runtime.run('RUN')
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['S$'], '"Hello world"')
-#  test initial load of data items
-
-  def testLoadData (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 DATA 1, 2, 3, 4, 5')
-    result = commands.executeCommand('20 DATA red, blue, green')
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 RANDOMIZE')
+    commands.executeCommand('20 LET R = RND(10)')
+    self.assertEqual(len(data.codeList), 2)
     result = commands.executeCommand('RUN')
     self.assertEqual(result, 'Done')
-    self.assertEqual(data.dataList, ['1', '2', '3', '4', '5', 'RED', 'BLUE', 'GREEN'])
-    self.assertEqual(data.dataPointer, 0)
-
-#  test read statement
-
-  def testReadData (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 READ A$, B$, C$')
-    result = commands.executeCommand('20 DATA red, blue, green')
+    r = data.variables['R']
+    self.assertTrue(r >= 0)
+    self.assertTrue(r < 10)
+    
+    #  test matrix operations
+    
+  def testRunMatrix (self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 OPTION BASE 1')
+    commands.executeCommand('20 DIM X(3, 3)')
+    commands.executeCommand('30 N = 1')
+    commands.executeCommand('40 FOR I = 1 TO 3')
+    commands.executeCommand('50 FOR J = 1 TO 3')
+    commands.executeCommand('60 LET X(I, J) = N')    
+    commands.executeCommand('70 N = N + 1')
+    commands.executeCommand('80 NEXT')
+    commands.executeCommand('90 NEXT')
+    self.assertEqual(len(data.codeList), 9)
     result = commands.executeCommand('RUN')
     self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['A$'], '"RED"')
-    self.assertEqual(data.variables['B$'], '"BLUE"')    
-    self.assertEqual(data.variables['C$'], '"GREEN"')    
+    self.assertEqual(data.variables['X'], [1, 2, 3, 4, 5, 6, 7, 8, 9])
+    self.assertEqual(data.variables['X'], [1, 2, 3, 4, 5, 6, 7, 8, 9])
 
-#  test restore statement
-
-  def testRestore (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 READ A')
-    result = commands.executeCommand('20 RESTORE')
-    result = commands.executeCommand('30 READ B')
-    result = commands.executeCommand('40 RESTORE 90')
-    result = commands.executeCommand('60 READ C')
-    result = commands.executeCommand('70 DATA 1')
-    result = commands.executeCommand('80 DATA 2')
-    result = commands.executeCommand('90 DATA 3')        
+#  test variables using reserved words
+    
+  def testRunReserved (self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 LET MIN = 0')
+    commands.executeCommand('20 LET MIN = MIN + 1')
     result = commands.executeCommand('RUN')
-    self.assertEqual(result, 'Done')        
+    self.assertEqual(result, '10 LET MIN = 0\nBad variable')
+
+#  test matrix and function operations from primes.py
+
+  def testRunExpression (self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 OPTION BASE 1')
+    commands.executeCommand('20 DIM PRIMES(10)')
+    commands.executeCommand('30  PRIMES(1) = 2')
+    commands.executeCommand('40 LET N = 5')
+    commands.executeCommand('50 LET R = N - int(N / PRIMES(1)) * PRIMES(1)')    
+    result = commands.executeCommand('RUN')    
+    self.assertEqual(result, 'Done')    
+    self.assertEqual(data.matrixList['PRIMES']['dim'], [10])
+    self.assertEqual(data.variables['PRIMES'], [2, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    self.assertEqual(data.variables['R'], 1)
+
+#  test load data function
+
+  def testLoadData(self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 A = 1')    
+    commands.executeCommand('20 STOP')
+    commands.executeCommand('30  DATA 1, 2, 3, 4')
+    scanner.createIndex()
+    result = runtime.loadData()
+    self.assertEqual(result, 'OK')    
+    self.assertEqual(data.dataList, [1, 2, 3, 4])
+
+#  test break
+
+  def testBreak(self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 A = 1')    
+    commands.executeCommand('20 BREAK')
+    commands.executeCommand('30  B = A + 1')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Break 30')    
     self.assertEqual(data.variables['A'], 1)
-    self.assertEqual(data.variables['B'], 1)
-    self.assertEqual(data.variables['C'], 3)
+    self.assertEqual(len(data.variables), 1)
 
-#  test option base
+#  test break with line number
 
-  def testOption (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 OPTION BASE 1')
+  def testBreakWithLine(self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('5 BREAK 20')
+    commands.executeCommand('10 A = 1')    
+    commands.executeCommand('20 LET B = A + 1')
+    commands.executeCommand('30  C = B + 1')
     result = commands.executeCommand('RUN')
-    self.assertEqual(result, 'Done')        
-    self.assertEqual(data.matrixBase, 1)
+    self.assertEqual(result, 'Break 20')    
+    self.assertEqual(data.variables['A'], 1)
+    self.assertEqual(len(data.variables), 1)
 
-# test dim statement
+#  test continue
 
-  def testDim (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 DIM A(5)')
+  def testContinue(self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 A = 1')    
+    commands.executeCommand('20 BREAK')
+    commands.executeCommand('30  B = A + 1')
+    commands.executeCommand('40  C = B + 1')
     result = commands.executeCommand('RUN')
-    self.assertEqual(result, 'Done')        
-    self.assertEqual(data.matrixBase, 0)
-    self.assertEqual(len(data.matrixList), 1)
-    self.assertEqual(data.matrixList['A'], {'x': 5, 'y': 0, 'z': 0})
-    self.assertEqual(data.variables['A'], [0, 0, 0, 0, 0])
-
-  def testDim2 (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 OPTION BASE 1')    
-    result = commands.executeCommand('20 DIM A(5, 5)')
-    result = commands.executeCommand('RUN')
-    self.assertEqual(result, 'Done')        
-    self.assertEqual(data.matrixBase, 1)
-    self.assertEqual(len(data.matrixList), 1)
-    self.assertEqual(data.matrixList['A'], {'x': 5, 'y': 5, 'z': 0})
-    self.assertEqual(len(data.variables['A']), 25)
-
-  def testDim3 (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 DIM A(5, 5, 5)')
-    result = commands.executeCommand('RUN')
-    self.assertEqual(result, 'Done')        
-    self.assertEqual(data.matrixBase, 0)
-    self.assertEqual(len(data.matrixList), 1)
-    self.assertEqual(data.matrixList['A'], {'x': 5, 'y': 5, 'z': 5})
-    self.assertEqual(len(data.variables['A']), 125)
-
-  def testDim4 (self):
-    result = commands.executeCommand('NEW')    
-    result = commands.executeCommand('10 DIM A(5)')
-    result = commands.executeCommand('20 FOR I = 0 TO 4')
-    result = commands.executeCommand('30 A(I) = I')
-    result = commands.executeCommand('40 NEXT')
-    result = commands.executeCommand('RUN')
-    self.assertEqual(result, 'Done')        
-    self.assertEqual(data.matrixBase, 0)
-    self.assertEqual(len(data.matrixList), 1)
-    self.assertEqual(data.matrixList['A'], {'x': 5, 'y': 0, 'z': 0})
-    self.assertEqual(data.variables['A'], [0, 1, 2, 3, 4])
-
-  def testDim5 (self):
-    result = commands.executeCommand('NEW')    
-    result = commands.executeCommand('5 OPTION BASE 1')
-    result = commands.executeCommand('10 DIM A(5), B(5)')
-    result = commands.executeCommand('20 FOR I = 1 TO 5')
-    result = commands.executeCommand('30 A(I) = I')
-    result = commands.executeCommand('35 B(I) = I * 2')
-    result = commands.executeCommand('40 NEXT')
-    result = commands.executeCommand('RUN')
-    self.assertEqual(result, 'Done')        
-    self.assertEqual(data.matrixBase, 1)
-    self.assertEqual(len(data.matrixList), 2)
-    self.assertEqual(data.matrixList['A'], {'x': 5, 'y': 0, 'z': 0})
-    self.assertEqual(data.matrixList['B'], {'x': 5, 'y': 0, 'z': 0})
-    self.assertEqual(data.variables['A'], [1, 2, 3, 4, 5])
-    self.assertEqual(data.variables['B'], [2, 4, 6, 8, 10])
-
-  def testDim6 (self):
-    result = commands.executeCommand('NEW')    
-    result = commands.executeCommand('5 OPTION BASE 1')
-    result = commands.executeCommand('10 DIM A(3, 3)')
-    result = commands.executeCommand('20 FOR I = 1 TO 3')
-    result = commands.executeCommand('25 FOR J = 1 TO 3')
-    result = commands.executeCommand('30 LET A(I, J) = I + J')
-    result = commands.executeCommand('40 NEXT')
-    result = commands.executeCommand('45 NEXT')
-    result = commands.executeCommand('RUN')
-    self.assertEqual(result, 'Done')        
-    self.assertEqual(data.matrixBase, 1)
-    self.assertEqual(len(data.matrixList), 1)
-    self.assertEqual(data.matrixList['A'], {'x': 3, 'y': 3, 'z': 0})
-    self.assertEqual(data.variables['A'], [2, 3, 4, 3, 4, 5, 4, 5, 6])
-
-
-#  test option base after dim
-
-  def testOption2 (self):
-    result = commands.executeCommand('NEW')
-    result = commands.executeCommand('10 DIM A(5, 5, 5)')
-    result = commands.executeCommand('20 OPTION BASE 1')
-    result = commands.executeCommand('RUN')
-    self.assertEqual(result, '20 OPTION BASE 1\nOption must be before dim')
-
-#  test array values within expressions
-
-  def testArrayExpression (self):
-    result = commands.executeCommand('NEW')    
-    result = commands.executeCommand('10 DIM A(5)')
-    result = commands.executeCommand('20 FOR I = 0 To 4')
-    result = commands.executeCommand('30 LET A(I) = I + 1')
-    result = commands.executeCommand('40 NEXT')
-    result = commands.executeCommand('50 B = A(3)')
-    result = commands.executeCommand('RUN')
-    self.assertEqual(result, 'Done')        
-    self.assertEqual(data.variables['A'], [1, 2, 3, 4, 5])
-    self.assertEqual(data.variables['B'], 4)
-
-#  test on goto
-
-
-  def testOnGoto (self):
-    result = commands.executeCommand('NEW')    
-    result = commands.executeCommand('10 A = 2')
-    result = commands.executeCommand('15 N = 0')
-    result = commands.executeCommand('20 ON A GOTO 30, 40, 50')
-    result = commands.executeCommand('30 N = N + 1')
-    result = commands.executeCommand('40 N = N + 2')
-    result = commands.executeCommand('50 N = N + 3') 
-    result = commands.executeCommand('RUN')
-    self.assertEqual(result, 'Done')        
-    self.assertEqual(data.variables['N'], 5)
-
-  def testOnGotoBadIndex (self):
-    result = commands.executeCommand('NEW')    
-    result = commands.executeCommand('10 A = 20')
-    result = commands.executeCommand('15 N = 0')
-    result = commands.executeCommand('20 ON A GOTO 30, 40, 50')
-    result = commands.executeCommand('30 N = N + 1')
-    result = commands.executeCommand('40 N = N + 2')
-    result = commands.executeCommand('50 N = N + 3') 
-    result = commands.executeCommand('RUN')
-    self.assertEqual(result, '20 ON A GOTO 30, 40, 50\nBad value')
-
-  def testOnGotoBadLine (self):
-    result = commands.executeCommand('NEW')    
-    result = commands.executeCommand('10 A = 2')
-    result = commands.executeCommand('15 N = 0')
-    result = commands.executeCommand('20 ON A GOTO 30, 400, 50')
-    result = commands.executeCommand('30 N = N + 1')
-    result = commands.executeCommand('40 N = N + 2')
-    result = commands.executeCommand('50 N = N + 3') 
-    result = commands.executeCommand('RUN')
-    self.assertEqual(result, '20 ON A GOTO 30, 400, 50\nBad line number - 400')
-
-#  test on gosub
-
-  def testOnGosub (self):
-    result = commands.executeCommand('NEW')    
-    result = commands.executeCommand('10 A = 2')
-    result = commands.executeCommand('15 N = 0')
-    result = commands.executeCommand('20 ON A GOSUB 30, 40, 50')
-    result = commands.executeCommand('25 STOP')
-    result = commands.executeCommand('30 N = 5')
-    result = commands.executeCommand('35 RETURN')
-    result = commands.executeCommand('40 N = 10')
-    result = commands.executeCommand('45 RETURN')
-    result = commands.executeCommand('50 N = 25')
-    result = commands.executeCommand('55 RETURN')
-    result = commands.executeCommand('RUN')
-    self.assertEqual(result, 'Done')        
-    self.assertEqual(data.variables['N'], 10)
-
-  def testOnGosubBadIndex (self):
-    result = commands.executeCommand('NEW')    
-    result = commands.executeCommand('10 A = 20')
-    result = commands.executeCommand('15 N = 0')
-    result = commands.executeCommand('20 ON A GOSUB 30, 40, 50')
-    result = commands.executeCommand('25 STOP')
-    result = commands.executeCommand('30 N = 5')
-    result = commands.executeCommand('35 RETURN')
-    result = commands.executeCommand('40 N = 10')
-    result = commands.executeCommand('45 RETURN')
-    result = commands.executeCommand('50 N = 25')
-    result = commands.executeCommand('55 RETURN')
-    result = commands.executeCommand('RUN')
-    self.assertEqual(result, '20 ON A GOSUB 30, 40, 50\nBad index')
-
-  def testOnGosubBadLine (self):
-    result = commands.executeCommand('NEW')    
-    result = commands.executeCommand('10 A = 2')
-    result = commands.executeCommand('15 N = 0')
-    result = commands.executeCommand('20 ON A GOSUB 30, 41, 50')
-    result = commands.executeCommand('25 STOP')
-    result = commands.executeCommand('30 N = 5')
-    result = commands.executeCommand('35 RETURN')
-    result = commands.executeCommand('40 N = 10')
-    result = commands.executeCommand('45 RETURN')
-    result = commands.executeCommand('50 N = 25')
-    result = commands.executeCommand('55 RETURN')
-    result = commands.executeCommand('RUN')
-    self.assertEqual(result, '20 ON A GOSUB 30, 41, 50\nBad line number - 41')
-
-#  test break, unbreak
-
-  def testBreakpoint (self):
-    result = commands.executeCommand('NEW')    
-    result = commands.executeCommand('10 BREAK 40')
-    result = commands.executeCommand('20 N = 0')
-    result = commands.executeCommand('30 FOR I = 1 to 5')
-    result = commands.executeCommand('40 N = N + 1')
-    result = commands.executeCommand('60 NEXT')
-    result = commands.executeCommand('70 REM PRINT N')
-    result = commands.executeCommand('RUN')
-    self.assertEqual(result, 'Breakpoint at 40\n40 N = N + 1')
-    self.assertEqual(data.variables['N'], 0)
+    self.assertEqual(result, 'Break 30')    
+    self.assertEqual(data.variables['A'], 1)
+    self.assertEqual(len(data.variables), 1)
+    self.assertEqual(data.address, 30)
     result = commands.executeCommand('CONTINUE')
     self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['N'], 5)
-    
-  def testBreakpoint2 (self):
-    result = commands.executeCommand('NEW')    
-    result = commands.executeCommand('BREAK 40')
-    self.assertEqual(result, 'Bad line number - 40')
-    result = commands.executeCommand('20 N = 0')
-    result = commands.executeCommand('30 FOR I = 1 to 5')
-    result = commands.executeCommand('40 N = N + 1')
-    result = commands.executeCommand('60 NEXT')
-    result = commands.executeCommand('70 REM PRINT N')
-    result = commands.executeCommand('BREAK 40')
-    self.assertEqual(result, 'OK')
+    self.assertEqual(len(data.variables), 3)
+    self.assertEqual(data.variables['C'], 3)
+
+#  test break using line number
+
+  def testBreakContinue(self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 BREAK 30')
+    commands.executeCommand('20 A = 1')
+    commands.executeCommand('30  B = A + 1')
+    commands.executeCommand('40  C = B + 1')
     result = commands.executeCommand('RUN')
-    self.assertEqual(result, 'Breakpoint at 40\n40 N = N + 1')
-    self.assertEqual(data.variables['N'], 0)
+    self.assertEqual(result, 'Break 30')    
+    self.assertEqual(data.variables['A'], 1)
+    self.assertEqual(len(data.variables), 1)
+    self.assertEqual(data.address, 30)
     result = commands.executeCommand('CONTINUE')
     self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['N'], 5)
-
-#  test basic file open and close
-    
-  def testFileOpenClose (self):
-    commands.executeCommand('NEW')    
-    commands.executeCommand('10 Open #10, "TESTFILE", SEQUENTIAL, INTERNAL, OUTPUT')
-    commands.executeCommand('20 CLOSE #10')
-    result = commands.executeCommand('RUN')    
-    self.assertEqual(result, 'Done')
-    self.assertEqual(helpers.fileExists('TESTFILE.dat'), True)
-
-#  test open/close with delete option
-    
-  def testFileOpenCloseDelete (self):
-    commands.executeCommand('NEW')    
-    commands.executeCommand('10 Open #10, "TESTFILE", SEQUENTIAL, INTERNAL, OUTPUT')
-    commands.executeCommand('20 CLOSE #10: DELETE')
-    result = commands.executeCommand('RUN')    
-    self.assertEqual(result, 'Done')
-    self.assertEqual(helpers.fileExists('TESTFILE.dat'), False)
-
-#  test write file
-    
-  def testFileWrite (self):
-    commands.executeCommand('NEW')    
-    commands.executeCommand('10 Open #10, "TESTFILE", SEQUENTIAL, INTERNAL, OUTPUT')
-    commands.executeCommand('20 PRINT #10: 1, 2, "ABC"')
-    commands.executeCommand('30 CLOSE #10')
-    commands.executeCommand('40 Open #15, "TESTFILE", SEQUENTIAL, INTERNAL, INPUT')    
-    commands.executeCommand('50 INPUT #15: A, B, C$')
-    commands.executeCommand('60 CLOSE #15: DELETE')
-    result = commands.executeCommand('RUN')    
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['A'], 1)
-    self.assertEqual(data.variables['B'], 2)
-    self.assertEqual(data.variables['C$'], '"ABC"')
-
-#  test eof function
-    
-  def testFileEOF (self):
-    commands.executeCommand('NEW')    
-    commands.executeCommand('10 Open #10, "TESTFILE", SEQUENTIAL, INTERNAL, OUTPUT')
-    commands.executeCommand('20 FOR I = 1 to 5')
-    commands.executeCommand('30 PRINT #10: I')
-    commands.executeCommand('40 NEXT')    
-    commands.executeCommand('50 CLOSE #10')
-    commands.executeCommand('60 Open #15, "TESTFILE", SEQUENTIAL, INTERNAL, INPUT')    
-    commands.executeCommand('70 SUM = 0')
-    commands.executeCommand('80 IF EOF(15) <> 0 THEN 120')
-    commands.executeCommand('90 INPUT #15: J')
-    commands.executeCommand('100 SUM = SUM + J')
-    commands.executeCommand('110 GO TO 80')     
-    commands.executeCommand('120 CLOSE #15: DELETE')
-    result = commands.executeCommand('RUN')    
-    self.assertEqual(result, 'Done')
-    self.assertEqual(helpers.fileExists('TESTFILE.dat'), True)
-    self.assertEqual(data.variables['SUM'], 15)
-
-#  test out of data
-    
-  def testFileEOF (self):
-    commands.executeCommand('NEW')    
-    commands.executeCommand('10 Open #10, "TESTFILE", SEQUENTIAL, INTERNAL, OUTPUT')
-    commands.executeCommand('20 FOR I = 1 to 5')
-    commands.executeCommand('30 PRINT #10: I')
-    commands.executeCommand('40 NEXT')    
-    commands.executeCommand('50 CLOSE #10')
-    commands.executeCommand('60 Open #15, "TESTFILE", SEQUENTIAL, INTERNAL, INPUT')    
-    commands.executeCommand('70 SUM = 0')    
-    commands.executeCommand('90 INPUT #15: J')
-    commands.executeCommand('100 SUM = SUM + J')
-    commands.executeCommand('110 GO TO 90')     
-    commands.executeCommand('120 CLOSE #15: DELETE')    
-    result = commands.executeCommand('RUN')    
-    self.assertEqual(result, '90 INPUT #15: J\nOut of data')
-
-#  test partial read
-    
-  def testFileReadOPartial (self):
-    commands.executeCommand('NEW')    
-    commands.executeCommand('10 Open #10, "TESTFILE", SEQUENTIAL, INTERNAL, OUTPUT')
-    commands.executeCommand('20 PRINT #10: 1, 2, 3, 4')
-    commands.executeCommand('30 CLOSE #10')
-    commands.executeCommand('40 Open #15, "TESTFILE", SEQUENTIAL, INTERNAL, INPUT')    
-    commands.executeCommand('50 INPUT #15: A, B, C')
-    commands.executeCommand('60 CLOSE #15: DELETE')    
-    result = commands.executeCommand('RUN')    
-    self.assertEqual(result, 'Done')
-    self.assertEqual(data.variables['A'], 1)
-    self.assertEqual(data.variables['B'], 2)
+    self.assertEqual(len(data.variables), 3)
     self.assertEqual(data.variables['C'], 3)
-    
-#  read with too little data
-    
-  def testFileReadOPartial (self):
-    commands.executeCommand('NEW')    
-    commands.executeCommand('10 Open #10, "TESTFILE", SEQUENTIAL, INTERNAL, OUTPUT')
-    commands.executeCommand('20 PRINT #10: 1, 2, 3')
-    commands.executeCommand('30 CLOSE #10')
-    commands.executeCommand('40 Open #15, "TESTFILE", SEQUENTIAL, INTERNAL, INPUT')    
-    commands.executeCommand('50 INPUT #15: A, B, C, D')
-    commands.executeCommand('60 CLOSE #15: DELETE')    
-    result = commands.executeCommand('RUN')    
-    self.assertEqual(result, '50 INPUT #15: A, B, C, D\nBad values')
 
-#  test def statement
-    
-  def testDef (self):
-    commands.executeCommand('NEW')    
-    commands.executeCommand('10 DEF SQUARE(N) = N * N')
-    result = commands.executeCommand('RUN')    
-    self.assertEqual(result, 'Done')
-    self.assertEqual(len(data.userFunctionList), 1)
-    item = data.userFunctionList['SQUARE']
-    self.assertEqual(item['arg'], 'N')
-    self.assertEqual(item['expr'], 'N * N')
+#  test user defined functions
 
-    #  test user defined function
-        
-  def testUserFunction (self):
-    commands.executeCommand('NEW')    
-    commands.executeCommand('10 DEF SQUARE(N) = N * N')
-    commands.executeCommand('20 A = SQUARE(2 + 3) * 2')
-    result = commands.executeCommand('RUN')    
-    self.assertEqual(result, 'Done')
-    self.assertEqual(len(data.variables), 1)
-    self.assertEqual(data.variables['A'], 50)
-    
-#  test nested user functions
+  def testUserFunction(self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 DEF SQK(X) = X * X')
+    commands.executeCommand('20 A = SQK(5)')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Done')    
+    self.assertEqual(data.variables['A'], 25)
 
-  def testNestedUserFunction (self):
-    commands.executeCommand('NEW')    
-    commands.executeCommand('10 DEF SQUARE(N) = N * N')
-    commands.executeCommand('20 DEF INCR (N) = N + 1')    
-    commands.executeCommand('30 A = SQUARE(INCR(2))') 
-    result = commands.executeCommand('RUN')    
-    self.assertEqual(result, 'Done')
-    self.assertEqual(len(data.variables), 1)
-    self.assertEqual(data.variables['A'], 9)
+#  test user defined function with no argument
 
-#  test bad user function name
+  def testUserFunction2(self):
+    commands.executeCommand('NEW')
+    commands.executeCommand('10 DEF PI4() = 3.1416')
+    commands.executeCommand('20 P = PI4()')
+    result = commands.executeCommand('RUN')
+    self.assertEqual(result, 'Done')    
+    self.assertEqual(data.variables['P'], 3.1416)
 
-  def testBadUserFunction (self):
-    commands.executeCommand('NEW')    
-    commands.executeCommand('10 DEF SQR(N) = N * N')
-    result = commands.executeCommand('RUN')    
-    self.assertEqual(result, 'Bad function name')
-    
 
-    
+
 if __name__ == '__main__':  
     unittest.main()
     

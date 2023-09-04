@@ -1,0 +1,154 @@
+Checklist
+
+Features:
+
+Multiple statements on same line
+*Can run any statement from console
+*Run command can load and execute another file
+*Arrays can have up to 7 dimensions
+
+Commands
+
+*BREAK
+*BYE
+*CLEAR
+*CONTINUE
+*Data
+*DELETE
+*FILES
+*INPUT
+*LIST
+*MERGE
+*NEW
+*NUM
+*OLD
+*QUIT
+*READ
+*RESEQUENCE
+*RESTORE
+*RUN
+*PRINT
+*SAVE
+SIZE
+*TRACE
+*UNBREAK
+*UNTRACE
+*VERSION
+
+
+Statements
+*BREAK
+*CALL
+CLOSE
+*DATA
+*DEF
+*DIM
+*END
+*END SUB
+*EXIT SUB
+*FOR
+*GOSUB
+*GOTO
+*IF-THEN-ELSE
+*INPUT
+INPUT (files)
+*LET
+*LINPUT
+*NEXT
+ON BREAK
+ON ERROR
+*ON GOSUB
+*ON GOTO
+ON WARRNING
+OPEN
+*OPTION BASE
+*PRINT
+PRINT USING
+*RANDOMIZE
+*READ
+*REM
+*RESTORE
+*RETURN
+RETURN (on error)
+*RUN
+*STOP
+*SUB
+*TRACE
+*UNBREAK
+*UNTRACE
+
+Functions
+*ABS
+*ASC
+*ATN
+*CHR$
+*COS
+*EOF
+ERROR
+*EXP
+*INT
+KEY
+*LEN
+*LOG
+*MAX
+*MIN
+*PI
+*POS
+REC
+*RND
+*RPT$
+*SEG$
+*SGN
+*SIN
+*SQR
+*STR$
+*TAB
+*TAN
+*VAL
+
+Sound functions
+JOYST
+SAY
+SOUND
+
+Graphics statements
+DELSPRITE
+DISTANCE
+IMAGE
+LOCATE
+MAGNIFY
+MOTION
+PATTERN
+PEEK
+POSITION
+SCREEN
+SPRITE
+
+Graphics functions
+
+CHAR
+CHARPAT
+CHARSET
+COINC
+COLOR
+DISTANCE
+GCHAR
+HCHAR
+SIZE
+SPGET
+VCHAR
+
+Forms
+ACCEPT
+DISPLAY
+DISPLAY USING
+
+Assembly
+INIT
+LOAD
+LINK
+
+Features not implemented:
+Graphics
+Forms
+assembly

@@ -1,27 +1,16 @@
-#  TI 99/4A BASIC
-#  By Rick Leander
-#  Copyright (c) 2023 by Rick Leander - all rights reserved
-#
 # expressions.py - parse and evaluate an expressions
-#
-#  Entry point:
-#
-#  [value, error] = expressions.evaluate(expr)
-#
 
 import data
-import helpers
+import language
 import functions
 import matrix
+import scanner
+
 
 #  parse  an expression and return the result
 
-def evaluate (expr):
-  [parts, msg] = splitLine(expr)
-  if msg != 'OK':
-    return [0, msg]
-
-  [tree, msg] = buildTree(parts)
+def evaluate (tokens):
+  [tree, msg] = buildTree(tokens)
   if msg != 'OK':
     return [0, msg]
 
@@ -30,57 +19,6 @@ def evaluate (expr):
     return [0, msg]
 
   return [value, 'OK']
-
-
-# split the expression into its parts
-#  note: need to refactor for readability
-
-def splitLine(expr):
-  symbols = ['+', '-', '*', '/', '^', '(', ')', '&', ',']
-  parts = []
-  item = ''
-  inString = False
-
-  for char in expr:
-    if inString:
-      if char == '"':
-        inString = False
-        item = item + char
-        parts.append(item)
-        item = ''
-      else:
-        item = item + char
-
-    elif char == '"':
-      if item != '':
-        parts.append (item)
-      item = char
-      inString = True
-
-    elif char in symbols:
-      if item == '':
-        parts.append (char)
-      else:
-        parts.append(item)
-        parts.append(char)
-      item = ''
-
-    elif char == ' ':
-      if item != '':
-        parts.append(item)
-        item = ''
-
-    else:
-      item = item + char
-
-  if item != '':
-    parts.append(item)
-
-  if inString :
-    return [parts, 'Missing quote']
-
-  return [parts, 'OK']
-
 
 #  build the tree structure from the parts
 #  note: needs refactoring
@@ -105,7 +43,7 @@ def buildTree(parts):
  #  copy parts to branch
 
   for item in parts:
-    if item in data.functionNames or item in data.userFunctionList:
+    if item in language.functionNames or item in data.userFunctionList:
       idNum = tree['end'] + 1
       tree['end'] = idNum
       branch['parts'].append('~' + str(idNum))
@@ -238,7 +176,7 @@ def setVariables(parts, tree):
       branch = tree[index]
       newParts.append(branch['value'])
 
-    elif item in data.matrixList:
+    elif item in data.matrixList or item in language.functionNames:
       newParts.append (item)
 
     elif item in data.variables:
@@ -247,13 +185,13 @@ def setVariables(parts, tree):
     elif item in data.userFunctionList:
       newParts.append(item)
 
-    elif helpers.isnumeric(item) and item != '-':
+    elif scanner.isnumeric(item) and item != '-':
       newParts.append (float(item))
 
     elif item[0] == '"':
       newParts.append(item)
 
-    elif helpers.isValidVariable(item):
+    elif scanner.isValidVariable(item):
       if item[len(item) - 1] == '$':
         data.variables[item] = ""
         newParts.append("")
@@ -331,7 +269,10 @@ def calculateUserFunction(branch):
   functionData = data.userFunctionList[functionName]
   argName = functionData['arg']
   expr = functionData['expr']
-  expr = expr.replace(argName, str(argValue))
+  for i  in range (0, len(expr)):
+    if expr[i] == argName:
+      expr[i] = str(argValue)
+
   [value, msg] = evaluate(expr)
   if msg != 'OK':
     return [branch, msg]
@@ -390,6 +331,8 @@ def calcParts(parts, op):
       lastItem = parts[i - 1]
       nextItem = parts[i + 1]
 
+      if lastItem in language.operators or nextItem in language.operators:
+        return [parts, 'Bad expression']
 
       newItem = 0
       if op == '^':
@@ -397,20 +340,20 @@ def calcParts(parts, op):
 
       if op == '/':
         if nextItem == 0.0:
-          return [parts, 'Bad expression']
+          return [parts, 'Bad expression - divide by zero']
         newItem = lastItem / nextItem
 
       if op == '*':
-        if type(lastItem) == float and type(nextItem) == float:
-          newItem = lastItem * nextItem
         if type(lastItem) == bool and type(nextItem) == bool:
           newItem = lastItem and nextItem
+        else:
+          newItem = lastItem * nextItem
 
       if op == '+':
-        if type(lastItem) == float and type(nextItem) == float:
-          newItem = lastItem + nextItem
         if type(lastItem) == bool and type (nextItem) == bool:
           newItem = lastItem or nextItem
+        else:
+          newItem = lastItem + nextItem
 
       if op == '-':
         newItem = lastItem - nextItem
@@ -448,6 +391,7 @@ def joinStrings(parts):
   return [parts, 'OK']
 
   # comparisons
+  #  may want to refactor
 
 def compareParts(parts):
   if len(parts) < 3:
@@ -459,6 +403,18 @@ def compareParts(parts):
     if item in ['=', '<', '>', '<=', '>=', '<>']:
       prevItem = parts[i - 1]
       nextItem = parts[i + 1]
+
+      if type(prevItem) == int:
+        prevItem = float(prevItem)
+
+      if type (prevItem) == str:
+        prevItem = scanner.stripQuotes(prevItem)
+
+      if type(nextItem) == int:
+        nextItem = float(nextItem)
+
+      if type (nextItem) == str:
+        nextItem = scanner.stripQuotes(nextItem)
 
       if type(prevItem) != type(nextItem):
         return [parts, 'Bad expression']

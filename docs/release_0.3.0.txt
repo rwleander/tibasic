@@ -1,0 +1,38 @@
+Release Notes for Version 0.3.0
+
+September, 2023
+
+This is the third beta release of the TI 99/4A Basic interpreter.
+It runs using MicroPython 1.19.4 on the Raspberry Pico microprocessor.
+It also runs on Windows using Python version 3.10.6.
+
+This release implements many of the TI Extended Basic features
+and much of the code was rewritten to minimize memory usage and speed execution on the RP2040.
+
+Major differences between this interpreter and the original TI 99/4A Extended Basic:
+1. Does not support TI function keys,
+2.  Does not support TI graphics functions or colors,
+3. Does not yet support sound functions,
+4. No cassette interface,
+5. Only one statement per line,
+6. Disk file operations not yet supported.
+
+
+Installation:
+1. set up your Raspberry Pico or other RP2040 board with the latest version of MicroPython (see https://www.digikey.com/en/blog/quick-guide-to-rapid-prototyping-using-micropython).
+2. Install a serial program such as Terra Term for Windows.
+3. Connect the Pico to your computer using the USB cable then start Terra Term to determine which comm port to use.
+4. Change the com port in file upload.bat to match your serial connection. 
+5. Run upload.bat from a Windows console to upload the files.
+6. Connect your terminal program to the Pico and press <Control> and <c> to start the interpreter.
+
+Entering TI Basic code:
+1. type NUMBER then enter your code. Each time you press the <Enter> key, the next line number will appear.
+2. Press <Enter> to stop the auto-number feature.
+3. Enter LIST to list your program.
+4. Enter RUN to run your program.
+
+To edit a line of code, retype the entier line.
+
+Use the RESEQUENCE command to renumber the entire program. 
+
